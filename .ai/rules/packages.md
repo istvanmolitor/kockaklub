@@ -13,3 +13,6 @@ A packages/ mappa tartalma NINCS commitolva a kockaklub repóba (.gitignore: "/p
 A "shop" csomag jelenleg NINCS require-elve, mert az istvanmolitor/stock függőségét ez a projekt nem tartalmazza (találtunk egy stock mappát egy másik projektben: /home/molitor/work/molitor/packages/stock, de ide nem lett átmásolva).
 
 A packages/contact composer.json-jában a "laravel/framework" constraint bővítve lett "^11.0|^12.0|^13.0"-ra, hogy kompatibilis legyen ezzel a Laravel 13-as projekttel (ez a contact csomag saját git repójában külön commitolandó/pusholandó, mivel az egy önálló repo).
+
+## stock és shop csomag mostantól require-elve van
+Frissítés: az istvanmolitor/stock csomag bekerült a packages/ mappába, így az istvanmolitor/shop és istvanmolitor/stock is require-elve van a gyökér composer.json-ban (*@dev). A korábbi megjegyzés, miszerint a shop ki van hagyva a hiányzó stock miatt, már nem érvényes.
