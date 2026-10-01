@@ -41,8 +41,8 @@ class Region extends Model
         return $this->hasMany(StockMovement::class, 'destination_region_id');
     }
 
-    public function regionProductStocks(): HasMany
+    public function productSettings(): HasMany
     {
-        return $this->hasMany(RegionProductStock::class);
+        return $this->hasMany(RegionProductSetting::class);
     }
 }

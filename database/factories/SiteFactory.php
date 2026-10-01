@@ -22,6 +22,7 @@ class SiteFactory extends Factory
             'zip' => fake()->postcode(),
             'address' => fake()->streetAddress(),
             'is_active' => true,
+            'is_main' => false,
         ];
     }
 }

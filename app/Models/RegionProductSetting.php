@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
-use Database\Factories\RegionProductStockFactory;
+use Database\Factories\RegionProductSettingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class RegionProductStock extends Model
+class RegionProductSetting extends Model
 {
-    /** @use HasFactory<RegionProductStockFactory> */
+    /** @use HasFactory<RegionProductSettingFactory> */
     use HasFactory;
 
     protected $fillable = [
         'region_id',
         'product_id',
-        'quantity',
         'min_stock',
         'max_stock',
     ];
@@ -23,7 +22,6 @@ class RegionProductStock extends Model
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
             'min_stock' => 'integer',
             'max_stock' => 'integer',
         ];

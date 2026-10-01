@@ -10,6 +10,7 @@ use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Models\Site;
 use App\Repositories\CustomerRepository;
 use App\Repositories\ShippingMethodRepository;
 use App\Services\CartService;
@@ -47,6 +48,10 @@ class CheckoutController extends Controller
             return redirect()->route('cart.show')->with('status', 'Jelenleg nem érhető el szállítási mód.');
         }
 
+        if (! Site::main()) {
+            return redirect()->route('cart.show')->with('status', 'Jelenleg nem fogadható rendelés.');
+        }
+
         return view('storefront.checkout.create', [
             'cart' => $cart,
             'customer' => $customer,
@@ -63,6 +68,12 @@ class CheckoutController extends Controller
 
         if ($cart->items->isEmpty()) {
             return redirect()->route('cart.show')->with('status', 'A kosarad üres.');
+        }
+
+        $mainSite = Site::main();
+
+        if (! $mainSite) {
+            return redirect()->route('cart.show')->with('status', 'Jelenleg nem fogadható rendelés.');
         }
 
         if ($request->user()) {
@@ -93,7 +104,7 @@ class CheckoutController extends Controller
             ];
 
         try {
-            $order = DB::transaction(function () use ($cart, $customer, $validated, $billing, $shippingMethod, $paymentMethod) {
+            $order = DB::transaction(function () use ($cart, $customer, $validated, $billing, $shippingMethod, $paymentMethod, $mainSite) {
                 $subtotal = 0;
                 $lineData = [];
 
@@ -119,6 +130,7 @@ class CheckoutController extends Controller
                 }
 
                 $order = Order::create([
+                    'site_id' => $mainSite->id,
                     'customer_id' => $customer->id,
                     'order_status_id' => OrderStatus::default()->id,
                     'order_number' => Order::generateOrderNumber(),

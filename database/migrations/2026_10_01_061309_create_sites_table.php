@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('zip')->nullable();
             $table->string('address')->nullable();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_main')->default(false);
             $table->timestamps();
         });
     }

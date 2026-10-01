@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\ShippingMethod;
+use App\Models\Site;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,6 +27,7 @@ class OrderFactory extends Factory
         $paymentCost = fake()->numberBetween(0, 1500);
 
         return [
+            'site_id' => Site::factory(),
             'customer_id' => Customer::factory(),
             'order_status_id' => OrderStatus::factory(),
             'order_number' => 'ORD-'.now()->format('Ymd').'-'.fake()->unique()->numerify('####'),

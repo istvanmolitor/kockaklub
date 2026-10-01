@@ -5,10 +5,12 @@ use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Models\Site;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
+    Site::factory()->create(['is_main' => true]);
     OrderStatus::factory()->create(['slug' => 'pending', 'is_default' => true]);
 
     $this->shippingMethod = ShippingMethod::factory()->create(['is_active' => true]);

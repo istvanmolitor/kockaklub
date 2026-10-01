@@ -9,15 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('region_product_stocks', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('region_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->restrictOnDelete();
             $table->integer('quantity')->default(0);
-            $table->unsignedInteger('min_stock')->nullable();
-            $table->unsignedInteger('max_stock')->nullable();
-            $table->timestamps();
 
-            $table->unique(['region_id', 'product_id']);
+            $table->primary(['region_id', 'product_id']);
         });
     }
 

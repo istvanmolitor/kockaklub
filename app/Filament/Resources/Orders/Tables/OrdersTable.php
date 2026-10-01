@@ -29,6 +29,9 @@ class OrdersTable
                 TextColumn::make('customer.name')
                     ->label('Vásárló')
                     ->searchable(),
+                TextColumn::make('site.name')
+                    ->label('Telephely')
+                    ->searchable(),
                 TextColumn::make('total')
                     ->label('Összeg')
                     ->money('HUF', decimalPlaces: 0)
@@ -54,6 +57,10 @@ class OrdersTable
                 SelectFilter::make('customer_id')
                     ->label('Vásárló')
                     ->relationship('customer', 'name')
+                    ->searchable(),
+                SelectFilter::make('site_id')
+                    ->label('Telephely')
+                    ->relationship('site', 'name')
                     ->searchable(),
                 Filter::make('created_at')
                     ->schema([

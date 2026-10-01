@@ -18,6 +18,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'site_id',
         'customer_id',
         'order_status_id',
         'order_number',
@@ -53,6 +54,11 @@ class Order extends Model
             'total' => 'integer',
             'invoiced_at' => 'datetime',
         ];
+    }
+
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(Site::class);
     }
 
     public function customer(): BelongsTo

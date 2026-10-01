@@ -32,6 +32,11 @@ class SiteForm
                     ->label('Aktív')
                     ->default(true)
                     ->required(),
+                Toggle::make('is_main')
+                    ->label('Fő telephely')
+                    ->helperText('Az új megrendelések mindig a fő telephelyre érkeznek be. Egyszerre csak egy telephely lehet fő telephely.')
+                    ->default(false)
+                    ->required(),
             ]);
     }
 }

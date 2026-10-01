@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Repositories\StockRepository;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class StockService
@@ -33,11 +32,9 @@ class StockService
     }
 
     /**
-     * Recomputes the `quantity` column of every region_product_stocks row from the
-     * stock movement history (incoming minus outgoing per region+product), without
-     * touching the admin-managed `min_stock`/`max_stock` thresholds. Pairs with no
-     * movement history left are zeroed out rather than deleted, so a configured
-     * threshold survives even if the stock temporarily disappears.
+     * Recomputes the entire region_product_stocks snapshot from the stock movement
+     * history (incoming minus outgoing per region+product). The table is a pure
+     * cache, so it is wiped and reinserted wholesale on every rebuild.
      */
     public function rebuildRegionProductStocks(): void
     {
@@ -51,19 +48,15 @@ class StockService
             $totals[$row->region_id][$row->product_id] = ($totals[$row->region_id][$row->product_id] ?? 0) - (int) $row->quantity;
         }
 
-        DB::transaction(function () use ($totals) {
-            $touchedIds = [];
+        $rows = [];
 
-            foreach ($totals as $regionId => $products) {
-                foreach ($products as $productId => $quantity) {
-                    $stock = $this->stock->upsertRegionProductStockQuantity($regionId, $productId, $quantity);
-
-                    $touchedIds[] = $stock->id;
-                }
+        foreach ($totals as $regionId => $products) {
+            foreach ($products as $productId => $quantity) {
+                $rows[] = ['region_id' => $regionId, 'product_id' => $productId, 'quantity' => $quantity];
             }
+        }
 
-            $this->stock->zeroOutStocksExcept($touchedIds);
-        });
+        $this->stock->replaceRegionProductStocks($rows);
     }
 
     /**

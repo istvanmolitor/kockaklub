@@ -6,11 +6,13 @@ use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Models\Site;
 use Illuminate\Support\Facades\Mail;
 
 it('assigns the default order status to a newly created order', function () {
     Mail::fake();
 
+    Site::factory()->create(['is_main' => true]);
     OrderStatus::factory()->create(['slug' => 'processing', 'is_default' => false]);
     $pending = OrderStatus::factory()->create(['slug' => 'pending', 'is_default' => true]);
 

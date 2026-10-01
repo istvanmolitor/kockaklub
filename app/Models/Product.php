@@ -105,9 +105,9 @@ class Product extends Model
         return $this->hasMany(StockMovementItem::class);
     }
 
-    public function regionStocks(): HasMany
+    public function regionSettings(): HasMany
     {
-        return $this->hasMany(RegionProductStock::class);
+        return $this->hasMany(RegionProductSetting::class);
     }
 
     public function interests(): HasMany

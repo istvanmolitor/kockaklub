@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Models\RegionProductStock;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -38,12 +37,24 @@ class StockRepository
     }
 
     /**
+     * The current quantity snapshot for $productId inside $regionId, read
+     * from the region_product_stocks snapshot.
+     */
+    public function quantityFor(int $regionId, int $productId): int
+    {
+        return (int) DB::table('region_product_stocks')
+            ->where('region_id', $regionId)
+            ->where('product_id', $productId)
+            ->value('quantity');
+    }
+
+    /**
      * The aggregated quantity of $productId across every public region,
      * read from the region_product_stocks snapshot.
      */
     public function publicStockForProduct(int $productId): int
     {
-        return (int) RegionProductStock::query()
+        return (int) DB::table('region_product_stocks')
             ->join('regions', 'regions.id', '=', 'region_product_stocks.region_id')
             ->where('region_product_stocks.product_id', $productId)
             ->where('regions.is_public', true)
@@ -102,26 +113,21 @@ class StockRepository
             ]);
     }
 
-    public function upsertRegionProductStockQuantity(int $regionId, int $productId, int $quantity): RegionProductStock
-    {
-        return RegionProductStock::query()->updateOrCreate(
-            ['region_id' => $regionId, 'product_id' => $productId],
-            ['quantity' => $quantity],
-        );
-    }
-
     /**
-     * Zeroes out the quantity of every region_product_stocks row not in
-     * $touchedIds, without deleting the row (so configured min/max thresholds
-     * survive even if the stock temporarily disappears).
+     * Replaces the entire region_product_stocks snapshot with $rows. The table
+     * is a pure cache of the stock movement history, so it is safe to wipe and
+     * reinsert wholesale on every rebuild.
      *
-     * @param  array<int, int>  $touchedIds
+     * @param  array<int, array{region_id: int, product_id: int, quantity: int}>  $rows
      */
-    public function zeroOutStocksExcept(array $touchedIds): void
+    public function replaceRegionProductStocks(array $rows): void
     {
-        RegionProductStock::query()
-            ->whereNotIn('id', $touchedIds ?: [0])
-            ->where('quantity', '!=', 0)
-            ->update(['quantity' => 0]);
+        DB::transaction(function () use ($rows) {
+            DB::table('region_product_stocks')->delete();
+
+            foreach (array_chunk($rows, 500) as $chunk) {
+                DB::table('region_product_stocks')->insert($chunk);
+            }
+        });
     }
 }

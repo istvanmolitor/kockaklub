@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('site_id')->constrained()->restrictOnDelete();
             $table->foreignId('customer_id')->constrained()->restrictOnDelete();
             $table->foreignId('order_status_id')->constrained()->restrictOnDelete();
             $table->foreignId('shipping_method_id')->constrained()->restrictOnDelete();

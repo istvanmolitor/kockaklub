@@ -7,6 +7,7 @@ use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Models\Site;
 use App\Repositories\ProductRepository;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -28,6 +29,13 @@ class OrderForm
                     ->default(fn () => Order::generateOrderNumber())
                     ->disabled()
                     ->dehydrated(),
+                Select::make('site_id')
+                    ->label('Telephely')
+                    ->relationship('site', 'name')
+                    ->default(fn () => Site::main()?->id)
+                    ->searchable()
+                    ->preload()
+                    ->required(),
                 Select::make('customer_id')
                     ->label('Vásárló')
                     ->relationship('customer', 'name')
