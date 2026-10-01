@@ -36,6 +36,9 @@
 
         <div>
             <h1 class="text-2xl font-semibold text-gray-900">{{ $product->name }}</h1>
+            @if ($product->sku)
+                <p class="mt-1 text-sm text-gray-500">Cikkszám: {{ $product->sku }}</p>
+            @endif
             <p class="mt-2 text-2xl font-bold text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Ft</p>
 
             <p class="mt-2 text-sm {{ $publicStock > 0 ? 'text-green-600' : 'text-red-600' }}">
