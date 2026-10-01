@@ -93,6 +93,13 @@
                     A számlázási cím megegyezik a szállítási címmel
                 </label>
 
+                <div>
+                    <label for="billing_tax_number" class="block text-sm font-medium text-gray-700">Adószám (cégeknek, opcionális)</label>
+                    <input id="billing_tax_number" name="billing_tax_number" type="text"
+                           value="{{ old('billing_tax_number', $customer->billing_tax_number ?? '') }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                </div>
+
                 <div id="billing-fields" class="space-y-4 {{ old('billing_same_as_shipping', '1') ? 'hidden' : '' }}">
                     <div>
                         <label for="billing_name" class="block text-sm font-medium text-gray-700">Név</label>

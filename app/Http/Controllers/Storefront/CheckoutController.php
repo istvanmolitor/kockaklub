@@ -119,6 +119,7 @@ class CheckoutController extends Controller
                         'product' => $product,
                         'quantity' => $item->quantity,
                         'unit_price' => $product->price,
+                        'vat_rate' => $product->vat_rate,
                         'line_total' => $lineTotal,
                     ];
                 }
@@ -134,6 +135,7 @@ class CheckoutController extends Controller
                     'shipping_zip' => $validated['shipping_zip'],
                     'shipping_address' => $validated['shipping_address'],
                     ...$billing,
+                    'billing_tax_number' => $validated['billing_tax_number'] ?? null,
                     'shipping_method_id' => $shippingMethod->id,
                     'payment_method_id' => $paymentMethod->id,
                     'subtotal' => $subtotal,
@@ -147,6 +149,7 @@ class CheckoutController extends Controller
                         'product_id' => $line['product']->id,
                         'product_name' => $line['product']->name,
                         'unit_price' => $line['unit_price'],
+                        'vat_rate' => $line['vat_rate'],
                         'quantity' => $line['quantity'],
                         'line_total' => $line['line_total'],
                     ]);
@@ -182,6 +185,10 @@ class CheckoutController extends Controller
 
         if (! $customer->hasBillingDetails()) {
             $customer->fill($billing);
+        }
+
+        if (blank($customer->billing_tax_number) && filled($validated['billing_tax_number'] ?? null)) {
+            $customer->billing_tax_number = $validated['billing_tax_number'];
         }
 
         if ($customer->isDirty()) {

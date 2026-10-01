@@ -17,6 +17,7 @@ class OrderItem extends Model
         'product_id',
         'product_name',
         'unit_price',
+        'vat_rate',
         'quantity',
         'line_total',
     ];
@@ -25,6 +26,7 @@ class OrderItem extends Model
     {
         return [
             'unit_price' => 'integer',
+            'vat_rate' => 'integer',
             'quantity' => 'integer',
             'line_total' => 'integer',
         ];

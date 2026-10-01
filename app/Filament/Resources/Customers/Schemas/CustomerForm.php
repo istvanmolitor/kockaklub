@@ -51,6 +51,8 @@ class CustomerForm
                         TextInput::make('billing_address')
                             ->label('Cím')
                             ->columnSpanFull(),
+                        TextInput::make('billing_tax_number')
+                            ->label('Adószám'),
                     ]),
             ]);
     }

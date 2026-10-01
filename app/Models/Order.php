@@ -29,12 +29,16 @@ class Order extends Model
         'billing_city',
         'billing_zip',
         'billing_address',
+        'billing_tax_number',
         'shipping_method_id',
         'payment_method_id',
         'subtotal',
         'shipping_cost',
         'payment_cost',
         'total',
+        'invoice_number',
+        'invoiced_at',
+        'invoice_pdf_path',
     ];
 
     protected function casts(): array
@@ -44,6 +48,7 @@ class Order extends Model
             'shipping_cost' => 'integer',
             'payment_cost' => 'integer',
             'total' => 'integer',
+            'invoiced_at' => 'datetime',
         ];
     }
 
@@ -75,5 +80,10 @@ class Order extends Model
     public static function generateOrderNumber(): string
     {
         return 'ORD-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
+    }
+
+    public function isInvoiced(): bool
+    {
+        return filled($this->invoice_number);
     }
 }

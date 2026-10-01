@@ -50,6 +50,16 @@ class ProductForm
                                     ->required()
                                     ->numeric()
                                     ->suffix('Ft'),
+                                Select::make('vat_rate')
+                                    ->label('ÁFA kulcs')
+                                    ->options([
+                                        27 => '27%',
+                                        18 => '18%',
+                                        5 => '5%',
+                                        0 => '0%',
+                                    ])
+                                    ->default(27)
+                                    ->required(),
                                 TextInput::make('sku')
                                     ->label('SKU'),
                                 Toggle::make('is_active')

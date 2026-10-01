@@ -78,6 +78,21 @@ class OrderForm
                         TextInput::make('billing_address')
                             ->label('Cím')
                             ->required(),
+                        TextInput::make('billing_tax_number')
+                            ->label('Adószám'),
+                    ]),
+                Section::make('Számla')
+                    ->columns(2)
+                    ->visible(fn (?Order $record) => $record?->isInvoiced() ?? false)
+                    ->schema([
+                        TextInput::make('invoice_number')
+                            ->label('Számlaszám')
+                            ->disabled()
+                            ->dehydrated(false),
+                        TextInput::make('invoiced_at')
+                            ->label('Kiállítva')
+                            ->disabled()
+                            ->dehydrated(false),
                     ]),
                 Select::make('shipping_method_id')
                     ->label('Szállítási mód')
@@ -119,11 +134,13 @@ class OrderForm
 
                                 $set('product_name', $product?->name);
                                 $set('unit_price', $product?->price);
+                                $set('vat_rate', $product?->vat_rate);
                                 $set('line_total', $lineTotal);
 
                                 static::recalculateOrderTotals($get('../'), $get, $set, '../../');
                             }),
                         Hidden::make('product_name'),
+                        Hidden::make('vat_rate'),
                         TextInput::make('unit_price')
                             ->label('Egységár')
                             ->numeric()

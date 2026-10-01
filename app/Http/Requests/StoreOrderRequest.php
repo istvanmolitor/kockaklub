@@ -29,6 +29,7 @@ class StoreOrderRequest extends FormRequest
             'billing_city' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:255'],
             'billing_zip' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:20'],
             'billing_address' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:2000'],
+            'billing_tax_number' => ['nullable', 'string', 'max:20'],
             'shipping_method_id' => [
                 'required',
                 'integer',

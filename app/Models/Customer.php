@@ -29,6 +29,7 @@ class Customer extends Model
         'billing_city',
         'billing_zip',
         'billing_address',
+        'billing_tax_number',
     ];
 
     public function hasShippingDetails(): bool

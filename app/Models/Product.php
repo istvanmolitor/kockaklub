@@ -32,6 +32,7 @@ class Product extends Model
         'slug',
         'description',
         'price',
+        'vat_rate',
         'sku',
         'is_active',
         'is_discontinued',
@@ -42,6 +43,7 @@ class Product extends Model
     {
         return [
             'price' => 'integer',
+            'vat_rate' => 'integer',
             'is_active' => 'boolean',
             'is_discontinued' => 'boolean',
             'is_featured' => 'boolean',
