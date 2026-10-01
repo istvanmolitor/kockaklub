@@ -15,8 +15,10 @@ class CartService
 
     public function existingCart(Request $request): ?Cart
     {
-        if ($request->user()) {
-            return Cart::firstWhere('customer_id', $request->user()->customer->id);
+        $customerId = $request->user()?->customer?->id;
+
+        if ($customerId) {
+            return Cart::firstWhere('customer_id', $customerId);
         }
 
         $token = $request->cookie(self::COOKIE_NAME);
@@ -26,8 +28,10 @@ class CartService
 
     public function currentCart(Request $request): Cart
     {
-        if ($request->user()) {
-            return Cart::firstOrCreate(['customer_id' => $request->user()->customer->id]);
+        $customerId = $request->user()?->customer?->id;
+
+        if ($customerId) {
+            return Cart::firstOrCreate(['customer_id' => $customerId]);
         }
 
         $token = $request->cookie(self::COOKIE_NAME);
