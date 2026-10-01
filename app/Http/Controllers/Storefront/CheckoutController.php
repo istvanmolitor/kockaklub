@@ -14,7 +14,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
@@ -87,7 +86,7 @@ class CheckoutController extends Controller
                 $order = Order::create([
                     'customer_id' => $customer->id,
                     'order_status_id' => OrderStatus::default()->id,
-                    'order_number' => $this->generateOrderNumber(),
+                    'order_number' => Order::generateOrderNumber(),
                     'shipping_name' => $validated['shipping_name'],
                     'shipping_phone' => $validated['shipping_phone'],
                     'shipping_address' => $validated['shipping_address'],
@@ -127,10 +126,5 @@ class CheckoutController extends Controller
         $order->load('items', 'orderStatus');
 
         return view('storefront.checkout.confirmation', ['order' => $order]);
-    }
-
-    private function generateOrderNumber(): string
-    {
-        return 'ORD-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
     }
 }

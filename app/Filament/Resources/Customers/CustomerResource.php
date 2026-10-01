@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Customers;
 
+use App\Filament\Resources\Customers\Pages\CreateCustomer;
 use App\Filament\Resources\Customers\Pages\EditCustomer;
 use App\Filament\Resources\Customers\Pages\ListCustomers;
 use App\Filament\Resources\Customers\RelationManagers\OrdersRelationManager;
@@ -30,11 +31,6 @@ class CustomerResource extends Resource
         return CustomersTable::configure($table);
     }
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
     public static function getRelations(): array
     {
         return [
@@ -46,6 +42,7 @@ class CustomerResource extends Resource
     {
         return [
             'index' => ListCustomers::route('/'),
+            'create' => CreateCustomer::route('/create'),
             'edit' => EditCustomer::route('/{record}/edit'),
         ];
     }
