@@ -11,6 +11,17 @@
         </a>
     </div>
 
+    @if ($recommendedProducts->isNotEmpty())
+        <div class="mb-10">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Neked ajánljuk</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach ($recommendedProducts as $product)
+                    <x-storefront.product-card :product="$product" />
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
         @foreach ($products as $product)
             <x-storefront.product-card :product="$product" />

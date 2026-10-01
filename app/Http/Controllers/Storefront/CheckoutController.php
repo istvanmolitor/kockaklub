@@ -12,6 +12,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
 use App\Services\CartService;
+use App\Services\ProductInterestService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,10 @@ use Illuminate\View\View;
 
 class CheckoutController extends Controller
 {
-    public function __construct(private readonly CartService $cartService) {}
+    public function __construct(
+        private readonly CartService $cartService,
+        private readonly ProductInterestService $productInterestService,
+    ) {}
 
     public function create(Request $request): View|RedirectResponse
     {
@@ -158,6 +162,12 @@ class CheckoutController extends Controller
             });
         } catch (ValidationException $exception) {
             return back()->withErrors($exception->errors())->withInput();
+        }
+
+        if ($request->user()) {
+            foreach ($order->load('items.product')->items as $item) {
+                $this->productInterestService->recordOrder($request->user(), $item->product);
+            }
         }
 
         if (! $customer->hasShippingDetails()) {

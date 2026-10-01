@@ -76,6 +76,11 @@ class Product extends Model
         return $this->hasMany(RegionProductStock::class);
     }
 
+    public function interests(): HasMany
+    {
+        return $this->hasMany(ProductInterest::class);
+    }
+
     protected function defaultImageUrl(): Attribute
     {
         return Attribute::get(fn () => $this->defaultImage?->url() ?? asset('images/product-placeholder.svg'));

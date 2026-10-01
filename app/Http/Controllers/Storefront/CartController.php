@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\ProductInterestService;
 use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class CartController extends Controller
     public function __construct(
         private readonly CartService $cartService,
         private readonly StockService $stockService,
+        private readonly ProductInterestService $productInterestService,
     ) {}
 
     public function show(Request $request): View
@@ -40,6 +42,10 @@ class CartController extends Controller
         abort_unless($product->is_active, 404);
 
         $this->cartService->add($request, $product, $validated['quantity'] ?? 1);
+
+        if ($request->user()) {
+            $this->productInterestService->recordCartAdd($request->user(), $product);
+        }
 
         return back()->with('status', 'A terméket a kosárhoz adtuk.');
     }
