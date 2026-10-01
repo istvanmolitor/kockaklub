@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Orders\Schemas;
 
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\ShippingMethod;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -51,13 +53,25 @@ class OrderForm
                     ->relationship('shippingMethod', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
+                        $set('shipping_cost', ShippingMethod::find($state)?->cost ?? 0);
+
+                        static::recalculateOrderTotals($get('items') ?? [], $get, $set);
+                    }),
                 Select::make('payment_method_id')
                     ->label('Fizetési mód')
                     ->relationship('paymentMethod', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
+                        $set('payment_cost', PaymentMethod::find($state)?->cost ?? 0);
+
+                        static::recalculateOrderTotals($get('items') ?? [], $get, $set);
+                    }),
                 Repeater::make('items')
                     ->label('Tételek')
                     ->relationship()
@@ -76,7 +90,7 @@ class OrderForm
                                 $set('unit_price', $product?->price);
                                 $set('line_total', $lineTotal);
 
-                                static::recalculateOrderTotals($get('../'), $set, '../../');
+                                static::recalculateOrderTotals($get('../'), $get, $set, '../../');
                             }),
                         Hidden::make('product_name'),
                         TextInput::make('unit_price')
@@ -96,7 +110,7 @@ class OrderForm
                             ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
                                 $set('line_total', ((int) $get('unit_price')) * ((int) ($state ?: 0)));
 
-                                static::recalculateOrderTotals($get('../'), $set, '../../');
+                                static::recalculateOrderTotals($get('../'), $get, $set, '../../');
                             }),
                         TextInput::make('line_total')
                             ->label('Összesen')
@@ -110,10 +124,24 @@ class OrderForm
                     ->defaultItems(1)
                     ->addActionLabel('Tétel hozzáadása')
                     ->live()
-                    ->afterStateUpdated(fn (array $state, Set $set) => static::recalculateOrderTotals($state, $set))
+                    ->afterStateUpdated(fn (array $state, Set $set, Get $get) => static::recalculateOrderTotals($state, $get, $set))
                     ->columnSpanFull(),
                 TextInput::make('subtotal')
                     ->label('Részösszeg')
+                    ->numeric()
+                    ->suffix('Ft')
+                    ->default(0)
+                    ->disabled()
+                    ->dehydrated(),
+                TextInput::make('shipping_cost')
+                    ->label('Szállítási költség')
+                    ->numeric()
+                    ->suffix('Ft')
+                    ->default(0)
+                    ->disabled()
+                    ->dehydrated(),
+                TextInput::make('payment_cost')
+                    ->label('Fizetési költség')
                     ->numeric()
                     ->suffix('Ft')
                     ->default(0)
@@ -132,11 +160,13 @@ class OrderForm
     /**
      * @param  array<int, array<string, mixed>>  $items
      */
-    private static function recalculateOrderTotals(array $items, Set $set, string $prefix = ''): void
+    private static function recalculateOrderTotals(array $items, Get $get, Set $set, string $prefix = ''): void
     {
         $subtotal = collect($items)->sum(fn ($item) => (int) ($item['line_total'] ?? 0));
+        $shippingCost = (int) ($get($prefix.'shipping_cost') ?: 0);
+        $paymentCost = (int) ($get($prefix.'payment_cost') ?: 0);
 
         $set($prefix.'subtotal', $subtotal);
-        $set($prefix.'total', $subtotal);
+        $set($prefix.'total', $subtotal + $shippingCost + $paymentCost);
     }
 }

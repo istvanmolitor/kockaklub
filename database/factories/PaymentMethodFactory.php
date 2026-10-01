@@ -20,6 +20,7 @@ class PaymentMethodFactory extends Factory
         return [
             'name' => fake()->unique()->words(2, true),
             'description' => fake()->sentence(),
+            'cost' => fake()->numberBetween(0, 1500),
             'is_active' => true,
         ];
     }

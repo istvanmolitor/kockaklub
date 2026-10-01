@@ -22,6 +22,8 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         $subtotal = fake()->numberBetween(2000, 100000);
+        $shippingCost = fake()->numberBetween(0, 3000);
+        $paymentCost = fake()->numberBetween(0, 1500);
 
         return [
             'customer_id' => Customer::factory(),
@@ -33,7 +35,9 @@ class OrderFactory extends Factory
             'shipping_method_id' => ShippingMethod::factory(),
             'payment_method_id' => PaymentMethod::factory(),
             'subtotal' => $subtotal,
-            'total' => $subtotal,
+            'shipping_cost' => $shippingCost,
+            'payment_cost' => $paymentCost,
+            'total' => $subtotal + $shippingCost + $paymentCost,
         ];
     }
 }

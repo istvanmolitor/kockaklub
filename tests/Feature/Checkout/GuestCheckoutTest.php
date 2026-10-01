@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Mail;
 beforeEach(function () {
     OrderStatus::factory()->create(['slug' => 'pending', 'is_default' => true]);
 
-    $this->shippingMethod = ShippingMethod::factory()->create(['is_active' => true]);
-    $this->paymentMethod = PaymentMethod::factory()->create(['is_active' => true]);
+    $this->shippingMethod = ShippingMethod::factory()->create(['is_active' => true, 'cost' => 0]);
+    $this->paymentMethod = PaymentMethod::factory()->create(['is_active' => true, 'cost' => 0]);
     $this->shippingMethod->paymentMethods()->attach($this->paymentMethod);
 });
 

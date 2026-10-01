@@ -23,6 +23,10 @@ class PaymentMethodsTable
                     ->label('Leírás')
                     ->limit(50)
                     ->toggleable(),
+                TextColumn::make('cost')
+                    ->label('Költség')
+                    ->money('HUF', decimalPlaces: 0)
+                    ->sortable(),
                 TextColumn::make('shippingMethods.name')
                     ->label('Szállítási módok')
                     ->badge(),

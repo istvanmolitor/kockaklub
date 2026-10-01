@@ -20,6 +20,7 @@ class ShippingMethodFactory extends Factory
         return [
             'name' => fake()->unique()->words(2, true),
             'description' => fake()->sentence(),
+            'cost' => fake()->numberBetween(0, 3000),
             'is_active' => true,
         ];
     }

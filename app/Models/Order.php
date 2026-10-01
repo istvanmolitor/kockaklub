@@ -24,6 +24,8 @@ class Order extends Model
         'shipping_method_id',
         'payment_method_id',
         'subtotal',
+        'shipping_cost',
+        'payment_cost',
         'total',
     ];
 
@@ -31,6 +33,8 @@ class Order extends Model
     {
         return [
             'subtotal' => 'integer',
+            'shipping_cost' => 'integer',
+            'payment_cost' => 'integer',
             'total' => 'integer',
         ];
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Customer;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,9 +35,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        if ($request->user()->customer) {
-            $this->cartService->mergeGuestCartIntoCustomer($request, $request->user()->customer);
+        $user = $request->user();
+        $customer = $user->customer ?: Customer::firstOrCreate(
+            ['email' => $user->email],
+            ['name' => $user->name, 'user_id' => $user->id]
+        );
+
+        if ($customer->user_id === null) {
+            $customer->update(['user_id' => $user->id]);
         }
+
+        $this->cartService->mergeGuestCartIntoCustomer($request, $customer);
 
         return redirect()->intended(route('home'));
     }

@@ -6,6 +6,7 @@
     @php
         $selectedShippingMethodId = (int) old('shipping_method_id', $shippingMethods->first()->id);
         $oldPaymentMethodId = old('payment_method_id');
+        $cartTotal = $cart->items->sum(fn ($item) => $item->lineTotal());
     @endphp
 
     <h1 class="text-2xl font-semibold text-gray-900 mb-6">Pénztár</h1>
@@ -63,10 +64,13 @@
                     <label class="flex items-start gap-2 text-sm">
                         <input type="radio" name="shipping_method_id" value="{{ $shippingMethod->id }}"
                                data-shipping-method-option
+                               data-cost="{{ $shippingMethod->cost }}"
                                {{ $selectedShippingMethodId === $shippingMethod->id ? 'checked' : '' }}
                                class="mt-1 border-gray-300">
                         <span>
                             {{ $shippingMethod->name }}
+                            &mdash;
+                            {{ $shippingMethod->cost > 0 ? number_format($shippingMethod->cost, 0, ',', ' ').' Ft' : 'Díjtalan' }}
                             @if ($shippingMethod->description)
                                 <span class="block text-gray-500">{{ $shippingMethod->description }}</span>
                             @endif
@@ -84,12 +88,16 @@
                         @foreach ($shippingMethod->paymentMethods as $paymentMethod)
                             <label class="flex items-start gap-2 text-sm">
                                 <input type="radio" name="payment_method_id" value="{{ $paymentMethod->id }}"
+                                       data-payment-method-option
+                                       data-cost="{{ $paymentMethod->cost }}"
                                        {{ $oldPaymentMethodId
                                             ? ($oldPaymentMethodId == $paymentMethod->id ? 'checked' : '')
                                             : ($selectedShippingMethodId === $shippingMethod->id && $loop->first ? 'checked' : '') }}
                                        class="mt-1 border-gray-300">
                                 <span>
                                     {{ $paymentMethod->name }}
+                                    &mdash;
+                                    {{ $paymentMethod->cost > 0 ? number_format($paymentMethod->cost, 0, ',', ' ').' Ft' : 'Díjtalan' }}
                                     @if ($paymentMethod->description)
                                         <span class="block text-gray-500">{{ $paymentMethod->description }}</span>
                                     @endif
@@ -118,17 +126,49 @@
                 @endforeach
             </ul>
 
+            <div class="mt-4 pt-4 border-t border-gray-200 space-y-1 text-sm">
+                <div class="flex justify-between">
+                    <span>Részösszeg</span>
+                    <span data-summary-subtotal>{{ number_format($cartTotal, 0, ',', ' ') }} Ft</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Szállítás</span>
+                    <span data-summary-shipping-cost>0 Ft</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Fizetési díj</span>
+                    <span data-summary-payment-cost>0 Ft</span>
+                </div>
+            </div>
+
             <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between font-semibold">
                 <span>Összesen</span>
-                <span>{{ number_format($cart->items->sum(fn ($item) => $item->lineTotal()), 0, ',', ' ') }} Ft</span>
+                <span data-summary-total>{{ number_format($cartTotal, 0, ',', ' ') }} Ft</span>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var cartSubtotal = {{ (int) $cartTotal }};
             var shippingInputs = document.querySelectorAll('[data-shipping-method-option]');
             var paymentGroups = document.querySelectorAll('[data-payment-methods-for]');
+
+            function formatFt(amount) {
+                return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' Ft';
+            }
+
+            function updateSummary() {
+                var selectedShipping = document.querySelector('[data-shipping-method-option]:checked');
+                var selectedPayment = document.querySelector('[data-payment-method-option]:checked');
+
+                var shippingCost = selectedShipping ? parseInt(selectedShipping.dataset.cost, 10) : 0;
+                var paymentCost = selectedPayment ? parseInt(selectedPayment.dataset.cost, 10) : 0;
+
+                document.querySelector('[data-summary-shipping-cost]').textContent = formatFt(shippingCost);
+                document.querySelector('[data-summary-payment-cost]').textContent = formatFt(paymentCost);
+                document.querySelector('[data-summary-total]').textContent = formatFt(cartSubtotal + shippingCost + paymentCost);
+            }
 
             function updatePaymentGroups() {
                 var selected = document.querySelector('[data-shipping-method-option]:checked');
@@ -145,11 +185,19 @@
                         }
                     }
                 });
+
+                updateSummary();
             }
 
             shippingInputs.forEach(function (input) {
                 input.addEventListener('change', updatePaymentGroups);
             });
+
+            document.querySelectorAll('[data-payment-method-option]').forEach(function (input) {
+                input.addEventListener('change', updateSummary);
+            });
+
+            updateSummary();
         });
     </script>
 @endsection

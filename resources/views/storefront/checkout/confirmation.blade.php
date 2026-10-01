@@ -16,6 +16,12 @@
             @endforeach
         </ul>
 
+        <dl class="text-sm text-gray-600 space-y-1 mb-4">
+            <div class="flex justify-between"><dt>Részösszeg</dt><dd>{{ number_format($order->subtotal, 0, ',', ' ') }} Ft</dd></div>
+            <div class="flex justify-between"><dt>Szállítás ({{ $order->shippingMethod->name }})</dt><dd>{{ number_format($order->shipping_cost, 0, ',', ' ') }} Ft</dd></div>
+            <div class="flex justify-between"><dt>Fizetési díj ({{ $order->paymentMethod->name }})</dt><dd>{{ number_format($order->payment_cost, 0, ',', ' ') }} Ft</dd></div>
+        </dl>
+
         <div class="flex justify-between font-semibold text-lg mb-6">
             <span>Végösszeg</span>
             <span>{{ number_format($order->total, 0, ',', ' ') }} Ft</span>
@@ -23,8 +29,6 @@
 
         <dl class="text-sm text-gray-600 space-y-1 mb-6">
             <div><dt class="inline font-medium">Szállítási cím: </dt><dd class="inline">{{ $order->shipping_address }}</dd></div>
-            <div><dt class="inline font-medium">Szállítási mód: </dt><dd class="inline">{{ $order->shippingMethod->name }}</dd></div>
-            <div><dt class="inline font-medium">Fizetési mód: </dt><dd class="inline">{{ $order->paymentMethod->name }}</dd></div>
             <div><dt class="inline font-medium">Státusz: </dt><dd class="inline">{{ $order->orderStatus->name }}</dd></div>
         </dl>
 

@@ -15,12 +15,14 @@ class PaymentMethod extends Model
     protected $fillable = [
         'name',
         'description',
+        'cost',
         'is_active',
     ];
 
     protected function casts(): array
     {
         return [
+            'cost' => 'integer',
             'is_active' => 'boolean',
         ];
     }

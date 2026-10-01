@@ -20,6 +20,12 @@ class ShippingMethodForm
                 Textarea::make('description')
                     ->label('Leírás')
                     ->columnSpanFull(),
+                TextInput::make('cost')
+                    ->label('Költség')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->suffix('Ft'),
                 Toggle::make('is_active')
                     ->label('Aktív')
                     ->default(true)

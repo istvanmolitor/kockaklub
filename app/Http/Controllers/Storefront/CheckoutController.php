@@ -8,6 +8,7 @@ use App\Mail\OrderConfirmationMail;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
 use App\Services\CartService;
@@ -72,8 +73,11 @@ class CheckoutController extends Controller
             );
         }
 
+        $shippingMethod = ShippingMethod::findOrFail($validated['shipping_method_id']);
+        $paymentMethod = PaymentMethod::findOrFail($validated['payment_method_id']);
+
         try {
-            $order = DB::transaction(function () use ($cart, $customer, $validated) {
+            $order = DB::transaction(function () use ($cart, $customer, $validated, $shippingMethod, $paymentMethod) {
                 $subtotal = 0;
                 $lineData = [];
 
@@ -104,10 +108,12 @@ class CheckoutController extends Controller
                     'shipping_name' => $validated['shipping_name'],
                     'shipping_phone' => $validated['shipping_phone'],
                     'shipping_address' => $validated['shipping_address'],
-                    'shipping_method_id' => $validated['shipping_method_id'],
-                    'payment_method_id' => $validated['payment_method_id'],
+                    'shipping_method_id' => $shippingMethod->id,
+                    'payment_method_id' => $paymentMethod->id,
                     'subtotal' => $subtotal,
-                    'total' => $subtotal,
+                    'shipping_cost' => $shippingMethod->cost,
+                    'payment_cost' => $paymentMethod->cost,
+                    'total' => $subtotal + $shippingMethod->cost + $paymentMethod->cost,
                 ]);
 
                 foreach ($lineData as $line) {
