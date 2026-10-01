@@ -40,4 +40,9 @@ class Region extends Model
     {
         return $this->hasMany(StockMovement::class, 'destination_region_id');
     }
+
+    public function regionProductStocks(): HasMany
+    {
+        return $this->hasMany(RegionProductStock::class);
+    }
 }

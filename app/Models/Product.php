@@ -61,6 +61,11 @@ class Product extends Model
         return $this->hasMany(StockMovementItem::class);
     }
 
+    public function regionStocks(): HasMany
+    {
+        return $this->hasMany(RegionProductStock::class);
+    }
+
     protected function defaultImageUrl(): Attribute
     {
         return Attribute::get(fn () => $this->defaultImage?->url() ?? asset('images/product-placeholder.svg'));

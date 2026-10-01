@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\RegionProductStock;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -34,25 +35,15 @@ class StockService
 
     /**
      * The aggregated quantity of $productId across every public region,
-     * derived from the stock movement history.
+     * read from the region_product_stocks snapshot (see rebuildRegionProductStocks()).
      */
     public function publicStockForProduct(int $productId): int
     {
-        $incoming = DB::table('stock_movement_items')
-            ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
-            ->join('regions', 'regions.id', '=', 'stock_movements.destination_region_id')
-            ->where('stock_movement_items.product_id', $productId)
+        return (int) RegionProductStock::query()
+            ->join('regions', 'regions.id', '=', 'region_product_stocks.region_id')
+            ->where('region_product_stocks.product_id', $productId)
             ->where('regions.is_public', true)
-            ->sum('stock_movement_items.quantity');
-
-        $outgoing = DB::table('stock_movement_items')
-            ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
-            ->join('regions', 'regions.id', '=', 'stock_movements.source_region_id')
-            ->where('stock_movement_items.product_id', $productId)
-            ->where('regions.is_public', true)
-            ->sum('stock_movement_items.quantity');
-
-        return (int) $incoming - (int) $outgoing;
+            ->sum('region_product_stocks.quantity');
     }
 
     /**
@@ -62,17 +53,71 @@ class StockService
      */
     public static function publicStockSubquery(): Builder
     {
-        return DB::table('stock_movement_items')
+        return DB::table('region_product_stocks')
+            ->join('regions', 'regions.id', '=', 'region_product_stocks.region_id')
+            ->whereColumn('region_product_stocks.product_id', 'products.id')
+            ->where('regions.is_public', true)
+            ->selectRaw('COALESCE(SUM(region_product_stocks.quantity), 0)');
+    }
+
+    /**
+     * Recomputes the `quantity` column of every region_product_stocks row from the
+     * stock movement history (incoming minus outgoing per region+product), without
+     * touching the admin-managed `min_stock`/`max_stock` thresholds. Pairs with no
+     * movement history left are zeroed out rather than deleted, so a configured
+     * threshold survives even if the stock temporarily disappears.
+     */
+    public function rebuildRegionProductStocks(): void
+    {
+        $totals = [];
+
+        $incoming = DB::table('stock_movement_items')
             ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
-            ->leftJoin('regions as destination_regions', 'destination_regions.id', '=', 'stock_movements.destination_region_id')
-            ->leftJoin('regions as source_regions', 'source_regions.id', '=', 'stock_movements.source_region_id')
-            ->whereColumn('stock_movement_items.product_id', 'products.id')
-            ->selectRaw(
-                'COALESCE(SUM('.
-                'CASE WHEN destination_regions.is_public = 1 THEN stock_movement_items.quantity ELSE 0 END - '.
-                'CASE WHEN source_regions.is_public = 1 THEN stock_movement_items.quantity ELSE 0 END'.
-                '), 0)'
-            );
+            ->whereNotNull('stock_movements.destination_region_id')
+            ->groupBy('stock_movements.destination_region_id', 'stock_movement_items.product_id')
+            ->get([
+                'stock_movements.destination_region_id as region_id',
+                'stock_movement_items.product_id',
+                DB::raw('SUM(stock_movement_items.quantity) as quantity'),
+            ]);
+
+        $outgoing = DB::table('stock_movement_items')
+            ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
+            ->whereNotNull('stock_movements.source_region_id')
+            ->groupBy('stock_movements.source_region_id', 'stock_movement_items.product_id')
+            ->get([
+                'stock_movements.source_region_id as region_id',
+                'stock_movement_items.product_id',
+                DB::raw('SUM(stock_movement_items.quantity) as quantity'),
+            ]);
+
+        foreach ($incoming as $row) {
+            $totals[$row->region_id][$row->product_id] = ($totals[$row->region_id][$row->product_id] ?? 0) + (int) $row->quantity;
+        }
+
+        foreach ($outgoing as $row) {
+            $totals[$row->region_id][$row->product_id] = ($totals[$row->region_id][$row->product_id] ?? 0) - (int) $row->quantity;
+        }
+
+        DB::transaction(function () use ($totals) {
+            $touchedIds = [];
+
+            foreach ($totals as $regionId => $products) {
+                foreach ($products as $productId => $quantity) {
+                    $stock = RegionProductStock::query()->updateOrCreate(
+                        ['region_id' => $regionId, 'product_id' => $productId],
+                        ['quantity' => $quantity],
+                    );
+
+                    $touchedIds[] = $stock->id;
+                }
+            }
+
+            RegionProductStock::query()
+                ->whereNotIn('id', $touchedIds ?: [0])
+                ->where('quantity', '!=', 0)
+                ->update(['quantity' => 0]);
+        });
     }
 
     /**

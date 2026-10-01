@@ -18,6 +18,11 @@ class CreateStockMovement extends CreateRecord
         return $data;
     }
 
+    protected function afterCreate(): void
+    {
+        app(StockService::class)->rebuildRegionProductStocks();
+    }
+
     /**
      * @param  array<string, mixed>  $data
      */

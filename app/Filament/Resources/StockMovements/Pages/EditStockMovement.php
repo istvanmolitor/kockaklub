@@ -15,7 +15,8 @@ class EditStockMovement extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            DeleteAction::make(),
+            DeleteAction::make()
+                ->after(fn () => app(StockService::class)->rebuildRegionProductStocks()),
         ];
     }
 
@@ -24,6 +25,11 @@ class EditStockMovement extends EditRecord
         $this->assertStockAvailable($data);
 
         return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        app(StockService::class)->rebuildRegionProductStocks();
     }
 
     /**

@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Sites\RelationManagers;
 
+use App\Models\Product;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -30,6 +33,34 @@ class RegionsRelationManager extends RelationManager
                     ->label('Publikus')
                     ->default(true)
                     ->required(),
+                Repeater::make('regionProductStocks')
+                    ->relationship()
+                    ->label('Termékenkénti minimum / maximum készlet')
+                    ->schema([
+                        Select::make('product_id')
+                            ->label('Termék')
+                            ->options(fn () => Product::query()->orderBy('name')->pluck('name', 'id'))
+                            ->searchable()
+                            ->required()
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                        TextInput::make('quantity')
+                            ->label('Aktuális mennyiség')
+                            ->numeric()
+                            ->disabled()
+                            ->dehydrated(false),
+                        TextInput::make('min_stock')
+                            ->label('Minimum')
+                            ->numeric()
+                            ->minValue(0),
+                        TextInput::make('max_stock')
+                            ->label('Maximum')
+                            ->numeric()
+                            ->minValue(0),
+                    ])
+                    ->columns(4)
+                    ->defaultItems(0)
+                    ->addActionLabel('Termék hozzáadása')
+                    ->columnSpanFull(),
             ]);
     }
 

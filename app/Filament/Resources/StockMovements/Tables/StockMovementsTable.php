@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StockMovements\Tables;
 
 use App\Models\StockMovement;
+use App\Services\StockService;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -55,7 +56,8 @@ class StockMovementsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->after(fn () => app(StockService::class)->rebuildRegionProductStocks()),
                 ]),
             ]);
     }
