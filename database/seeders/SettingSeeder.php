@@ -17,8 +17,9 @@ class SettingSeeder extends Seeder
             'contact_email' => ['label' => 'E-mail cím', 'value' => 'info@kockaklub.hu'],
             'contact_address' => ['label' => 'Cím', 'value' => '1111 Budapest, Példa utca 1.'],
             'company_name' => ['label' => 'Cégnév', 'value' => 'Kockaklub Kft.'],
-            'facebook_url' => ['label' => 'Facebook link', 'value' => null],
-            'instagram_url' => ['label' => 'Instagram link', 'value' => null],
+            'facebook_url' => ['label' => 'Facebook link', 'value' => 'https://www.facebook.com/KockaKlubHu'],
+            'instagram_url' => ['label' => 'Instagram link', 'value' => 'https://www.instagram.com/kockaklub'],
+            'youtube_url' => ['label' => 'Youtube link', 'value' => 'https://www.youtube.com/@KockafejAndr%C3%A1s'],
         ];
 
         foreach ($settings as $key => $setting) {
