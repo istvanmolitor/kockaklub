@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\OrderItem;
 use App\Models\Product;
-use App\Models\ProductInterest;
 use App\Models\User;
+use App\Repositories\OrderRepository;
+use App\Repositories\ProductInterestRepository;
 use Illuminate\Database\Eloquent\Collection;
 
 class ProductInterestService
@@ -15,6 +15,11 @@ class ProductInterestService
     public const CART_SCORE = 5;
 
     public const ORDER_SCORE = 10;
+
+    public function __construct(
+        private readonly ProductInterestRepository $productInterests,
+        private readonly OrderRepository $orders,
+    ) {}
 
     public function recordView(User $user, Product $product): void
     {
@@ -42,29 +47,14 @@ class ProductInterestService
         $customerId = $user->customer?->id;
 
         $orderedProductIds = $customerId
-            ? OrderItem::query()->whereHas('order', fn ($query) => $query->where('customer_id', $customerId))->pluck('product_id')
+            ? $this->orders->productIdsPurchasedByCustomer($customerId)
             : collect();
 
-        return Product::query()
-            ->join('product_interests', 'product_interests.product_id', '=', 'products.id')
-            ->where('product_interests.user_id', $user->id)
-            ->where('products.is_active', true)
-            ->when($orderedProductIds->isNotEmpty(), fn ($query) => $query->whereNotIn('products.id', $orderedProductIds))
-            ->select('products.*')
-            ->withPublicStock()
-            ->with('defaultImage')
-            ->orderByDesc('product_interests.score')
-            ->limit($limit)
-            ->get();
+        return $this->productInterests->recommendedProductsFor($user->id, $orderedProductIds, $limit);
     }
 
     private function addScore(User $user, Product $product, int $points): void
     {
-        $interest = ProductInterest::query()->firstOrCreate(
-            ['user_id' => $user->id, 'product_id' => $product->id],
-            ['score' => 0]
-        );
-
-        $interest->increment('score', $points);
+        $this->productInterests->incrementScore($user->id, $product->id, $points);
     }
 }

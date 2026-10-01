@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Services\ProductInterestService;
 
 beforeEach(function () {
-    $this->service = new ProductInterestService;
+    $this->service = app(ProductInterestService::class);
 });
 
 it('creates and accumulates a score across repeated interactions', function () {

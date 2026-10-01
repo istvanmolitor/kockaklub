@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\StockMovements\Schemas;
 
-use App\Models\Product;
 use App\Models\StockMovement;
+use App\Repositories\ProductRepository;
 use Closure;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -56,7 +56,7 @@ class StockMovementForm
                     ->schema([
                         Select::make('product_id')
                             ->label('Termék')
-                            ->options(fn () => Product::query()->orderBy('name')->pluck('name', 'id'))
+                            ->options(fn () => app(ProductRepository::class)->pluckNamesForSelect())
                             ->searchable()
                             ->required(),
                         TextInput::make('quantity')

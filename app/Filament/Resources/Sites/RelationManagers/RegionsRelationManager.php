@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Sites\RelationManagers;
 
-use App\Models\Product;
+use App\Repositories\ProductRepository;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -39,7 +39,7 @@ class RegionsRelationManager extends RelationManager
                     ->schema([
                         Select::make('product_id')
                             ->label('Termék')
-                            ->options(fn () => Product::query()->orderBy('name')->pluck('name', 'id'))
+                            ->options(fn () => app(ProductRepository::class)->pluckNamesForSelect())
                             ->searchable()
                             ->required()
                             ->disableOptionsWhenSelectedInSiblingRepeaterItems(),

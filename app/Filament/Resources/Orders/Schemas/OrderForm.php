@@ -7,6 +7,7 @@ use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Repositories\ProductRepository;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -124,7 +125,7 @@ class OrderForm
                     ->schema([
                         Select::make('product_id')
                             ->label('Termék')
-                            ->options(fn () => Product::query()->orderBy('name')->pluck('name', 'id'))
+                            ->options(fn () => app(ProductRepository::class)->pluckNamesForSelect())
                             ->searchable()
                             ->required()
                             ->live()

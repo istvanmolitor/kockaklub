@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Observers\ProductObserver;
-use App\Services\StockService;
+use App\Repositories\StockRepository;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -141,7 +141,7 @@ class Product extends Model
      */
     public function scopeWithPublicStock(Builder $query): Builder
     {
-        return $query->addSelect(['public_stock' => StockService::publicStockSubquery()]);
+        return $query->addSelect(['public_stock' => StockRepository::publicStockSubquery()]);
     }
 
     /**

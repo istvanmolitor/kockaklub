@@ -8,20 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('order_items', function (Blueprint $table) {
+        Schema::create('order_status_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->restrictOnDelete();
-            $table->string('product_name');
-            $table->unsignedInteger('unit_price');
-            $table->unsignedInteger('quantity');
-            $table->unsignedInteger('line_total');
+            $table->foreignId('order_status_id')->constrained()->restrictOnDelete();
+            $table->foreignId('previous_order_status_id')->nullable()->constrained('order_statuses')->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('order_items');
+        Schema::dropIfExists('order_status_logs');
     }
 };

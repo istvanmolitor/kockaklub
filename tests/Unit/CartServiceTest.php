@@ -7,7 +7,7 @@ use App\Services\CartService;
 use Illuminate\Http\Request;
 
 beforeEach(function () {
-    $this->service = new CartService;
+    $this->service = app(CartService::class);
 });
 
 it('adds a product to a new guest cart and increments quantity on repeat add', function () {

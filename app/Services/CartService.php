@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Repositories\CartRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Str;
@@ -13,17 +14,19 @@ class CartService
 {
     public const COOKIE_NAME = 'cart_token';
 
+    public function __construct(private readonly CartRepository $carts) {}
+
     public function existingCart(Request $request): ?Cart
     {
         $customerId = $request->user()?->customer?->id;
 
         if ($customerId) {
-            return Cart::firstWhere('customer_id', $customerId);
+            return $this->carts->findByCustomerId($customerId);
         }
 
         $token = $request->cookie(self::COOKIE_NAME);
 
-        return $token ? Cart::firstWhere('guest_token', $token) : null;
+        return $token ? $this->carts->findByGuestToken($token) : null;
     }
 
     public function currentCart(Request $request): Cart
@@ -31,13 +34,13 @@ class CartService
         $customerId = $request->user()?->customer?->id;
 
         if ($customerId) {
-            return Cart::firstOrCreate(['customer_id' => $customerId]);
+            return $this->carts->firstOrCreateForCustomer($customerId);
         }
 
         $token = $request->cookie(self::COOKIE_NAME);
 
         if ($token) {
-            $cart = Cart::firstWhere('guest_token', $token);
+            $cart = $this->carts->findByGuestToken($token);
 
             if ($cart) {
                 return $cart;
@@ -45,7 +48,7 @@ class CartService
         }
 
         $token = (string) Str::uuid();
-        $cart = Cart::create(['guest_token' => $token]);
+        $cart = $this->carts->createGuest($token);
 
         Cookie::queue(Cookie::make(self::COOKIE_NAME, $token, 60 * 24 * 365));
 
@@ -94,7 +97,7 @@ class CartService
             return;
         }
 
-        $guestCart = Cart::firstWhere('guest_token', $token);
+        $guestCart = $this->carts->findByGuestToken($token);
 
         if (! $guestCart) {
             Cookie::queue(Cookie::forget(self::COOKIE_NAME));
@@ -102,7 +105,7 @@ class CartService
             return;
         }
 
-        $customerCart = Cart::firstOrCreate(['customer_id' => $customer->id]);
+        $customerCart = $this->carts->firstOrCreateForCustomer($customer->id);
 
         foreach ($guestCart->items as $guestItem) {
             $existing = $customerCart->items()->firstWhere('product_id', $guestItem->product_id);

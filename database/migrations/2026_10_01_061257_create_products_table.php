@@ -15,9 +15,11 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->unsignedInteger('price');
-            $table->unsignedInteger('stock')->default(0);
+            $table->unsignedTinyInteger('vat_rate')->default(27);
             $table->string('sku')->nullable()->unique();
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_discontinued')->default(false);
+            $table->boolean('is_featured')->default(false);
             $table->timestamps();
         });
     }

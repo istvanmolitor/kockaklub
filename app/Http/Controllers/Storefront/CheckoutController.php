@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Mail\OrderConfirmationMail;
-use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
+use App\Repositories\CustomerRepository;
+use App\Repositories\ShippingMethodRepository;
 use App\Services\CartService;
 use App\Services\ProductInterestService;
 use Illuminate\Http\RedirectResponse;
@@ -25,6 +26,8 @@ class CheckoutController extends Controller
     public function __construct(
         private readonly CartService $cartService,
         private readonly ProductInterestService $productInterestService,
+        private readonly CustomerRepository $customers,
+        private readonly ShippingMethodRepository $shippingMethods,
     ) {}
 
     public function create(Request $request): View|RedirectResponse
@@ -38,13 +41,7 @@ class CheckoutController extends Controller
 
         $customer = $request->user()?->customer;
 
-        $shippingMethods = ShippingMethod::query()
-            ->where('is_active', true)
-            ->with(['paymentMethods' => fn ($query) => $query->where('is_active', true)->orderBy('name')])
-            ->orderBy('name')
-            ->get()
-            ->filter(fn (ShippingMethod $shippingMethod) => $shippingMethod->paymentMethods->isNotEmpty())
-            ->values();
+        $shippingMethods = $this->shippingMethods->activeWithAvailablePaymentMethods();
 
         if ($shippingMethods->isEmpty()) {
             return redirect()->route('cart.show')->with('status', 'Jelenleg nem érhető el szállítási mód.');
@@ -71,10 +68,7 @@ class CheckoutController extends Controller
         if ($request->user()) {
             $customer = $request->user()->customer;
         } else {
-            $customer = Customer::firstOrCreate(
-                ['email' => $validated['email']],
-                ['name' => $validated['name']]
-            );
+            $customer = $this->customers->firstOrCreateByEmail($validated['email'], $validated['name']);
         }
 
         $shippingMethod = ShippingMethod::findOrFail($validated['shipping_method_id']);

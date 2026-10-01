@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Repositories\ProductRepository;
 use App\Services\ProductInterestService;
-use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
     private const SECTION_SIZE = 4;
 
-    public function __construct(private readonly ProductInterestService $productInterestService) {}
+    public function __construct(
+        private readonly ProductInterestService $productInterestService,
+        private readonly ProductRepository $products,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -24,25 +28,10 @@ class HomeController extends Controller
             : collect();
         $usedIds = $recommendedProducts->pluck('id')->all();
 
-        $featuredProducts = Product::query()
-            ->withPublicStock()
-            ->with('defaultImage')
-            ->where('is_active', true)
-            ->where('is_featured', true)
-            ->whereNotIn('id', $usedIds)
-            ->latest()
-            ->limit(self::SECTION_SIZE)
-            ->get();
+        $featuredProducts = $this->products->featuredExcluding($usedIds, self::SECTION_SIZE);
         $usedIds = array_merge($usedIds, $featuredProducts->pluck('id')->all());
 
-        $newProducts = Product::query()
-            ->withPublicStock()
-            ->with('defaultImage')
-            ->where('is_active', true)
-            ->whereNotIn('id', $usedIds)
-            ->latest()
-            ->limit(self::SECTION_SIZE)
-            ->get();
+        $newProducts = $this->products->newestExcluding($usedIds, self::SECTION_SIZE);
         $usedIds = array_merge($usedIds, $newProducts->pluck('id')->all());
 
         // Phase 2: top up any section that is short with random active products,
@@ -78,14 +67,7 @@ class HomeController extends Controller
             return $products;
         }
 
-        $filler = Product::query()
-            ->withPublicStock()
-            ->with('defaultImage')
-            ->where('is_active', true)
-            ->whereNotIn('id', $usedIds)
-            ->inRandomOrder()
-            ->limit($remaining)
-            ->get();
+        $filler = $this->products->randomActiveExcluding($usedIds, $remaining);
 
         return $products->concat($filler);
     }

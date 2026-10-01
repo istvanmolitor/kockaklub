@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Product;
+use App\Repositories\CategoryRepository;
+use App\Repositories\ProductRepository;
 use App\Services\ProductInterestService;
 use App\Services\StockService;
 use Illuminate\Http\Request;
@@ -15,22 +16,19 @@ class CatalogController extends Controller
     public function __construct(
         private readonly StockService $stockService,
         private readonly ProductInterestService $productInterestService,
+        private readonly ProductRepository $products,
+        private readonly CategoryRepository $categories,
     ) {}
 
     public function index(Request $request): View
     {
-        $category = Category::query()->where('slug', $request->string('category'))->first();
+        $category = $this->categories->findBySlug($request->string('category')->toString());
 
-        $products = Product::query()
-            ->withPublicStock()
-            ->with('defaultImage')
-            ->where('is_active', true)
-            ->when($category, fn ($query) => $query->whereIn('category_id', $category->selfAndDescendantIds()))
-            ->sortBy($request->string('sort')->toString())
-            ->paginate(12)
+        $products = $this->products
+            ->paginateActiveCatalog($category, $request->string('sort')->toString())
             ->withQueryString();
 
-        $categories = Category::tree(Category::query()->where('is_active', true)->orderBy('name')->get());
+        $categories = $this->categories->activeTree();
 
         return view('storefront.catalog.index', [
             'products' => $products,
@@ -47,11 +45,7 @@ class CatalogController extends Controller
             $this->productInterestService->recordView($request->user(), $product);
         }
 
-        $product->load('images', 'category');
-        $product->load(['relatedProducts' => fn ($query) => $query
-            ->where('is_active', true)
-            ->withPublicStock()
-            ->with('defaultImage')]);
+        $this->products->loadStorefrontShowRelations($product);
 
         return view('storefront.catalog.show', [
             'product' => $product,
