@@ -24,13 +24,16 @@ class OrderStatusForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Név')
                     ->required()
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
                 TextInput::make('slug')
+                    ->label('Azonosító')
                     ->required()
                     ->unique(ignoreRecord: true),
                 Select::make('color')
+                    ->label('Szín')
                     ->options(self::COLORS)
                     ->required()
                     ->default('gray'),

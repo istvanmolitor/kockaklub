@@ -22,18 +22,22 @@ class ProductForm
         return $schema
             ->components([
                 Select::make('category_id')
+                    ->label('Kategória')
                     ->relationship('category', 'name')
                     ->required()
                     ->searchable()
                     ->preload(),
                 TextInput::make('name')
+                    ->label('Név')
                     ->required()
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
                 TextInput::make('slug')
+                    ->label('Azonosító')
                     ->required()
                     ->unique(ignoreRecord: true),
                 RichEditor::make('description')
+                    ->label('Leírás')
                     ->columnSpanFull(),
                 TextInput::make('price')
                     ->label('Ár')

@@ -15,15 +15,19 @@ class CategoryForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Név')
                     ->required()
                     ->live(onBlur: true)
                     ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
                 TextInput::make('slug')
+                    ->label('Azonosító')
                     ->required()
                     ->unique(ignoreRecord: true),
                 Textarea::make('description')
+                    ->label('Leírás')
                     ->columnSpanFull(),
                 Toggle::make('is_active')
+                    ->label('Aktív')
                     ->default(true)
                     ->required(),
             ]);

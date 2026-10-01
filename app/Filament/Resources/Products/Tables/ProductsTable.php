@@ -43,10 +43,12 @@ class ProductsTable
                     ->label('Aktív')
                     ->boolean(),
                 TextColumn::make('created_at')
+                    ->label('Létrehozva')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Módosítva')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

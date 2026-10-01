@@ -31,6 +31,7 @@ class CustomersTable
                     ->counts('orders')
                     ->label('Rendelések'),
                 TextColumn::make('created_at')
+                    ->label('Létrehozva')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

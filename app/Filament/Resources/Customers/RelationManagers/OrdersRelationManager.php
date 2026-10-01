@@ -11,6 +11,8 @@ class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
 
+    protected static ?string $title = 'Rendelések';
+
     public function table(Table $table): Table
     {
         return $table

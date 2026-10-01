@@ -20,6 +20,10 @@ class OrderResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedShoppingBag;
 
+    protected static ?string $modelLabel = 'Rendelés';
+
+    protected static ?string $pluralModelLabel = 'Rendelések';
+
     public static function form(Schema $schema): Schema
     {
         return OrderForm::configure($schema);

@@ -20,6 +20,10 @@ class OrderStatusResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $modelLabel = 'Rendelés státusz';
+
+    protected static ?string $pluralModelLabel = 'Rendelés státuszok';
+
     public static function form(Schema $schema): Schema
     {
         return OrderStatusForm::configure($schema);
