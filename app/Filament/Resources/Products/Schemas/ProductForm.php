@@ -58,6 +58,9 @@ class ProductForm
                                 Toggle::make('is_discontinued')
                                     ->label('Kifutó termék')
                                     ->helperText('Kifutó termék készlethiány esetén nem rendelhető.'),
+                                Toggle::make('is_featured')
+                                    ->label('Kiemelt')
+                                    ->helperText('Kiemelt termékek megjelennek a főoldalon.'),
                             ]),
                         Tab::make('Képek')
                             ->schema([

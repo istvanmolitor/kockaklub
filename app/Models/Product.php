@@ -35,6 +35,7 @@ class Product extends Model
         'sku',
         'is_active',
         'is_discontinued',
+        'is_featured',
     ];
 
     protected function casts(): array
@@ -43,6 +44,7 @@ class Product extends Model
             'price' => 'integer',
             'is_active' => 'boolean',
             'is_discontinued' => 'boolean',
+            'is_featured' => 'boolean',
         ];
     }
 

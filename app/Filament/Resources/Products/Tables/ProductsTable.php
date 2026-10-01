@@ -50,6 +50,9 @@ class ProductsTable
                 IconColumn::make('is_discontinued')
                     ->label('Kifutó')
                     ->boolean(),
+                IconColumn::make('is_featured')
+                    ->label('Kiemelt')
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Létrehozva')
                     ->dateTime()
@@ -69,6 +72,8 @@ class ProductsTable
                     ->label('Aktív'),
                 TernaryFilter::make('is_discontinued')
                     ->label('Kifutó'),
+                TernaryFilter::make('is_featured')
+                    ->label('Kiemelt'),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -30,11 +30,17 @@ class ProductFactory extends Factory
             'sku' => strtoupper(fake()->unique()->bothify('SKU-####??')),
             'is_active' => true,
             'is_discontinued' => false,
+            'is_featured' => false,
         ];
     }
 
     public function discontinued(): static
     {
         return $this->state(['is_discontinued' => true]);
+    }
+
+    public function featured(): static
+    {
+        return $this->state(['is_featured' => true]);
     }
 }

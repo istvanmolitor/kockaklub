@@ -50,10 +50,10 @@ class ProductInterestService
             ->where('product_interests.user_id', $user->id)
             ->where('products.is_active', true)
             ->when($orderedProductIds->isNotEmpty(), fn ($query) => $query->whereNotIn('products.id', $orderedProductIds))
+            ->select('products.*')
             ->withPublicStock()
             ->with('defaultImage')
             ->orderByDesc('product_interests.score')
-            ->select('products.*')
             ->limit($limit)
             ->get();
     }
