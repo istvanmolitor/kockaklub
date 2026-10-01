@@ -3,6 +3,11 @@
 @section('title', 'Pénztár')
 
 @section('content')
+    @php
+        $selectedShippingMethodId = (int) old('shipping_method_id', $shippingMethods->first()->id);
+        $oldPaymentMethodId = old('payment_method_id');
+    @endphp
+
     <h1 class="text-2xl font-semibold text-gray-900 mb-6">Pénztár</h1>
 
     <div class="grid md:grid-cols-3 gap-10">
@@ -52,16 +57,47 @@
             </div>
 
             <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-3">
+                <h2 class="font-semibold text-gray-900">Szállítási mód</h2>
+
+                @foreach ($shippingMethods as $shippingMethod)
+                    <label class="flex items-start gap-2 text-sm">
+                        <input type="radio" name="shipping_method_id" value="{{ $shippingMethod->id }}"
+                               data-shipping-method-option
+                               {{ $selectedShippingMethodId === $shippingMethod->id ? 'checked' : '' }}
+                               class="mt-1 border-gray-300">
+                        <span>
+                            {{ $shippingMethod->name }}
+                            @if ($shippingMethod->description)
+                                <span class="block text-gray-500">{{ $shippingMethod->description }}</span>
+                            @endif
+                        </span>
+                    </label>
+                @endforeach
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-3">
                 <h2 class="font-semibold text-gray-900">Fizetési mód</h2>
 
-                <label class="flex items-center gap-2 text-sm">
-                    <input type="radio" name="payment_method" value="cod" checked class="border-gray-300">
-                    Utánvét
-                </label>
-                <label class="flex items-center gap-2 text-sm">
-                    <input type="radio" name="payment_method" value="bank_transfer" class="border-gray-300">
-                    Banki átutalás
-                </label>
+                @foreach ($shippingMethods as $shippingMethod)
+                    <div data-payment-methods-for="{{ $shippingMethod->id }}"
+                         class="space-y-3 {{ $selectedShippingMethodId === $shippingMethod->id ? '' : 'hidden' }}">
+                        @foreach ($shippingMethod->paymentMethods as $paymentMethod)
+                            <label class="flex items-start gap-2 text-sm">
+                                <input type="radio" name="payment_method_id" value="{{ $paymentMethod->id }}"
+                                       {{ $oldPaymentMethodId
+                                            ? ($oldPaymentMethodId == $paymentMethod->id ? 'checked' : '')
+                                            : ($selectedShippingMethodId === $shippingMethod->id && $loop->first ? 'checked' : '') }}
+                                       class="mt-1 border-gray-300">
+                                <span>
+                                    {{ $paymentMethod->name }}
+                                    @if ($paymentMethod->description)
+                                        <span class="block text-gray-500">{{ $paymentMethod->description }}</span>
+                                    @endif
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                @endforeach
             </div>
 
             <button type="submit"
@@ -88,4 +124,32 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var shippingInputs = document.querySelectorAll('[data-shipping-method-option]');
+            var paymentGroups = document.querySelectorAll('[data-payment-methods-for]');
+
+            function updatePaymentGroups() {
+                var selected = document.querySelector('[data-shipping-method-option]:checked');
+                var selectedId = selected ? selected.value : null;
+
+                paymentGroups.forEach(function (group) {
+                    var isVisible = group.dataset.paymentMethodsFor === selectedId;
+                    group.classList.toggle('hidden', !isVisible);
+
+                    if (isVisible && !group.querySelector('input[type="radio"]:checked')) {
+                        var firstRadio = group.querySelector('input[type="radio"]');
+                        if (firstRadio) {
+                            firstRadio.checked = true;
+                        }
+                    }
+                });
+            }
+
+            shippingInputs.forEach(function (input) {
+                input.addEventListener('change', updatePaymentGroups);
+            });
+        });
+    </script>
 @endsection

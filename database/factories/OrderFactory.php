@@ -5,6 +5,8 @@ namespace Database\Factories;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Models\PaymentMethod;
+use App\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -28,7 +30,8 @@ class OrderFactory extends Factory
             'shipping_name' => fake()->name(),
             'shipping_phone' => fake()->phoneNumber(),
             'shipping_address' => fake()->address(),
-            'payment_method' => fake()->randomElement(['cod', 'bank_transfer']),
+            'shipping_method_id' => ShippingMethod::factory(),
+            'payment_method_id' => PaymentMethod::factory(),
             'subtotal' => $subtotal,
             'total' => $subtotal,
         ];

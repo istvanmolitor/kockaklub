@@ -21,7 +21,8 @@ class Order extends Model
         'shipping_name',
         'shipping_phone',
         'shipping_address',
-        'payment_method',
+        'shipping_method_id',
+        'payment_method_id',
         'subtotal',
         'total',
     ];
@@ -42,6 +43,16 @@ class Order extends Model
     public function orderStatus(): BelongsTo
     {
         return $this->belongsTo(OrderStatus::class);
+    }
+
+    public function shippingMethod(): BelongsTo
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
+
+    public function paymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function items(): HasMany

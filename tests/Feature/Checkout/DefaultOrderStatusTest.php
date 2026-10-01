@@ -3,7 +3,9 @@
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\ShippingMethod;
 use Illuminate\Support\Facades\Mail;
 
 it('assigns the default order status to a newly created order', function () {
@@ -11,6 +13,10 @@ it('assigns the default order status to a newly created order', function () {
 
     OrderStatus::factory()->create(['slug' => 'processing', 'is_default' => false]);
     $pending = OrderStatus::factory()->create(['slug' => 'pending', 'is_default' => true]);
+
+    $shippingMethod = ShippingMethod::factory()->create(['is_active' => true]);
+    $paymentMethod = PaymentMethod::factory()->create(['is_active' => true]);
+    $shippingMethod->paymentMethods()->attach($paymentMethod);
 
     $product = Product::factory()->create(['price' => 2500, 'stock' => 5]);
 
@@ -23,7 +29,8 @@ it('assigns the default order status to a newly created order', function () {
         'shipping_name' => 'Teszt Vásárló',
         'shipping_phone' => '+36301239999',
         'shipping_address' => '5555 Győr, Alap utca 5.',
-        'payment_method' => 'cod',
+        'shipping_method_id' => $shippingMethod->id,
+        'payment_method_id' => $paymentMethod->id,
     ]);
 
     $order = Order::first();

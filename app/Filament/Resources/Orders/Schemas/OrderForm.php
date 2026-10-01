@@ -46,12 +46,17 @@ class OrderForm
                     ->label('Szállítási cím')
                     ->required()
                     ->columnSpanFull(),
-                Select::make('payment_method')
+                Select::make('shipping_method_id')
+                    ->label('Szállítási mód')
+                    ->relationship('shippingMethod', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                Select::make('payment_method_id')
                     ->label('Fizetési mód')
-                    ->options([
-                        'cod' => 'Utánvét',
-                        'bank_transfer' => 'Banki átutalás',
-                    ])
+                    ->relationship('paymentMethod', 'name')
+                    ->searchable()
+                    ->preload()
                     ->required(),
                 Repeater::make('items')
                     ->label('Tételek')

@@ -3,12 +3,18 @@
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\ShippingMethod;
 use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
     OrderStatus::factory()->create(['slug' => 'pending', 'is_default' => true]);
+
+    $this->shippingMethod = ShippingMethod::factory()->create(['is_active' => true]);
+    $this->paymentMethod = PaymentMethod::factory()->create(['is_active' => true]);
+    $this->shippingMethod->paymentMethods()->attach($this->paymentMethod);
 });
 
 it('links an order to the logged in customer without creating a duplicate', function () {
@@ -26,7 +32,8 @@ it('links an order to the logged in customer without creating a duplicate', func
         'shipping_name' => $customer->name,
         'shipping_phone' => '+36301112222',
         'shipping_address' => '2222 Debrecen, Fő utca 2.',
-        'payment_method' => 'bank_transfer',
+        'shipping_method_id' => $this->shippingMethod->id,
+        'payment_method_id' => $this->paymentMethod->id,
     ]);
 
     $order = Order::first();

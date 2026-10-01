@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\Product;
+use App\Models\ShippingMethod;
 use App\Services\CartService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -32,9 +33,22 @@ class CheckoutController extends Controller
 
         $customer = $request->user()?->customer;
 
+        $shippingMethods = ShippingMethod::query()
+            ->where('is_active', true)
+            ->with(['paymentMethods' => fn ($query) => $query->where('is_active', true)->orderBy('name')])
+            ->orderBy('name')
+            ->get()
+            ->filter(fn (ShippingMethod $shippingMethod) => $shippingMethod->paymentMethods->isNotEmpty())
+            ->values();
+
+        if ($shippingMethods->isEmpty()) {
+            return redirect()->route('cart.show')->with('status', 'Jelenleg nem érhető el szállítási mód.');
+        }
+
         return view('storefront.checkout.create', [
             'cart' => $cart,
             'customer' => $customer,
+            'shippingMethods' => $shippingMethods,
         ]);
     }
 
@@ -90,7 +104,8 @@ class CheckoutController extends Controller
                     'shipping_name' => $validated['shipping_name'],
                     'shipping_phone' => $validated['shipping_phone'],
                     'shipping_address' => $validated['shipping_address'],
-                    'payment_method' => $validated['payment_method'],
+                    'shipping_method_id' => $validated['shipping_method_id'],
+                    'payment_method_id' => $validated['payment_method_id'],
                     'subtotal' => $subtotal,
                     'total' => $subtotal,
                 ]);
@@ -123,7 +138,7 @@ class CheckoutController extends Controller
 
     public function confirmation(Order $order): View
     {
-        $order->load('items', 'orderStatus');
+        $order->load('items', 'orderStatus', 'shippingMethod', 'paymentMethod');
 
         return view('storefront.checkout.confirmation', ['order' => $order]);
     }

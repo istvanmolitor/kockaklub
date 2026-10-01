@@ -23,7 +23,8 @@
 
         <dl class="text-sm text-gray-600 space-y-1 mb-6">
             <div><dt class="inline font-medium">Szállítási cím: </dt><dd class="inline">{{ $order->shipping_address }}</dd></div>
-            <div><dt class="inline font-medium">Fizetési mód: </dt><dd class="inline">{{ $order->payment_method === 'cod' ? 'Utánvét' : 'Banki átutalás' }}</dd></div>
+            <div><dt class="inline font-medium">Szállítási mód: </dt><dd class="inline">{{ $order->shippingMethod->name }}</dd></div>
+            <div><dt class="inline font-medium">Fizetési mód: </dt><dd class="inline">{{ $order->paymentMethod->name }}</dd></div>
             <div><dt class="inline font-medium">Státusz: </dt><dd class="inline">{{ $order->orderStatus->name }}</dd></div>
         </dl>
 

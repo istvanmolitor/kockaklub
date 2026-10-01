@@ -15,7 +15,9 @@ Rendelésszám: **{{ $order->order_number }}**
 
 Szállítási cím: {{ $order->shipping_address }}
 
-Fizetési mód: {{ $order->payment_method === 'cod' ? 'Utánvét' : 'Banki átutalás' }}
+Szállítási mód: {{ $order->shippingMethod->name }}
+
+Fizetési mód: {{ $order->paymentMethod->name }}
 
 <x-mail::button :url="route('checkout.confirmation', $order)">
 Rendelés megtekintése

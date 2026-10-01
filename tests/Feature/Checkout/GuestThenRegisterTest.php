@@ -3,13 +3,19 @@
 use App\Models\Cart;
 use App\Models\Customer;
 use App\Models\OrderStatus;
+use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\ShippingMethod;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
     OrderStatus::factory()->create(['slug' => 'pending', 'is_default' => true]);
+
+    $this->shippingMethod = ShippingMethod::factory()->create(['is_active' => true]);
+    $this->paymentMethod = PaymentMethod::factory()->create(['is_active' => true]);
+    $this->shippingMethod->paymentMethods()->attach($this->paymentMethod);
 });
 
 it('links an existing guest customer to a new account instead of duplicating it', function () {
@@ -27,7 +33,8 @@ it('links an existing guest customer to a new account instead of duplicating it'
         'shipping_name' => 'Ismétlődő Ügyfél',
         'shipping_phone' => '+36309998888',
         'shipping_address' => '3333 Szeged, Teszt tér 3.',
-        'payment_method' => 'cod',
+        'shipping_method_id' => $this->shippingMethod->id,
+        'payment_method_id' => $this->paymentMethod->id,
     ]);
 
     expect(Customer::count())->toBe(1);
