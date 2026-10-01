@@ -38,6 +38,18 @@ class OrderForm
                     ->relationship('orderStatus', 'name')
                     ->default(fn () => OrderStatus::default()?->id)
                     ->required(),
+                Select::make('payment_method_id')
+                    ->label('Fizetési mód')
+                    ->relationship('paymentMethod', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
+                        $set('payment_cost', PaymentMethod::find($state)?->cost ?? 0);
+
+                        static::recalculateOrderTotals($get('items') ?? [], $get, $set);
+                    }),
                 Section::make('Szállítási adatok')
                     ->columns(2)
                     ->schema([
@@ -103,18 +115,6 @@ class OrderForm
                     ->live()
                     ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
                         $set('shipping_cost', ShippingMethod::find($state)?->cost ?? 0);
-
-                        static::recalculateOrderTotals($get('items') ?? [], $get, $set);
-                    }),
-                Select::make('payment_method_id')
-                    ->label('Fizetési mód')
-                    ->relationship('paymentMethod', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
-                        $set('payment_cost', PaymentMethod::find($state)?->cost ?? 0);
 
                         static::recalculateOrderTotals($get('items') ?? [], $get, $set);
                     }),
