@@ -13,6 +13,17 @@ class CartService
 {
     public const COOKIE_NAME = 'cart_token';
 
+    public function existingCart(Request $request): ?Cart
+    {
+        if ($request->user()) {
+            return Cart::firstWhere('customer_id', $request->user()->customer->id);
+        }
+
+        $token = $request->cookie(self::COOKIE_NAME);
+
+        return $token ? Cart::firstWhere('guest_token', $token) : null;
+    }
+
     public function currentCart(Request $request): Cart
     {
         if ($request->user()) {
