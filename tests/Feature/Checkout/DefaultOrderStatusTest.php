@@ -18,7 +18,7 @@ it('assigns the default order status to a newly created order', function () {
     $paymentMethod = PaymentMethod::factory()->create(['is_active' => true]);
     $shippingMethod->paymentMethods()->attach($paymentMethod);
 
-    $product = Product::factory()->create(['price' => 2500, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 2500]);
 
     $cart = Cart::create(['guest_token' => 'status-default-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);

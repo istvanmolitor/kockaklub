@@ -10,8 +10,8 @@ it('merges the guest cart into the customer cart on login and removes the guest 
     $user = User::factory()->create(['password' => Hash::make('jelszo1234')]);
     $customer = Customer::factory()->create(['user_id' => $user->id, 'email' => $user->email]);
 
-    $productA = Product::factory()->create(['stock' => 10]);
-    $productB = Product::factory()->create(['stock' => 10]);
+    $productA = Product::factory()->create();
+    $productB = Product::factory()->create();
 
     $customerCart = Cart::create(['customer_id' => $customer->id]);
     $customerCart->items()->create(['product_id' => $productA->id, 'quantity' => 1]);

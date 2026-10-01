@@ -5,6 +5,12 @@
 @section('content')
     <nav class="text-sm text-gray-500 mb-6">
         <a href="{{ route('catalog.index') }}" class="hover:text-amber-600">Termékek</a>
+        @foreach ($product->category->ancestors() as $ancestor)
+            <span class="mx-2">/</span>
+            <a href="{{ route('catalog.index', ['category' => $ancestor->slug]) }}" class="hover:text-amber-600">
+                {{ $ancestor->name }}
+            </a>
+        @endforeach
         <span class="mx-2">/</span>
         <a href="{{ route('catalog.index', ['category' => $product->category->slug]) }}" class="hover:text-amber-600">
             {{ $product->category->name }}
@@ -32,8 +38,8 @@
             <h1 class="text-2xl font-semibold text-gray-900">{{ $product->name }}</h1>
             <p class="mt-2 text-2xl font-bold text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Ft</p>
 
-            <p class="mt-2 text-sm {{ $product->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
-                {{ $product->stock > 0 ? 'Raktáron' : 'Elfogyott' }}
+            <p class="mt-2 text-sm {{ $publicStock > 0 ? 'text-green-600' : 'text-red-600' }}">
+                {{ $publicStock > 0 ? "Raktáron ({$publicStock} db)" : 'Elfogyott' }}
             </p>
 
             <div class="mt-6 prose prose-sm max-w-none text-gray-700">
@@ -44,13 +50,13 @@
                 @csrf
                 <div>
                     <label for="quantity" class="block text-sm font-medium text-gray-700">Mennyiség</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ $product->stock }}"
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ $publicStock }}"
                            class="mt-1 w-20 rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
                 </div>
                 <button type="submit"
-                        @disabled($product->stock < 1)
+                        @disabled($publicStock < 1)
                         class="rounded-md bg-amber-600 px-5 py-2.5 text-white font-medium hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed">
-                    {{ $product->stock < 1 ? 'Elfogyott' : 'Kosárba teszem' }}
+                    {{ $publicStock < 1 ? 'Elfogyott' : 'Kosárba teszem' }}
                 </button>
             </form>
         </div>

@@ -23,7 +23,7 @@ it('links an order to the logged in customer without creating a duplicate', func
     $user = User::factory()->create(['email' => 'user@example.com']);
     $customer = Customer::factory()->create(['user_id' => $user->id, 'email' => $user->email]);
 
-    $product = Product::factory()->create(['price' => 7500, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 7500]);
 
     $this->actingAs($user);
     $this->post("/kosar/hozzaadas/{$product->id}", ['quantity' => 1]);

@@ -22,7 +22,7 @@ it('links an existing guest customer to a new account instead of duplicating it'
     Mail::fake();
     Event::fake();
 
-    $product = Product::factory()->create(['price' => 3000, 'stock' => 10]);
+    $product = Product::factory()->create(['price' => 3000]);
 
     $cart = Cart::create(['guest_token' => 'guest-register-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);

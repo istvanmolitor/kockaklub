@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\Categories\Tables;
+namespace App\Filament\Resources\Sites\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -10,7 +10,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-class CategoriesTable
+class SitesTable
 {
     public static function configure(Table $table): Table
     {
@@ -19,16 +19,15 @@ class CategoriesTable
                 TextColumn::make('name')
                     ->label('Név')
                     ->searchable(),
-                TextColumn::make('parent.name')
-                    ->label('Szülő kategória')
-                    ->placeholder('—')
-                    ->sortable(),
-                TextColumn::make('slug')
-                    ->label('Azonosító')
-                    ->searchable(),
-                TextColumn::make('products_count')
-                    ->counts('products')
-                    ->label('Termékek'),
+                TextColumn::make('country')
+                    ->label('Ország')
+                    ->placeholder('—'),
+                TextColumn::make('city')
+                    ->label('Város')
+                    ->placeholder('—'),
+                TextColumn::make('regions_count')
+                    ->counts('regions')
+                    ->label('Régiók'),
                 IconColumn::make('is_active')
                     ->label('Aktív')
                     ->boolean(),

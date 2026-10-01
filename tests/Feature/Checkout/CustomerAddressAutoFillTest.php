@@ -35,7 +35,7 @@ it('fills the customer address details from the first order when they were empty
         'billing_address' => null,
     ]);
 
-    $product = Product::factory()->create(['price' => 1000, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 1000]);
 
     $this->actingAs($user);
     $this->post("/kosar/hozzaadas/{$product->id}", ['quantity' => 1]);
@@ -71,7 +71,7 @@ it('does not overwrite already filled in customer address details on a later ord
         'billing_city' => 'Eredeti Város',
     ]);
 
-    $product = Product::factory()->create(['price' => 1000, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 1000]);
 
     $this->actingAs($user);
     $this->post("/kosar/hozzaadas/{$product->id}", ['quantity' => 1]);

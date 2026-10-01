@@ -19,7 +19,7 @@ it('adds the shipping and payment method costs to the order total', function () 
     $paymentMethod = PaymentMethod::factory()->create(['is_active' => true, 'cost' => 390]);
     $shippingMethod->paymentMethods()->attach($paymentMethod);
 
-    $product = Product::factory()->create(['price' => 5000, 'stock' => 10]);
+    $product = Product::factory()->create(['price' => 5000]);
 
     $cart = Cart::create(['guest_token' => 'cost-checkout-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 2]);

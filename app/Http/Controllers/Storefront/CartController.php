@@ -5,20 +5,30 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Services\CartService;
+use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    public function __construct(private readonly CartService $cartService) {}
+    public function __construct(
+        private readonly CartService $cartService,
+        private readonly StockService $stockService,
+    ) {}
 
     public function show(Request $request): View
     {
         $cart = $this->cartService->currentCart($request);
         $cart->load('items.product.defaultImage');
 
-        return view('storefront.cart.show', ['cart' => $cart]);
+        $publicStockByProductId = $cart->items
+            ->mapWithKeys(fn ($item) => [$item->product_id => $this->stockService->publicStockForProduct($item->product_id)]);
+
+        return view('storefront.cart.show', [
+            'cart' => $cart,
+            'publicStockByProductId' => $publicStockByProductId,
+        ]);
     }
 
     public function store(Request $request, Product $product): RedirectResponse

@@ -13,15 +13,13 @@
                         Összes termék
                     </a>
                 </li>
-                @foreach ($categories as $category)
-                    <li>
-                        <a href="{{ route('catalog.index', ['category' => $category->slug]) }}"
-                           class="{{ $activeCategory === $category->slug ? 'text-amber-600 font-medium' : 'text-gray-600 hover:text-amber-600' }}">
-                            {{ $category->name }}
-                        </a>
-                    </li>
-                @endforeach
             </ul>
+
+            @include('storefront.catalog._category-tree', [
+                'categories' => $categories,
+                'activeCategory' => $activeCategory,
+                'level' => 0,
+            ])
         </aside>
 
         <div class="flex-1">

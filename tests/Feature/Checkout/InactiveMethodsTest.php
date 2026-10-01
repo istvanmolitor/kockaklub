@@ -19,7 +19,7 @@ it('does not show an inactive shipping method on the checkout page', function ()
     $inactiveShippingMethod = ShippingMethod::factory()->create(['is_active' => false, 'name' => 'Inaktív szállítás']);
     $inactiveShippingMethod->paymentMethods()->attach($paymentMethod);
 
-    $product = Product::factory()->create(['price' => 2000, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 2000]);
     $cart = Cart::create(['guest_token' => 'inactive-methods-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);
 
@@ -34,7 +34,7 @@ it('rejects an order placed with an inactive payment method', function () {
     $inactivePaymentMethod = PaymentMethod::factory()->create(['is_active' => false]);
     $shippingMethod->paymentMethods()->attach($inactivePaymentMethod);
 
-    $product = Product::factory()->create(['price' => 2000, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 2000]);
     $cart = Cart::create(['guest_token' => 'inactive-payment-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);
 
@@ -60,7 +60,7 @@ it('rejects a payment method that is not linked to the selected shipping method'
     $shippingMethod = ShippingMethod::factory()->create(['is_active' => true]);
     $unrelatedPaymentMethod = PaymentMethod::factory()->create(['is_active' => true]);
 
-    $product = Product::factory()->create(['price' => 2000, 'stock' => 5]);
+    $product = Product::factory()->create(['price' => 2000]);
     $cart = Cart::create(['guest_token' => 'mismatched-methods-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 1]);
 

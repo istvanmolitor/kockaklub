@@ -27,7 +27,6 @@ class ProductFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->paragraph(),
             'price' => fake()->numberBetween(1000, 50000),
-            'stock' => fake()->numberBetween(0, 100),
             'sku' => strtoupper(fake()->unique()->bothify('SKU-####??')),
             'is_active' => true,
         ];

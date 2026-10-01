@@ -19,7 +19,6 @@ it('allows an admin to create a product through the admin panel', function () {
             'name' => 'Teszt termék',
             'slug' => 'teszt-termek',
             'price' => 12990,
-            'stock' => 10,
             'sku' => 'TT-0001',
             'is_active' => true,
         ])
@@ -48,7 +47,6 @@ it('allows an admin to assign single and multi-select attribute values to a prod
             'name' => 'Attribútumos termék',
             'slug' => 'attributumos-termek',
             'price' => 9990,
-            'stock' => 5,
             'is_active' => true,
             'attribute_values' => [
                 $brand->id => $brandValue->id,

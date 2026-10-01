@@ -44,11 +44,6 @@ class ProductForm
                     ->required()
                     ->numeric()
                     ->suffix('Ft'),
-                TextInput::make('stock')
-                    ->label('Készlet')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
                 TextInput::make('sku')
                     ->label('SKU'),
                 Toggle::make('is_active')

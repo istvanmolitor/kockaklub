@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use App\Models\Product;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -11,12 +12,14 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->withPublicStock())
             ->columns([
                 ImageColumn::make('default_image_url')
                     ->label('Kép')
@@ -32,10 +35,12 @@ class ProductsTable
                     ->label('Ár')
                     ->money('HUF', decimalPlaces: 0)
                     ->sortable(),
-                TextColumn::make('stock')
-                    ->label('Készlet')
-                    ->numeric()
-                    ->sortable(),
+                IconColumn::make('public_stock')
+                    ->label('Készleten')
+                    ->boolean()
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->getStateUsing(fn (Product $record) => $record->public_stock > 0),
                 TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable(),

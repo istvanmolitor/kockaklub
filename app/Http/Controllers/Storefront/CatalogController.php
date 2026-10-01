@@ -5,24 +5,28 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Services\StockService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class CatalogController extends Controller
 {
+    public function __construct(private readonly StockService $stockService) {}
+
     public function index(Request $request): View
     {
+        $category = Category::query()->where('slug', $request->string('category'))->first();
+
         $products = Product::query()
+            ->withPublicStock()
             ->with('defaultImage')
             ->where('is_active', true)
-            ->when($request->filled('category'), function ($query) use ($request) {
-                $query->whereHas('category', fn ($q) => $q->where('slug', $request->string('category')));
-            })
+            ->when($category, fn ($query) => $query->whereIn('category_id', $category->selfAndDescendantIds()))
             ->latest()
             ->paginate(12)
             ->withQueryString();
 
-        $categories = Category::query()->where('is_active', true)->orderBy('name')->get();
+        $categories = Category::tree(Category::query()->where('is_active', true)->orderBy('name')->get());
 
         return view('storefront.catalog.index', [
             'products' => $products,
@@ -39,6 +43,7 @@ class CatalogController extends Controller
 
         return view('storefront.catalog.show', [
             'product' => $product,
+            'publicStock' => $this->stockService->publicStockForProduct($product->id),
         ]);
     }
 }

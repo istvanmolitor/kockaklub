@@ -13,9 +13,9 @@
         <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-auto pt-4">
             @csrf
             <button type="submit"
-                    @disabled($product->stock < 1)
+                    @disabled($product->public_stock < 1)
                     class="w-full rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed">
-                {{ $product->stock < 1 ? 'Elfogyott' : 'Kosárba' }}
+                {{ $product->public_stock < 1 ? 'Elfogyott' : 'Kosárba' }}
             </button>
         </form>
     </div>

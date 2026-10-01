@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Services\StockService;
 use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +24,6 @@ class Product extends Model
         'slug',
         'description',
         'price',
-        'stock',
         'sku',
         'is_active',
     ];
@@ -31,7 +32,6 @@ class Product extends Model
     {
         return [
             'price' => 'integer',
-            'stock' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -56,8 +56,22 @@ class Product extends Model
         return $this->belongsToMany(ProductAttributeValue::class, 'attribute_value_product');
     }
 
+    public function stockMovementItems(): HasMany
+    {
+        return $this->hasMany(StockMovementItem::class);
+    }
+
     protected function defaultImageUrl(): Attribute
     {
         return Attribute::get(fn () => $this->defaultImage?->url() ?? asset('images/product-placeholder.svg'));
+    }
+
+    /**
+     * Adds a `public_stock` column to the query: the aggregated quantity of this
+     * product across all public regions, derived from stock movement history.
+     */
+    public function scopeWithPublicStock(Builder $query): Builder
+    {
+        return $query->addSelect(['public_stock' => StockService::publicStockSubquery()]);
     }
 }

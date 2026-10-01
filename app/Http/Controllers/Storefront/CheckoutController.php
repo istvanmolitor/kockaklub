@@ -100,11 +100,11 @@ class CheckoutController extends Controller
                 $lineData = [];
 
                 foreach ($cart->items as $item) {
-                    $product = Product::whereKey($item->product_id)->lockForUpdate()->first();
+                    $product = Product::whereKey($item->product_id)->first();
 
-                    if (! $product || $product->stock < $item->quantity) {
+                    if (! $product) {
                         throw ValidationException::withMessages([
-                            'quantity' => sprintf('"%s" termékből nincs elég készleten.', $item->product->name),
+                            'quantity' => sprintf('"%s" termék már nem elérhető.', $item->product->name),
                         ]);
                     }
 
@@ -147,7 +147,8 @@ class CheckoutController extends Controller
                         'line_total' => $line['line_total'],
                     ]);
 
-                    $line['product']->decrement('stock', $line['quantity']);
+                    // Stock is not automatically decremented on checkout (out of scope —
+                    // see the Leltár/StockMovement resource for manual stock management).
                 }
 
                 $cart->items()->delete();

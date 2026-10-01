@@ -21,7 +21,7 @@ beforeEach(function () {
 it('allows a guest to check out and creates an order with a linked guest customer', function () {
     Mail::fake();
 
-    $product = Product::factory()->create(['price' => 5000, 'stock' => 10]);
+    $product = Product::factory()->create(['price' => 5000]);
 
     $cart = Cart::create(['guest_token' => 'guest-checkout-token']);
     $cart->items()->create(['product_id' => $product->id, 'quantity' => 2]);
@@ -53,8 +53,6 @@ it('allows a guest to check out and creates an order with a linked guest custome
     expect($customer)->not->toBeNull()
         ->and($customer->user_id)->toBeNull()
         ->and($order->customer_id)->toBe($customer->id);
-
-    expect($product->fresh()->stock)->toBe(8);
 
     Mail::assertQueued(OrderConfirmationMail::class);
 });
