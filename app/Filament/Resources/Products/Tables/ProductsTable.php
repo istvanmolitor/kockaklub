@@ -47,6 +47,9 @@ class ProductsTable
                 IconColumn::make('is_active')
                     ->label('Aktív')
                     ->boolean(),
+                IconColumn::make('is_discontinued')
+                    ->label('Kifutó')
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Létrehozva')
                     ->dateTime()
@@ -64,6 +67,8 @@ class ProductsTable
                     ->relationship('category', 'name'),
                 TernaryFilter::make('is_active')
                     ->label('Aktív'),
+                TernaryFilter::make('is_discontinued')
+                    ->label('Kifutó'),
             ])
             ->recordActions([
                 EditAction::make(),

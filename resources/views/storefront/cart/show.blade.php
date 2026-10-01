@@ -21,10 +21,11 @@
                         <p class="text-sm text-gray-500">{{ number_format($item->product->price, 0, ',', ' ') }} Ft / db</p>
                     </div>
 
+                    @php $itemStock = $publicStockByProductId[$item->product_id] ?? 0; @endphp
                     <form method="POST" action="{{ route('cart.update', $item->product) }}" class="flex items-center gap-2">
                         @csrf
                         @method('PATCH')
-                        <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" max="{{ $publicStockByProductId[$item->product_id] ?? 0 }}"
+                        <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" @if ($itemStock > 0) max="{{ $itemStock }}" @endif
                                class="w-16 rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
                         <button type="submit" class="text-sm text-amber-600 hover:underline">Frissít</button>
                     </form>

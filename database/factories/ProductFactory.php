@@ -29,6 +29,12 @@ class ProductFactory extends Factory
             'price' => fake()->numberBetween(1000, 50000),
             'sku' => strtoupper(fake()->unique()->bothify('SKU-####??')),
             'is_active' => true,
+            'is_discontinued' => false,
         ];
+    }
+
+    public function discontinued(): static
+    {
+        return $this->state(['is_discontinued' => true]);
     }
 }

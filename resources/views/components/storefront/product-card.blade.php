@@ -13,9 +13,9 @@
         <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-auto pt-4">
             @csrf
             <button type="submit"
-                    @disabled($product->public_stock < 1)
+                    @disabled(! $product->isOrderable($product->public_stock))
                     class="w-full rounded-md bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed">
-                {{ $product->public_stock < 1 ? 'Elfogyott' : 'Kosárba' }}
+                {{ $product->isOrderable($product->public_stock) ? ($product->public_stock < 1 ? 'Elfogyott, előrendelhető' : 'Kosárba') : 'Elfogyott' }}
             </button>
         </form>
     </div>

@@ -11,6 +11,7 @@ class HomeController extends Controller
     public function index(): View
     {
         $products = Product::query()
+            ->withPublicStock()
             ->with('defaultImage')
             ->where('is_active', true)
             ->latest()

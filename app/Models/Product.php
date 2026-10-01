@@ -34,6 +34,7 @@ class Product extends Model
         'price',
         'sku',
         'is_active',
+        'is_discontinued',
     ];
 
     protected function casts(): array
@@ -41,6 +42,7 @@ class Product extends Model
         return [
             'price' => 'integer',
             'is_active' => 'boolean',
+            'is_discontinued' => 'boolean',
         ];
     }
 
@@ -77,6 +79,16 @@ class Product extends Model
     protected function defaultImageUrl(): Attribute
     {
         return Attribute::get(fn () => $this->defaultImage?->url() ?? asset('images/product-placeholder.svg'));
+    }
+
+    /**
+     * Whether the product can still be ordered given its current public stock.
+     * Non-discontinued products stay orderable (backorder) even out of stock;
+     * discontinued products stop being orderable once their stock reaches zero.
+     */
+    public function isOrderable(int $publicStock): bool
+    {
+        return ! $this->is_discontinued || $publicStock > 0;
     }
 
     /**

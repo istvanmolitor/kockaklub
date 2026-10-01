@@ -50,13 +50,13 @@
                 @csrf
                 <div>
                     <label for="quantity" class="block text-sm font-medium text-gray-700">Mennyiség</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="{{ $publicStock }}"
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" @if ($publicStock > 0) max="{{ $publicStock }}" @endif
                            class="mt-1 w-20 rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
                 </div>
                 <button type="submit"
-                        @disabled($publicStock < 1)
+                        @disabled(! $product->isOrderable($publicStock))
                         class="rounded-md bg-amber-600 px-5 py-2.5 text-white font-medium hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed">
-                    {{ $publicStock < 1 ? 'Elfogyott' : 'Kosárba teszem' }}
+                    {{ $product->isOrderable($publicStock) ? ($publicStock < 1 ? 'Előrendelem' : 'Kosárba teszem') : 'Elfogyott' }}
                 </button>
             </form>
         </div>

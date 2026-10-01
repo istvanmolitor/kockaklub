@@ -55,6 +55,9 @@ class ProductForm
                                 Toggle::make('is_active')
                                     ->default(true)
                                     ->required(),
+                                Toggle::make('is_discontinued')
+                                    ->label('Kifutó termék')
+                                    ->helperText('Kifutó termék készlethiány esetén nem rendelhető.'),
                             ]),
                         Tab::make('Képek')
                             ->schema([
