@@ -31,7 +31,11 @@ it('allows a guest to check out and creates an order with a linked guest custome
         'email' => 'vendeg@example.com',
         'shipping_name' => 'Vendég Vásárló',
         'shipping_phone' => '+36301234567',
-        'shipping_address' => '1111 Budapest, Teszt utca 1.',
+        'shipping_country' => 'Magyarország',
+        'shipping_city' => 'Budapest',
+        'shipping_zip' => '1111',
+        'shipping_address' => 'Teszt utca 1.',
+        'billing_same_as_shipping' => 1,
         'shipping_method_id' => $this->shippingMethod->id,
         'payment_method_id' => $this->paymentMethod->id,
     ]);

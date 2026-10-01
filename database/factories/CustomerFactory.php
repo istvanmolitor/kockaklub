@@ -22,6 +22,16 @@ class CustomerFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->optional()->phoneNumber(),
+            'shipping_name' => fake()->name(),
+            'shipping_country' => 'Magyarország',
+            'shipping_city' => fake()->city(),
+            'shipping_zip' => fake()->postcode(),
+            'shipping_address' => fake()->streetAddress(),
+            'billing_name' => fake()->name(),
+            'billing_country' => 'Magyarország',
+            'billing_city' => fake()->city(),
+            'billing_zip' => fake()->postcode(),
+            'billing_address' => fake()->streetAddress(),
         ];
     }
 }

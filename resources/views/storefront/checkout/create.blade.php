@@ -50,10 +50,88 @@
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
                 </div>
 
-                <div>
-                    <label for="shipping_address" class="block text-sm font-medium text-gray-700">Szállítási cím</label>
-                    <textarea id="shipping_address" name="shipping_address" rows="3" required
-                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">{{ old('shipping_address') }}</textarea>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="shipping_country" class="block text-sm font-medium text-gray-700">Ország</label>
+                        <input id="shipping_country" name="shipping_country" type="text"
+                               value="{{ old('shipping_country', $customer->shipping_country ?? 'Magyarország') }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                    </div>
+
+                    <div>
+                        <label for="shipping_city" class="block text-sm font-medium text-gray-700">Város</label>
+                        <input id="shipping_city" name="shipping_city" type="text"
+                               value="{{ old('shipping_city', $customer->shipping_city ?? '') }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                    </div>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="shipping_zip" class="block text-sm font-medium text-gray-700">Irányítószám</label>
+                        <input id="shipping_zip" name="shipping_zip" type="text"
+                               value="{{ old('shipping_zip', $customer->shipping_zip ?? '') }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                    </div>
+
+                    <div>
+                        <label for="shipping_address" class="block text-sm font-medium text-gray-700">Cím</label>
+                        <input id="shipping_address" name="shipping_address" type="text"
+                               value="{{ old('shipping_address', $customer->shipping_address ?? '') }}" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
+                <h2 class="font-semibold text-gray-900">Számlázási adatok</h2>
+
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" id="billing_same_as_shipping" name="billing_same_as_shipping" value="1"
+                           {{ old('billing_same_as_shipping', '1') ? 'checked' : '' }}
+                           class="rounded border-gray-300">
+                    A számlázási cím megegyezik a szállítási címmel
+                </label>
+
+                <div id="billing-fields" class="space-y-4 {{ old('billing_same_as_shipping', '1') ? 'hidden' : '' }}">
+                    <div>
+                        <label for="billing_name" class="block text-sm font-medium text-gray-700">Név</label>
+                        <input id="billing_name" name="billing_name" type="text"
+                               value="{{ old('billing_name', $customer->billing_name ?? '') }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="billing_country" class="block text-sm font-medium text-gray-700">Ország</label>
+                            <input id="billing_country" name="billing_country" type="text"
+                                   value="{{ old('billing_country', $customer->billing_country ?? 'Magyarország') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                        </div>
+
+                        <div>
+                            <label for="billing_city" class="block text-sm font-medium text-gray-700">Város</label>
+                            <input id="billing_city" name="billing_city" type="text"
+                                   value="{{ old('billing_city', $customer->billing_city ?? '') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                        </div>
+                    </div>
+
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="billing_zip" class="block text-sm font-medium text-gray-700">Irányítószám</label>
+                            <input id="billing_zip" name="billing_zip" type="text"
+                                   value="{{ old('billing_zip', $customer->billing_zip ?? '') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                        </div>
+
+                        <div>
+                            <label for="billing_address" class="block text-sm font-medium text-gray-700">Cím</label>
+                            <input id="billing_address" name="billing_address" type="text"
+                                   value="{{ old('billing_address', $customer->billing_address ?? '') }}"
+                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -198,6 +276,13 @@
             });
 
             updateSummary();
+
+            var billingCheckbox = document.getElementById('billing_same_as_shipping');
+            var billingFields = document.getElementById('billing-fields');
+
+            billingCheckbox.addEventListener('change', function () {
+                billingFields.classList.toggle('hidden', billingCheckbox.checked);
+            });
         });
     </script>
 @endsection

@@ -29,7 +29,11 @@ it('refuses to check out a product that is out of stock', function () {
         'email' => 'nincs.keszlet@example.com',
         'shipping_name' => 'Teszt Vásárló',
         'shipping_phone' => '+36301230000',
-        'shipping_address' => '4444 Pécs, Üres utca 4.',
+        'shipping_country' => 'Magyarország',
+        'shipping_city' => 'Pécs',
+        'shipping_zip' => '4444',
+        'shipping_address' => 'Üres utca 4.',
+        'billing_same_as_shipping' => 1,
         'shipping_method_id' => $this->shippingMethod->id,
         'payment_method_id' => $this->paymentMethod->id,
     ]);

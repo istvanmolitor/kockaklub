@@ -28,7 +28,11 @@ it('assigns the default order status to a newly created order', function () {
         'email' => 'statusz@example.com',
         'shipping_name' => 'Teszt Vásárló',
         'shipping_phone' => '+36301239999',
-        'shipping_address' => '5555 Győr, Alap utca 5.',
+        'shipping_country' => 'Magyarország',
+        'shipping_city' => 'Győr',
+        'shipping_zip' => '5555',
+        'shipping_address' => 'Alap utca 5.',
+        'billing_same_as_shipping' => 1,
         'shipping_method_id' => $shippingMethod->id,
         'payment_method_id' => $paymentMethod->id,
     ]);

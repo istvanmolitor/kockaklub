@@ -28,7 +28,14 @@
         </div>
 
         <dl class="text-sm text-gray-600 space-y-1 mb-6">
-            <div><dt class="inline font-medium">Szállítási cím: </dt><dd class="inline">{{ $order->shipping_address }}</dd></div>
+            <div>
+                <dt class="inline font-medium">Szállítási cím: </dt>
+                <dd class="inline">{{ $order->shipping_name }}, {{ $order->shipping_country }}, {{ $order->shipping_zip }} {{ $order->shipping_city }}, {{ $order->shipping_address }}</dd>
+            </div>
+            <div>
+                <dt class="inline font-medium">Számlázási cím: </dt>
+                <dd class="inline">{{ $order->billing_name }}, {{ $order->billing_country }}, {{ $order->billing_zip }} {{ $order->billing_city }}, {{ $order->billing_address }}</dd>
+            </div>
             <div><dt class="inline font-medium">Státusz: </dt><dd class="inline">{{ $order->orderStatus->name }}</dd></div>
         </dl>
 

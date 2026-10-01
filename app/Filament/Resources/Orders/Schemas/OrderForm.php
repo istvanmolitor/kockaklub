@@ -10,8 +10,8 @@ use App\Models\ShippingMethod;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -38,16 +38,47 @@ class OrderForm
                     ->relationship('orderStatus', 'name')
                     ->default(fn () => OrderStatus::default()?->id)
                     ->required(),
-                TextInput::make('shipping_name')
-                    ->label('Szállítási név')
-                    ->required(),
-                TextInput::make('shipping_phone')
-                    ->label('Szállítási telefon')
-                    ->required(),
-                Textarea::make('shipping_address')
-                    ->label('Szállítási cím')
-                    ->required()
-                    ->columnSpanFull(),
+                Section::make('Szállítási adatok')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('shipping_name')
+                            ->label('Név')
+                            ->required(),
+                        TextInput::make('shipping_phone')
+                            ->label('Telefon')
+                            ->required(),
+                        TextInput::make('shipping_country')
+                            ->label('Ország')
+                            ->required(),
+                        TextInput::make('shipping_city')
+                            ->label('Város')
+                            ->required(),
+                        TextInput::make('shipping_zip')
+                            ->label('Irányítószám')
+                            ->required(),
+                        TextInput::make('shipping_address')
+                            ->label('Cím')
+                            ->required(),
+                    ]),
+                Section::make('Számlázási adatok')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('billing_name')
+                            ->label('Név')
+                            ->required(),
+                        TextInput::make('billing_country')
+                            ->label('Ország')
+                            ->required(),
+                        TextInput::make('billing_city')
+                            ->label('Város')
+                            ->required(),
+                        TextInput::make('billing_zip')
+                            ->label('Irányítószám')
+                            ->required(),
+                        TextInput::make('billing_address')
+                            ->label('Cím')
+                            ->required(),
+                    ]),
                 Select::make('shipping_method_id')
                     ->label('Szállítási mód')
                     ->relationship('shippingMethod', 'name')

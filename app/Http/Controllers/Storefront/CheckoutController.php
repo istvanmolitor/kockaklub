@@ -76,8 +76,26 @@ class CheckoutController extends Controller
         $shippingMethod = ShippingMethod::findOrFail($validated['shipping_method_id']);
         $paymentMethod = PaymentMethod::findOrFail($validated['payment_method_id']);
 
+        $billingSameAsShipping = (bool) ($validated['billing_same_as_shipping'] ?? false);
+
+        $billing = $billingSameAsShipping
+            ? [
+                'billing_name' => $validated['shipping_name'],
+                'billing_country' => $validated['shipping_country'],
+                'billing_city' => $validated['shipping_city'],
+                'billing_zip' => $validated['shipping_zip'],
+                'billing_address' => $validated['shipping_address'],
+            ]
+            : [
+                'billing_name' => $validated['billing_name'],
+                'billing_country' => $validated['billing_country'],
+                'billing_city' => $validated['billing_city'],
+                'billing_zip' => $validated['billing_zip'],
+                'billing_address' => $validated['billing_address'],
+            ];
+
         try {
-            $order = DB::transaction(function () use ($cart, $customer, $validated, $shippingMethod, $paymentMethod) {
+            $order = DB::transaction(function () use ($cart, $customer, $validated, $billing, $shippingMethod, $paymentMethod) {
                 $subtotal = 0;
                 $lineData = [];
 
@@ -107,7 +125,11 @@ class CheckoutController extends Controller
                     'order_number' => Order::generateOrderNumber(),
                     'shipping_name' => $validated['shipping_name'],
                     'shipping_phone' => $validated['shipping_phone'],
+                    'shipping_country' => $validated['shipping_country'],
+                    'shipping_city' => $validated['shipping_city'],
+                    'shipping_zip' => $validated['shipping_zip'],
                     'shipping_address' => $validated['shipping_address'],
+                    ...$billing,
                     'shipping_method_id' => $shippingMethod->id,
                     'payment_method_id' => $paymentMethod->id,
                     'subtotal' => $subtotal,
@@ -135,6 +157,24 @@ class CheckoutController extends Controller
             });
         } catch (ValidationException $exception) {
             return back()->withErrors($exception->errors())->withInput();
+        }
+
+        if (! $customer->hasShippingDetails()) {
+            $customer->fill([
+                'shipping_name' => $validated['shipping_name'],
+                'shipping_country' => $validated['shipping_country'],
+                'shipping_city' => $validated['shipping_city'],
+                'shipping_zip' => $validated['shipping_zip'],
+                'shipping_address' => $validated['shipping_address'],
+            ]);
+        }
+
+        if (! $customer->hasBillingDetails()) {
+            $customer->fill($billing);
+        }
+
+        if ($customer->isDirty()) {
+            $customer->save();
         }
 
         Mail::to($customer->email)->queue(new OrderConfirmationMail($order));

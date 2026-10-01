@@ -46,4 +46,5 @@ Route::middleware('auth')->group(function () {
         ->name('verification.send');
 
     Route::get('/fiokom', [AccountController::class, 'show'])->middleware('verified')->name('account.show');
+    Route::patch('/fiokom', [AccountController::class, 'update'])->middleware('verified')->name('account.update');
 });

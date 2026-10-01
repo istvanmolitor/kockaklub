@@ -31,7 +31,11 @@ it('links an order to the logged in customer without creating a duplicate', func
     $this->post('/penztar', [
         'shipping_name' => $customer->name,
         'shipping_phone' => '+36301112222',
-        'shipping_address' => '2222 Debrecen, Fő utca 2.',
+        'shipping_country' => 'Magyarország',
+        'shipping_city' => 'Debrecen',
+        'shipping_zip' => '2222',
+        'shipping_address' => 'Fő utca 2.',
+        'billing_same_as_shipping' => 1,
         'shipping_method_id' => $this->shippingMethod->id,
         'payment_method_id' => $this->paymentMethod->id,
     ]);

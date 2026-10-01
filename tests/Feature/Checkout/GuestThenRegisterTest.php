@@ -32,7 +32,11 @@ it('links an existing guest customer to a new account instead of duplicating it'
         'email' => 'ismetlodo@example.com',
         'shipping_name' => 'Ismétlődő Ügyfél',
         'shipping_phone' => '+36309998888',
-        'shipping_address' => '3333 Szeged, Teszt tér 3.',
+        'shipping_country' => 'Magyarország',
+        'shipping_city' => 'Szeged',
+        'shipping_zip' => '3333',
+        'shipping_address' => 'Teszt tér 3.',
+        'billing_same_as_shipping' => 1,
         'shipping_method_id' => $this->shippingMethod->id,
         'payment_method_id' => $this->paymentMethod->id,
     ]);
