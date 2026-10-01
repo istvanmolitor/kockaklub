@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Product;
 use App\Models\ProductAttribute;
+use App\Models\ProductBarcode;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -95,6 +96,34 @@ class ProductForm
                                     ])
                                     ->columns(3)
                                     ->defaultItems(0)
+                                    ->columnSpanFull(),
+                            ]),
+                        Tab::make('Vonalkódok')
+                            ->schema([
+                                Repeater::make('barcodePivots')
+                                    ->label('Vonalkódok')
+                                    ->relationship()
+                                    ->schema([
+                                        Select::make('product_barcode_id')
+                                            ->label('Vonalkód')
+                                            ->relationship(name: 'productBarcode', titleAttribute: 'barcode')
+                                            ->searchable()
+                                            ->preload()
+                                            ->required()
+                                            ->createOptionForm([
+                                                TextInput::make('barcode')
+                                                    ->label('Vonalkód')
+                                                    ->required()
+                                                    ->unique(table: 'product_barcodes', column: 'barcode'),
+                                            ]),
+                                        Toggle::make('is_primary')
+                                            ->label('Elsődleges')
+                                            ->fixIndistinctState(),
+                                    ])
+                                    ->columns(2)
+                                    ->itemLabel(fn (array $state): ?string => ProductBarcode::find($state['product_barcode_id'] ?? null)?->barcode)
+                                    ->defaultItems(0)
+                                    ->addActionLabel('Vonalkód hozzáadása')
                                     ->columnSpanFull(),
                             ]),
                         Tab::make('Tulajdonságok')

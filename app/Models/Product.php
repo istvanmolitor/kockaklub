@@ -63,6 +63,19 @@ class Product extends Model
         return $this->hasMany(ProductImage::class)->orderBy('sort_order');
     }
 
+    public function barcodePivots(): HasMany
+    {
+        return $this->hasMany(BarcodeProduct::class);
+    }
+
+    public function barcodes(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductBarcode::class, 'barcode_product')
+            ->using(BarcodeProduct::class)
+            ->withPivot('is_primary')
+            ->withTimestamps();
+    }
+
     public function defaultImage(): HasOne
     {
         return $this->hasOne(ProductImage::class)->where('is_default', true);
