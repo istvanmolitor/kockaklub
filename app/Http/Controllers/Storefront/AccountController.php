@@ -14,13 +14,21 @@ class AccountController extends Controller
     {
         $customer = $request->user()->customer;
 
+        return view('storefront.account.show', [
+            'user' => $request->user(),
+            'customer' => $customer,
+        ]);
+    }
+
+    public function orders(Request $request): View
+    {
+        $customer = $request->user()->customer;
+
         $orders = $customer
             ? $customer->orders()->with('orderStatus')->latest()->get()
             : collect();
 
-        return view('storefront.account.show', [
-            'user' => $request->user(),
-            'customer' => $customer,
+        return view('storefront.account.orders', [
             'orders' => $orders,
         ]);
     }

@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.account')
 
 @section('title', 'Rendelés visszaigazolás')
 
-@section('content')
-    <div class="max-w-2xl mx-auto bg-white border border-gray-200 rounded-lg p-8">
+@section('account-content')
+    <div class="bg-white border border-gray-200 rounded-lg p-8">
         <h1 class="text-2xl font-semibold text-gray-900 mb-2">Köszönjük a rendelésed!</h1>
         <p class="text-gray-600 mb-6">Rendelésszám: <strong>{{ $order->order_number }}</strong></p>
 

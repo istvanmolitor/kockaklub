@@ -7,7 +7,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
-    <header x-data="{ mobileOpen: false, cartOpen: false }" @keydown.escape.window="mobileOpen = false; cartOpen = false" class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200">
+    <header x-data="{ mobileOpen: false, cartOpen: false, accountOpen: false }" @keydown.escape.window="mobileOpen = false; cartOpen = false; accountOpen = false" class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-gray-200">
         <div class="mx-auto max-w-6xl px-4">
             <div class="flex h-16 items-center justify-between gap-4">
                 <a href="{{ route('home') }}" class="flex shrink-0 items-center">
@@ -27,21 +27,38 @@
 
                 <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
                     <a href="{{ route('catalog.index') }}" class="text-gray-700 hover:text-amber-600">Termékek</a>
-                    @auth
-                        <a href="{{ route('account.show') }}" class="text-gray-700 hover:text-amber-600">Fiókom</a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="text-gray-700 hover:text-amber-600">Kijelentkezés</button>
-                        </form>
-                    @else
+                    @guest
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-amber-600">Bejelentkezés</a>
                         <a href="{{ route('register') }}" class="rounded-full bg-amber-600 px-4 py-2 text-white hover:bg-amber-700">Regisztráció</a>
-                    @endauth
+                    @endguest
                 </nav>
 
                 <div class="flex items-center gap-2">
+                    @auth
+                        <div class="relative">
+                            <button type="button" @click="accountOpen = !accountOpen; cartOpen = false; mobileOpen = false" :aria-expanded="accountOpen.toString()"
+                                    aria-label="Fiókom megnyitása" class="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.964 0a9 9 0 10-11.964 0m11.964 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+
+                            <div x-show="accountOpen" x-cloak @click.outside="accountOpen = false" x-transition
+                                 class="absolute right-0 z-50 mt-2 w-56 rounded-lg border border-gray-200 bg-white shadow-lg">
+                                <div class="py-2">
+                                    <a href="{{ route('account.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Profilom</a>
+                                    <a href="{{ route('account.orders') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Rendeléseim</a>
+                                    <form method="POST" action="{{ route('logout') }}" class="border-t border-gray-100">
+                                        @csrf
+                                        <button type="submit" class="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50">Kijelentkezés</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    @endauth
+
                     <div class="relative">
-                        <button type="button" @click="cartOpen = !cartOpen; mobileOpen = false" :aria-expanded="cartOpen.toString()"
+                        <button type="button" @click="cartOpen = !cartOpen; mobileOpen = false; accountOpen = false" :aria-expanded="cartOpen.toString()"
                                 aria-label="Kosár megnyitása" class="relative flex h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.344 1.087.836l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.994-4.693 2.609-7.164.067-.27-.148-.53-.426-.53H5.106M7.5 14.25L5.106 5.272M6 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
@@ -89,7 +106,7 @@
                         </div>
                     </div>
 
-                    <button type="button" @click="mobileOpen = !mobileOpen; cartOpen = false" :aria-expanded="mobileOpen.toString()"
+                    <button type="button" @click="mobileOpen = !mobileOpen; cartOpen = false; accountOpen = false" :aria-expanded="mobileOpen.toString()"
                             aria-label="Menü megnyitása" class="flex h-10 w-10 items-center justify-center rounded-full text-gray-700 hover:bg-gray-100 md:hidden">
                         <svg x-show="!mobileOpen" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
@@ -119,7 +136,8 @@
                     <a href="{{ route('catalog.index') }}" class="text-gray-700 hover:text-amber-600">Termékek</a>
                     <a href="{{ route('cart.show') }}" class="text-gray-700 hover:text-amber-600">Kosár</a>
                     @auth
-                        <a href="{{ route('account.show') }}" class="text-gray-700 hover:text-amber-600">Fiókom</a>
+                        <a href="{{ route('account.show') }}" class="text-gray-700 hover:text-amber-600">Profilom</a>
+                        <a href="{{ route('account.orders') }}" class="text-gray-700 hover:text-amber-600">Rendeléseim</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="text-gray-700 hover:text-amber-600">Kijelentkezés</button>

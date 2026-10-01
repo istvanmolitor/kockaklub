@@ -53,4 +53,5 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/fiokom', [AccountController::class, 'show'])->middleware('verified')->name('account.show');
     Route::patch('/fiokom', [AccountController::class, 'update'])->middleware('verified')->name('account.update');
+    Route::get('/fiokom/rendeleseim', [AccountController::class, 'orders'])->middleware('verified')->name('account.orders');
 });
