@@ -17,9 +17,9 @@
              class="border-b border-gray-100 bg-white/90 backdrop-blur-md transition-shadow duration-300">
             <div class="mx-auto max-w-7xl px-4 sm:px-6">
                 <div class="flex h-20 items-center justify-between gap-3 sm:h-24 sm:gap-6">
-                    <a href="{{ route('home') }}" class="group flex shrink-0 items-center">
+                    <a href="{{ route('home') }}" class="flex shrink-0 items-center">
                         <img src="{{ asset('images/logo.png') }}" alt="Kockaklub"
-                             class="h-12 w-auto transition-transform duration-300 ease-out group-hover:-rotate-2 group-hover:scale-105 sm:h-16">
+                             class="h-12 w-auto sm:h-16">
                     </a>
 
                     <form method="GET" action="{{ route('search.index') }}" class="relative hidden flex-1 max-w-md lg:block">

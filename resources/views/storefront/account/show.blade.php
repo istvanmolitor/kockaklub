@@ -21,7 +21,10 @@
             <div>
                 <label for="name" class="field-label">Név</label>
                 <input id="name" name="name" type="text" value="{{ old('name', $customer->name ?? $user->name) }}" required
-                       class="input-field">
+                       class="input-field @error('name') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                @error('name')
+                    <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>
