@@ -27,6 +27,7 @@
 
                 <nav class="hidden items-center gap-6 text-sm font-medium md:flex">
                     <a href="{{ route('catalog.index') }}" class="text-gray-700 hover:text-amber-600">Termékek</a>
+                    <a href="{{ route('contact.create') }}" class="text-gray-700 hover:text-amber-600">Kapcsolat</a>
                     @guest
                         <a href="{{ route('login') }}" class="text-gray-700 hover:text-amber-600">Bejelentkezés</a>
                         <a href="{{ route('register') }}" class="rounded-full bg-amber-600 px-4 py-2 text-white hover:bg-amber-700">Regisztráció</a>
@@ -134,6 +135,7 @@
 
                 <nav class="flex flex-col gap-3 text-sm font-medium">
                     <a href="{{ route('catalog.index') }}" class="text-gray-700 hover:text-amber-600">Termékek</a>
+                    <a href="{{ route('contact.create') }}" class="text-gray-700 hover:text-amber-600">Kapcsolat</a>
                     <a href="{{ route('cart.show') }}" class="text-gray-700 hover:text-amber-600">Kosár</a>
                     @auth
                         <a href="{{ route('account.show') }}" class="text-gray-700 hover:text-amber-600">Profilom</a>

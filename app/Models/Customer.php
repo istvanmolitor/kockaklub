@@ -55,4 +55,9 @@ class Customer extends Model
     {
         return $this->hasOne(Cart::class);
     }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
 }

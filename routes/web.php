@@ -9,6 +9,7 @@ use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CatalogController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\ContactController;
 use App\Http\Controllers\Storefront\ContentController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\SearchController;
@@ -22,6 +23,9 @@ Route::get('/termekek/{product:slug}', [CatalogController::class, 'show'])->name
 Route::get('/kereses', [SearchController::class, 'index'])->name('search.index');
 
 Route::get('/tartalom/{content:slug}', [ContentController::class, 'show'])->name('content.show');
+
+Route::get('/kapcsolat', [ContactController::class, 'create'])->name('contact.create');
+Route::post('/kapcsolat', [ContactController::class, 'store'])->name('contact.store');
 
 Route::get('/kosar', [CartController::class, 'show'])->name('cart.show');
 Route::post('/kosar/hozzaadas/{product}', [CartController::class, 'store'])->name('cart.store');
