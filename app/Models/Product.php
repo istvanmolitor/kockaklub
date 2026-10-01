@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Observers\ProductObserver;
 use App\Services\StockService;
 use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+#[ObservedBy(ProductObserver::class)]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
@@ -83,6 +86,11 @@ class Product extends Model
     public function interests(): HasMany
     {
         return $this->hasMany(ProductInterest::class);
+    }
+
+    public function priceLogs(): HasMany
+    {
+        return $this->hasMany(ProductPriceLog::class)->latest('id');
     }
 
     protected function defaultImageUrl(): Attribute
