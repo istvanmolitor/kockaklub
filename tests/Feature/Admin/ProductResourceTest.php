@@ -2,6 +2,8 @@
 
 use App\Filament\Resources\Products\Pages\CreateProduct;
 use App\Filament\Resources\Products\Pages\EditProduct;
+use App\Filament\Resources\Products\Pages\ViewProduct;
+use App\Filament\Resources\Products\RelationManagers\PriceLogsRelationManager;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductAttribute;
@@ -75,6 +77,21 @@ it('allows an admin to assign single and multi-select attribute values to a prod
 
     expect($product->attributeValues()->pluck('product_attribute_values.id')->sort()->values()->all())
         ->toEqual(collect([$brandValue->id, $green->id])->sort()->values()->all());
+});
+
+it('shows the price history on the product stats page but not on the edit page', function () {
+    $admin = User::factory()->admin()->create();
+    $product = Product::factory()->create(['price' => 9990]);
+
+    $this->actingAs($admin);
+
+    livewire(ViewProduct::class, ['record' => $product->getRouteKey()])
+        ->assertSuccessful()
+        ->assertSeeLivewire(PriceLogsRelationManager::class);
+
+    livewire(EditProduct::class, ['record' => $product->getRouteKey()])
+        ->assertSuccessful()
+        ->assertDontSeeLivewire(PriceLogsRelationManager::class);
 });
 
 it('does not allow a non-admin user to access the admin panel', function () {

@@ -28,6 +28,12 @@ class ProductForm
                     ->tabs([
                         Tab::make('Alapadatok')
                             ->schema([
+                                Toggle::make('is_active')
+                                    ->label('Aktív')
+                                    ->default(true)
+                                    ->required(),
+                                TextInput::make('sku')
+                                    ->label('Cikkszám'),
                                 Select::make('category_id')
                                     ->label('Kategória')
                                     ->relationship('category', 'name')
@@ -40,7 +46,7 @@ class ProductForm
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
                                 TextInput::make('slug')
-                                    ->label('Azonosító')
+                                    ->label('Elérés')
                                     ->required()
                                     ->unique(ignoreRecord: true),
                                 RichEditor::make('description')
@@ -60,11 +66,6 @@ class ProductForm
                                         0 => '0%',
                                     ])
                                     ->default(27)
-                                    ->required(),
-                                TextInput::make('sku')
-                                    ->label('SKU'),
-                                Toggle::make('is_active')
-                                    ->default(true)
                                     ->required(),
                                 Toggle::make('is_discontinued')
                                     ->label('Kifutó termék')

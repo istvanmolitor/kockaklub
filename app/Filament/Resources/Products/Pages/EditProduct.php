@@ -3,10 +3,14 @@
 namespace App\Filament\Resources\Products\Pages;
 
 use App\Filament\Resources\Products\ProductResource;
+use App\Filament\Resources\Products\RelationManagers\PriceLogsRelationManager;
 use App\Filament\Resources\Products\Schemas\ProductForm;
-use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Resources\RelationManagers\RelationGroup;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\RelationManagers\RelationManagerConfiguration;
 
 class EditProduct extends EditRecord
 {
@@ -18,14 +22,22 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('view')
-                ->label('Megtekintés')
-                ->icon('heroicon-o-eye')
-                ->color('gray')
-                ->url(fn (): string => route('catalog.show', $this->record))
-                ->openUrlInNewTab(),
+            ViewAction::make()
+                ->label('Statisztika')
+                ->icon('heroicon-o-chart-bar'),
             DeleteAction::make(),
         ];
+    }
+
+    /**
+     * @return array<class-string<RelationManager>|RelationGroup|RelationManagerConfiguration>
+     */
+    protected function getAllRelationManagers(): array
+    {
+        return array_filter(
+            parent::getAllRelationManagers(),
+            fn (string|RelationGroup|RelationManagerConfiguration $manager): bool => $manager !== PriceLogsRelationManager::class,
+        );
     }
 
     protected function mutateFormDataBeforeFill(array $data): array
