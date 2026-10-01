@@ -20,6 +20,8 @@ class PaymentMethodResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Beállítások';
+
     protected static ?string $modelLabel = 'Fizetési mód';
 
     protected static ?string $pluralModelLabel = 'Fizetési módok';

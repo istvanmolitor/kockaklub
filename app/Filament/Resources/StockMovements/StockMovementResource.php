@@ -20,6 +20,8 @@ class StockMovementResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Készlet';
+
     protected static ?string $modelLabel = 'Leltár';
 
     protected static ?string $pluralModelLabel = 'Leltárak';

@@ -20,6 +20,8 @@ class SettingResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Beállítások';
+
     protected static ?string $modelLabel = 'Beállítás';
 
     protected static ?string $pluralModelLabel = 'Beállítások';

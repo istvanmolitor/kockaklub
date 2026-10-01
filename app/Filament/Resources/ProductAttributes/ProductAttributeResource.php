@@ -20,6 +20,8 @@ class ProductAttributeResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Termék';
+
     protected static ?string $modelLabel = 'Termék tulajdonság';
 
     protected static ?string $pluralModelLabel = 'Termék tulajdonságok';

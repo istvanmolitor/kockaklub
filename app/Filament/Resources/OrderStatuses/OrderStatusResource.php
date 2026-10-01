@@ -20,6 +20,8 @@ class OrderStatusResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Beállítások';
+
     protected static ?string $modelLabel = 'Rendelés státusz';
 
     protected static ?string $pluralModelLabel = 'Rendelés státuszok';

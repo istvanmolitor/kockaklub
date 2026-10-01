@@ -20,6 +20,8 @@ class ProductResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Termék';
+
     protected static ?string $modelLabel = 'Termék';
 
     protected static ?string $pluralModelLabel = 'Termékek';

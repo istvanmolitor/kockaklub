@@ -20,6 +20,8 @@ class ContentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Beállítások';
+
     protected static ?string $modelLabel = 'Tartalom';
 
     protected static ?string $pluralModelLabel = 'Tartalmak';

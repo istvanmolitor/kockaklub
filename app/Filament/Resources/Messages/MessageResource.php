@@ -19,6 +19,8 @@ class MessageResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedEnvelope;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Ügyfelek';
+
     protected static ?string $modelLabel = 'Üzenet';
 
     protected static ?string $pluralModelLabel = 'Üzenetek';

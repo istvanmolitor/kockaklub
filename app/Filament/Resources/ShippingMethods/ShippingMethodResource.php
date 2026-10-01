@@ -20,6 +20,8 @@ class ShippingMethodResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Beállítások';
+
     protected static ?string $modelLabel = 'Szállítási mód';
 
     protected static ?string $pluralModelLabel = 'Szállítási módok';

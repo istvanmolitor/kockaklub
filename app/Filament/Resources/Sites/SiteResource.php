@@ -21,6 +21,8 @@ class SiteResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
+    protected static string|\UnitEnum|null $navigationGroup = 'Készlet';
+
     protected static ?string $modelLabel = 'Telephely';
 
     protected static ?string $pluralModelLabel = 'Telephelyek';
