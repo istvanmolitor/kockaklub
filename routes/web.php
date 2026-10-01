@@ -9,6 +9,7 @@ use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CatalogController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\ContentController;
 use App\Http\Controllers\Storefront\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/termekek', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/termekek/{product:slug}', [CatalogController::class, 'show'])->name('catalog.show');
+
+Route::get('/tartalom/{content:slug}', [ContentController::class, 'show'])->name('content.show');
 
 Route::get('/kosar', [CartController::class, 'show'])->name('cart.show');
 Route::post('/kosar/hozzaadas/{product}', [CartController::class, 'store'])->name('cart.store');
