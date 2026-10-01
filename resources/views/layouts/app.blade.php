@@ -13,6 +13,17 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Kockaklub" class="h-10 w-auto">
             </a>
             <nav class="flex items-center gap-6 text-sm">
+                <form method="GET" action="{{ route('search.index') }}" class="relative">
+                    <input type="text" name="q" value="{{ request()->routeIs('search.index') ? request('q') : '' }}"
+                           placeholder="Mit keresel?" autocomplete="off"
+                           class="w-40 sm:w-56 rounded-md border border-gray-300 py-1.5 pl-8 pr-3 text-sm focus:border-amber-500 focus:ring-amber-500">
+                    <button type="submit" aria-label="Keresés" class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m1.1-5.15a6.25 6.25 0 11-12.5 0 6.25 6.25 0 0112.5 0z" />
+                        </svg>
+                    </button>
+                </form>
+
                 <a href="{{ route('catalog.index') }}" class="hover:text-amber-600">Termékek</a>
                 <a href="{{ route('cart.show') }}" class="hover:text-amber-600">Kosár</a>
                 @auth

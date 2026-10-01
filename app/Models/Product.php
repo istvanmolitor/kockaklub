@@ -18,6 +18,14 @@ class Product extends Model
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
 
+    public const SORT_OPTIONS = [
+        'newest' => 'Legújabb',
+        'price_asc' => 'Ár szerint növekvő',
+        'price_desc' => 'Ár szerint csökkenő',
+        'name_asc' => 'Név szerint (A-Z)',
+        'name_desc' => 'Név szerint (Z-A)',
+    ];
+
     protected $fillable = [
         'category_id',
         'name',
@@ -78,5 +86,19 @@ class Product extends Model
     public function scopeWithPublicStock(Builder $query): Builder
     {
         return $query->addSelect(['public_stock' => StockService::publicStockSubquery()]);
+    }
+
+    /**
+     * Orders the query by one of self::SORT_OPTIONS, defaulting to newest first.
+     */
+    public function scopeSortBy(Builder $query, ?string $sort): Builder
+    {
+        return match ($sort) {
+            'price_asc' => $query->orderBy('price'),
+            'price_desc' => $query->orderByDesc('price'),
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            default => $query->latest(),
+        };
     }
 }

@@ -26,6 +26,10 @@
             @if ($products->isEmpty())
                 <p class="text-gray-600">Nincs megjeleníthető termék.</p>
             @else
+                <div class="flex items-center justify-end mb-6">
+                    @include('storefront.partials.sort-select')
+                </div>
+
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
                     @foreach ($products as $product)
                         <x-storefront.product-card :product="$product" />

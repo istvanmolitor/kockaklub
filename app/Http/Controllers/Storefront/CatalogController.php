@@ -22,7 +22,7 @@ class CatalogController extends Controller
             ->with('defaultImage')
             ->where('is_active', true)
             ->when($category, fn ($query) => $query->whereIn('category_id', $category->selfAndDescendantIds()))
-            ->latest()
+            ->sortBy($request->string('sort')->toString())
             ->paginate(12)
             ->withQueryString();
 
