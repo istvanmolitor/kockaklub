@@ -9,151 +9,151 @@
         $cartTotal = $cart->items->sum(fn ($item) => $item->lineTotal());
     @endphp
 
-    <h1 class="text-2xl font-semibold text-gray-900 mb-6">Pénztár</h1>
+    <h1 class="mb-6 text-2xl font-black text-gray-900">Pénztár</h1>
 
-    <div class="grid md:grid-cols-3 gap-10">
+    <div class="grid gap-10 md:grid-cols-3">
         <form method="POST" action="{{ route('checkout.store') }}" class="md:col-span-2 space-y-6">
             @csrf
 
             @guest
-                <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-                    <h2 class="font-semibold text-gray-900">Kapcsolattartó adatok</h2>
+                <div class="card space-y-4">
+                    <h2 class="text-lg font-black text-gray-900">Kapcsolattartó adatok</h2>
 
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Név</label>
+                        <label for="name" class="field-label">Név</label>
                         <input id="name" name="name" type="text" value="{{ old('name') }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
 
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                        <label for="email" class="field-label">Email</label>
                         <input id="email" name="email" type="email" value="{{ old('email') }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
                 </div>
             @endguest
 
-            <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-                <h2 class="font-semibold text-gray-900">Szállítási adatok</h2>
+            <div class="card space-y-4">
+                <h2 class="text-lg font-black text-gray-900">Szállítási adatok</h2>
 
                 <div>
-                    <label for="shipping_name" class="block text-sm font-medium text-gray-700">Átvevő neve</label>
+                    <label for="shipping_name" class="field-label">Átvevő neve</label>
                     <input id="shipping_name" name="shipping_name" type="text"
                            value="{{ old('shipping_name', $customer->name ?? '') }}" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                           class="input-field">
                 </div>
 
                 <div>
-                    <label for="shipping_phone" class="block text-sm font-medium text-gray-700">Telefonszám</label>
+                    <label for="shipping_phone" class="field-label">Telefonszám</label>
                     <input id="shipping_phone" name="shipping_phone" type="text"
                            value="{{ old('shipping_phone', $customer->phone ?? '') }}" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                           class="input-field">
                 </div>
 
-                <div class="grid sm:grid-cols-2 gap-4">
+                <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="shipping_country" class="block text-sm font-medium text-gray-700">Ország</label>
+                        <label for="shipping_country" class="field-label">Ország</label>
                         <input id="shipping_country" name="shipping_country" type="text"
                                value="{{ old('shipping_country', $customer->shipping_country ?? 'Magyarország') }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
 
                     <div>
-                        <label for="shipping_city" class="block text-sm font-medium text-gray-700">Város</label>
+                        <label for="shipping_city" class="field-label">Város</label>
                         <input id="shipping_city" name="shipping_city" type="text"
                                value="{{ old('shipping_city', $customer->shipping_city ?? '') }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
                 </div>
 
-                <div class="grid sm:grid-cols-2 gap-4">
+                <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="shipping_zip" class="block text-sm font-medium text-gray-700">Irányítószám</label>
+                        <label for="shipping_zip" class="field-label">Irányítószám</label>
                         <input id="shipping_zip" name="shipping_zip" type="text"
                                value="{{ old('shipping_zip', $customer->shipping_zip ?? '') }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
 
                     <div>
-                        <label for="shipping_address" class="block text-sm font-medium text-gray-700">Cím</label>
+                        <label for="shipping_address" class="field-label">Cím</label>
                         <input id="shipping_address" name="shipping_address" type="text"
                                value="{{ old('shipping_address', $customer->shipping_address ?? '') }}" required
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
-                <h2 class="font-semibold text-gray-900">Számlázási adatok</h2>
+            <div class="card space-y-4">
+                <h2 class="text-lg font-black text-gray-900">Számlázási adatok</h2>
 
-                <label class="flex items-center gap-2 text-sm">
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-600">
                     <input type="checkbox" id="billing_same_as_shipping" name="billing_same_as_shipping" value="1"
                            {{ old('billing_same_as_shipping', '1') ? 'checked' : '' }}
-                           class="rounded border-gray-300">
+                           class="checkbox-field">
                     A számlázási cím megegyezik a szállítási címmel
                 </label>
 
                 <div>
-                    <label for="billing_tax_number" class="block text-sm font-medium text-gray-700">Adószám (cégeknek, opcionális)</label>
+                    <label for="billing_tax_number" class="field-label">Adószám (cégeknek, opcionális)</label>
                     <input id="billing_tax_number" name="billing_tax_number" type="text"
                            value="{{ old('billing_tax_number', $customer->billing_tax_number ?? '') }}"
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                           class="input-field">
                 </div>
 
                 <div id="billing-fields" class="space-y-4 {{ old('billing_same_as_shipping', '1') ? 'hidden' : '' }}">
                     <div>
-                        <label for="billing_name" class="block text-sm font-medium text-gray-700">Név</label>
+                        <label for="billing_name" class="field-label">Név</label>
                         <input id="billing_name" name="billing_name" type="text"
                                value="{{ old('billing_name', $customer->billing_name ?? '') }}"
-                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                               class="input-field">
                     </div>
 
-                    <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="grid gap-4 sm:grid-cols-2">
                         <div>
-                            <label for="billing_country" class="block text-sm font-medium text-gray-700">Ország</label>
+                            <label for="billing_country" class="field-label">Ország</label>
                             <input id="billing_country" name="billing_country" type="text"
                                    value="{{ old('billing_country', $customer->billing_country ?? 'Magyarország') }}"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                                   class="input-field">
                         </div>
 
                         <div>
-                            <label for="billing_city" class="block text-sm font-medium text-gray-700">Város</label>
+                            <label for="billing_city" class="field-label">Város</label>
                             <input id="billing_city" name="billing_city" type="text"
                                    value="{{ old('billing_city', $customer->billing_city ?? '') }}"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                                   class="input-field">
                         </div>
                     </div>
 
-                    <div class="grid sm:grid-cols-2 gap-4">
+                    <div class="grid gap-4 sm:grid-cols-2">
                         <div>
-                            <label for="billing_zip" class="block text-sm font-medium text-gray-700">Irányítószám</label>
+                            <label for="billing_zip" class="field-label">Irányítószám</label>
                             <input id="billing_zip" name="billing_zip" type="text"
                                    value="{{ old('billing_zip', $customer->billing_zip ?? '') }}"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                                   class="input-field">
                         </div>
 
                         <div>
-                            <label for="billing_address" class="block text-sm font-medium text-gray-700">Cím</label>
+                            <label for="billing_address" class="field-label">Cím</label>
                             <input id="billing_address" name="billing_address" type="text"
                                    value="{{ old('billing_address', $customer->billing_address ?? '') }}"
-                                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-amber-500 focus:ring-amber-500">
+                                   class="input-field">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-3">
-                <h2 class="font-semibold text-gray-900">Szállítási mód</h2>
+            <div class="card space-y-3">
+                <h2 class="text-lg font-black text-gray-900">Szállítási mód</h2>
 
                 @foreach ($shippingMethods as $shippingMethod)
-                    <label class="flex items-start gap-2 text-sm">
+                    <label class="flex items-start gap-3 rounded-2xl border-2 border-gray-100 p-3 text-sm font-medium transition hover:border-accent-200 hover:bg-accent-50/50">
                         <input type="radio" name="shipping_method_id" value="{{ $shippingMethod->id }}"
                                data-shipping-method-option
                                data-cost="{{ $shippingMethod->cost }}"
                                {{ $selectedShippingMethodId === $shippingMethod->id ? 'checked' : '' }}
-                               class="mt-1 border-gray-300">
+                               class="mt-1 h-4 w-4 border-2 border-gray-300 text-accent-600 focus:ring-4 focus:ring-accent-500/15">
                         <span>
-                            {{ $shippingMethod->name }}
+                            <span class="font-bold text-gray-900">{{ $shippingMethod->name }}</span>
                             &mdash;
                             {{ $shippingMethod->cost > 0 ? number_format($shippingMethod->cost, 0, ',', ' ').' Ft' : 'Díjtalan' }}
                             @if ($shippingMethod->description)
@@ -164,23 +164,23 @@
                 @endforeach
             </div>
 
-            <div class="bg-white border border-gray-200 rounded-lg p-6 space-y-3">
-                <h2 class="font-semibold text-gray-900">Fizetési mód</h2>
+            <div class="card space-y-3">
+                <h2 class="text-lg font-black text-gray-900">Fizetési mód</h2>
 
                 @foreach ($shippingMethods as $shippingMethod)
                     <div data-payment-methods-for="{{ $shippingMethod->id }}"
                          class="space-y-3 {{ $selectedShippingMethodId === $shippingMethod->id ? '' : 'hidden' }}">
                         @foreach ($shippingMethod->paymentMethods as $paymentMethod)
-                            <label class="flex items-start gap-2 text-sm">
+                            <label class="flex items-start gap-3 rounded-2xl border-2 border-gray-100 p-3 text-sm font-medium transition hover:border-accent-200 hover:bg-accent-50/50">
                                 <input type="radio" name="payment_method_id" value="{{ $paymentMethod->id }}"
                                        data-payment-method-option
                                        data-cost="{{ $paymentMethod->cost }}"
                                        {{ $oldPaymentMethodId
                                             ? ($oldPaymentMethodId == $paymentMethod->id ? 'checked' : '')
                                             : ($selectedShippingMethodId === $shippingMethod->id && $loop->first ? 'checked' : '') }}
-                                       class="mt-1 border-gray-300">
+                                       class="mt-1 h-4 w-4 border-2 border-gray-300 text-accent-600 focus:ring-4 focus:ring-accent-500/15">
                                 <span>
-                                    {{ $paymentMethod->name }}
+                                    <span class="font-bold text-gray-900">{{ $paymentMethod->name }}</span>
                                     &mdash;
                                     {{ $paymentMethod->cost > 0 ? number_format($paymentMethod->cost, 0, ',', ' ').' Ft' : 'Díjtalan' }}
                                     @if ($paymentMethod->description)
@@ -193,25 +193,24 @@
                 @endforeach
             </div>
 
-            <button type="submit"
-                    class="w-full rounded-md bg-amber-600 px-5 py-3 text-white font-medium hover:bg-amber-700">
+            <button type="submit" class="btn-primary w-full">
                 Rendelés leadása
             </button>
         </form>
 
-        <div class="bg-white border border-gray-200 rounded-lg p-6 h-fit">
-            <h2 class="font-semibold text-gray-900 mb-4">Rendelés összegzés</h2>
+        <div class="card h-fit">
+            <h2 class="mb-4 text-lg font-black text-gray-900">Rendelés összegzés</h2>
 
-            <ul class="divide-y divide-gray-200 text-sm">
+            <ul class="divide-y divide-gray-100 text-sm">
                 @foreach ($cart->items as $item)
-                    <li class="py-2 flex justify-between">
+                    <li class="flex justify-between py-2 font-medium text-gray-700">
                         <span>{{ $item->product->name }} &times; {{ $item->quantity }}</span>
                         <span>{{ number_format($item->lineTotal(), 0, ',', ' ') }} Ft</span>
                     </li>
                 @endforeach
             </ul>
 
-            <div class="mt-4 pt-4 border-t border-gray-200 space-y-1 text-sm">
+            <div class="mt-4 space-y-1 border-t border-gray-100 pt-4 text-sm font-medium text-gray-600">
                 <div class="flex justify-between">
                     <span>Részösszeg</span>
                     <span data-summary-subtotal>{{ number_format($cartTotal, 0, ',', ' ') }} Ft</span>
@@ -226,7 +225,7 @@
                 </div>
             </div>
 
-            <div class="mt-4 pt-4 border-t border-gray-200 flex justify-between font-semibold">
+            <div class="mt-4 flex justify-between border-t border-gray-100 pt-4 font-black text-gray-900">
                 <span>Összesen</span>
                 <span data-summary-total>{{ number_format($cartTotal, 0, ',', ' ') }} Ft</span>
             </div>

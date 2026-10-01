@@ -3,13 +3,13 @@
 @section('title', 'Termékek')
 
 @section('content')
-    <div class="flex flex-col sm:flex-row gap-8">
-        <aside class="sm:w-48 shrink-0">
-            <h2 class="font-semibold text-gray-900 mb-3">Kategóriák</h2>
-            <ul class="space-y-2 text-sm">
+    <div class="flex flex-col gap-8 sm:flex-row">
+        <aside class="card sm:w-56 shrink-0 p-4">
+            <h2 class="mb-3 px-2 text-sm font-black uppercase tracking-wide text-gray-400">Kategóriák</h2>
+            <ul class="space-y-1.5 text-sm">
                 <li>
                     <a href="{{ route('catalog.index') }}"
-                       class="{{ $activeCategory === '' ? 'text-amber-600 font-medium' : 'text-gray-600 hover:text-amber-600' }}">
+                       class="block rounded-xl px-2 py-1.5 font-semibold transition {{ $activeCategory === '' ? 'bg-accent-50 text-accent-700' : 'text-gray-600 hover:bg-accent-50 hover:text-accent-700' }}">
                         Összes termék
                     </a>
                 </li>
@@ -24,13 +24,13 @@
 
         <div class="flex-1">
             @if ($products->isEmpty())
-                <p class="text-gray-600">Nincs megjeleníthető termék.</p>
+                <p class="font-medium text-gray-600">Nincs megjeleníthető termék.</p>
             @else
                 <div class="flex items-center justify-end mb-6">
                     @include('storefront.partials.sort-select')
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
                     @foreach ($products as $product)
                         <x-storefront.product-card :product="$product" />
                     @endforeach

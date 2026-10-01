@@ -3,13 +3,13 @@
 @section('content')
     <div class="flex flex-col gap-8 md:flex-row">
         <aside class="w-full shrink-0 md:w-56">
-            <nav class="space-y-1 rounded-lg border border-gray-200 bg-white p-2">
+            <nav class="card space-y-1 p-2">
                 <a href="{{ route('account.show') }}"
-                   class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('account.show') ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                   class="block rounded-2xl px-4 py-2.5 text-sm font-bold transition {{ request()->routeIs('account.show') ? 'bg-gradient-to-r from-accent-600 to-accent3-500 text-white shadow-sm' : 'text-gray-600 hover:bg-accent-50 hover:text-accent-700' }}">
                     Profil
                 </a>
                 <a href="{{ route('account.orders') }}"
-                   class="block rounded-md px-3 py-2 text-sm font-medium {{ request()->routeIs('account.orders') ? 'bg-amber-50 text-amber-700' : 'text-gray-700 hover:bg-gray-50' }}">
+                   class="block rounded-2xl px-4 py-2.5 text-sm font-bold transition {{ request()->routeIs('account.orders') ? 'bg-gradient-to-r from-accent-600 to-accent3-500 text-white shadow-sm' : 'text-gray-600 hover:bg-accent-50 hover:text-accent-700' }}">
                     Megrendelés
                 </a>
             </nav>

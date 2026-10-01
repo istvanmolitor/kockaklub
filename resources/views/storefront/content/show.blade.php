@@ -3,7 +3,7 @@
 @section('title', $content->title)
 
 @section('content')
-    <h1 class="text-2xl font-semibold text-gray-900 mb-6">{{ $content->title }}</h1>
+    <h1 class="text-2xl font-black text-gray-900 mb-6">{{ $content->title }}</h1>
 
     <div class="space-y-6">
         @foreach ($content->blocks as $block)

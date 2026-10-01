@@ -3,25 +3,25 @@
 @section('title', $query !== '' ? "Keresés – {$query}" : 'Keresés')
 
 @section('content')
-    <form method="GET" action="{{ route('search.index') }}" class="mb-8 max-w-md flex gap-2">
+    <form method="GET" action="{{ route('search.index') }}" class="mb-8 flex max-w-md gap-2">
         <input type="text" name="q" value="{{ $query }}" placeholder="Mit keresel?" autocomplete="off"
-               class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-amber-500 focus:ring-amber-500">
-        <button type="submit" class="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700">
+               class="input-field mt-0 flex-1">
+        <button type="submit" class="btn-primary">
             Keresés
         </button>
     </form>
 
     @if ($query === '')
-        <p class="text-gray-600">Adj meg egy keresési kifejezést.</p>
+        <p class="font-medium text-gray-600">Adj meg egy keresési kifejezést.</p>
     @elseif ($products->isEmpty())
-        <p class="text-gray-600">Nincs a keresésnek megfelelő termék: &bdquo;{{ $query }}&rdquo;</p>
+        <p class="font-medium text-gray-600">Nincs a keresésnek megfelelő termék: &bdquo;{{ $query }}&rdquo;</p>
     @else
-        <div class="flex items-center justify-between mb-6">
-            <p class="text-sm text-gray-600">{{ $products->total() }} találat &bdquo;{{ $query }}&rdquo; keresésre</p>
+        <div class="mb-6 flex items-center justify-between">
+            <p class="text-sm font-semibold text-gray-600">{{ $products->total() }} találat &bdquo;{{ $query }}&rdquo; keresésre</p>
             @include('storefront.partials.sort-select')
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
             @foreach ($products as $product)
                 <x-storefront.product-card :product="$product" />
             @endforeach

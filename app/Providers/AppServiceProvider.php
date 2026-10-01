@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\CategoryRepository;
 use App\Services\CartService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
             $cart?->load('items.product.defaultImage');
 
             $view->with('headerCartItems', $cart?->items ?? collect());
+            $view->with('headerCategories', app(CategoryRepository::class)->activeTree());
         });
     }
 }
