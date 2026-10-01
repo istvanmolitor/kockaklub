@@ -48,6 +48,10 @@ class CatalogController extends Controller
         }
 
         $product->load('images', 'category');
+        $product->load(['relatedProducts' => fn ($query) => $query
+            ->where('is_active', true)
+            ->withPublicStock()
+            ->with('defaultImage')]);
 
         return view('storefront.catalog.show', [
             'product' => $product,

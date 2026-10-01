@@ -61,4 +61,15 @@
             </form>
         </div>
     </div>
+
+    @if ($product->relatedProducts->isNotEmpty())
+        <div class="mt-12">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Kapcsolódó termékek</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach ($product->relatedProducts as $related)
+                    <x-storefront.product-card :product="$related" />
+                @endforeach
+            </div>
+        </div>
+    @endif
 @endsection

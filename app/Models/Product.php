@@ -73,6 +73,20 @@ class Product extends Model
         return $this->belongsToMany(ProductAttributeValue::class, 'attribute_value_product');
     }
 
+    public function relatedProductPivots(): HasMany
+    {
+        return $this->hasMany(RelatedProduct::class)->orderBy('sort_order');
+    }
+
+    public function relatedProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'related_products', 'product_id', 'related_product_id')
+            ->using(RelatedProduct::class)
+            ->withPivot('sort_order')
+            ->withTimestamps()
+            ->orderBy('sort_order');
+    }
+
     public function stockMovementItems(): HasMany
     {
         return $this->hasMany(StockMovementItem::class);

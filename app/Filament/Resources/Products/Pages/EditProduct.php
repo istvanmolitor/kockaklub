@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Products\Pages;
 
 use App\Filament\Resources\Products\ProductResource;
 use App\Filament\Resources\Products\Schemas\ProductForm;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -17,6 +18,12 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('view')
+                ->label('Megtekintés')
+                ->icon('heroicon-o-eye')
+                ->color('gray')
+                ->url(fn (): string => route('catalog.show', $this->record))
+                ->openUrlInNewTab(),
             DeleteAction::make(),
         ];
     }

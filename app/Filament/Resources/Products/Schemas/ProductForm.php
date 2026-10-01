@@ -13,6 +13,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -99,6 +100,37 @@ class ProductForm
                             ->schema(static::attributeValueFields())
                             ->columns(2)
                             ->visible(fn () => ProductAttribute::query()->exists()),
+                        Tab::make('Kapcsolódó termékek')
+                            ->schema([
+                                Repeater::make('relatedProductPivots')
+                                    ->label('Kapcsolódó termékek')
+                                    ->relationship()
+                                    ->reorderable()
+                                    ->orderColumn('sort_order')
+                                    ->schema([
+                                        Select::make('related_product_id')
+                                            ->label('Termék')
+                                            ->relationship(
+                                                name: 'relatedProduct',
+                                                titleAttribute: 'name',
+                                                modifyQueryUsing: function (Builder $query, $livewire): Builder {
+                                                    if ($productId = $livewire->getRecord()?->getKey()) {
+                                                        $query->whereKeyNot($productId);
+                                                    }
+
+                                                    return $query;
+                                                },
+                                            )
+                                            ->searchable()
+                                            ->preload()
+                                            ->required()
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->itemLabel(fn (array $state): ?string => Product::find($state['related_product_id'] ?? null)?->name)
+                                    ->defaultItems(0)
+                                    ->addActionLabel('Kapcsolódó termék hozzáadása')
+                                    ->columnSpanFull(),
+                            ]),
                     ]),
             ]);
     }
