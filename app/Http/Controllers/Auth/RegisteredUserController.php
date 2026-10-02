@@ -53,6 +53,10 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        if ($request->input('redirect') === 'checkout') {
+            return redirect()->route('checkout.create');
+        }
+
         return redirect()->route('verification.notice');
     }
 }

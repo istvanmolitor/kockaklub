@@ -169,7 +169,7 @@
                                         </div>
                                         <div class="mt-3 grid grid-cols-2 gap-2">
                                             <a href="{{ route('cart.show') }}" class="rounded-full border-2 border-gray-200 px-3 py-2 text-center text-sm font-bold text-gray-700 transition hover:border-accent-300 hover:text-accent-700">Kosár</a>
-                                            <a href="{{ route('checkout.create') }}" class="rounded-full bg-gradient-to-r from-accent-600 to-accent3-500 px-3 py-2 text-center text-sm font-bold text-white shadow-sm transition hover:shadow-md">Pénztár</a>
+                                            <a href="{{ route('checkout.gate') }}" class="rounded-full bg-gradient-to-r from-accent-600 to-accent3-500 px-3 py-2 text-center text-sm font-bold text-white shadow-sm transition hover:shadow-md">Pénztár</a>
                                         </div>
                                     </div>
                                 @endif

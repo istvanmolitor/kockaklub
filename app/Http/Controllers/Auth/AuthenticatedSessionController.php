@@ -47,15 +47,25 @@ class AuthenticatedSessionController extends Controller
 
         $this->cartService->mergeGuestCartIntoCustomer($request, $customer);
 
+        if ($request->input('redirect') === 'checkout') {
+            return redirect()->route('checkout.create');
+        }
+
         return redirect()->intended(route('home'));
     }
 
     public function destroy(Request $request): RedirectResponse
     {
+        $customer = $request->user()?->customer;
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($customer) {
+            $this->cartService->moveCustomerCartToSession($customer);
+        }
 
         return redirect()->route('home');
     }

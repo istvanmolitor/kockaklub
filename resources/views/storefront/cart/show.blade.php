@@ -46,7 +46,7 @@
                 <p class="text-lg font-black text-gray-900">
                     Összesen: {{ number_format($cart->items->sum(fn ($item) => $item->lineTotal()), 0, ',', ' ') }} Ft
                 </p>
-                <a href="{{ route('checkout.create') }}" class="btn-primary mt-4">
+                <a href="{{ route('checkout.gate') }}" class="btn-primary mt-4">
                     Tovább a pénztárhoz
                 </a>
             </div>

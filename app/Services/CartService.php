@@ -124,4 +124,28 @@ class CartService
 
         Cookie::queue(Cookie::forget(self::COOKIE_NAME));
     }
+
+    public function moveCustomerCartToSession(Customer $customer): void
+    {
+        $customerCart = $this->carts->findByCustomerId($customer->id);
+
+        if (! $customerCart || $customerCart->items->isEmpty()) {
+            return;
+        }
+
+        $token = (string) Str::uuid();
+        $guestCart = $this->carts->createGuest($token);
+
+        foreach ($customerCart->items as $item) {
+            $guestCart->items()->create([
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+            ]);
+        }
+
+        $customerCart->items()->delete();
+        $customerCart->delete();
+
+        Cookie::queue(Cookie::make(self::COOKIE_NAME, $token, 60 * 24 * 365));
+    }
 }

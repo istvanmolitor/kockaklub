@@ -32,6 +32,7 @@ Route::post('/kosar/hozzaadas/{product}', [CartController::class, 'store'])->nam
 Route::patch('/kosar/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/kosar/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
+Route::get('/penztar/kezdes', [CheckoutController::class, 'gate'])->name('checkout.gate');
 Route::get('/penztar', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/penztar', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/rendeles/{order:order_number}/visszaigazolas', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');

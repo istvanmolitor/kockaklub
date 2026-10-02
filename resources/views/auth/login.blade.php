@@ -9,6 +9,9 @@
 
         <form method="POST" action="{{ route('login') }}" class="relative mt-6 space-y-4">
             @csrf
+            @if (request('redirect') === 'checkout')
+                <input type="hidden" name="redirect" value="checkout">
+            @endif
 
             <div>
                 <label for="email" class="field-label">Email</label>
@@ -33,7 +36,7 @@
         </form>
 
         <p class="relative mt-5 text-sm font-medium text-gray-600">
-            Nincs még fiókod? <a href="{{ route('register') }}" class="font-bold text-accent-600 hover:underline">Regisztrálj</a>
+            Nincs még fiókod? <a href="{{ route('register', request('redirect') === 'checkout' ? ['redirect' => 'checkout'] : []) }}" class="font-bold text-accent-600 hover:underline">Regisztrálj</a>
         </p>
     </div>
 @endsection

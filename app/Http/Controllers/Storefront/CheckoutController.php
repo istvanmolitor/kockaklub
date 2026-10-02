@@ -31,6 +31,22 @@ class CheckoutController extends Controller
         private readonly ShippingMethodRepository $shippingMethods,
     ) {}
 
+    public function gate(Request $request): View|RedirectResponse
+    {
+        $cart = $this->cartService->currentCart($request);
+        $cart->load('items');
+
+        if ($cart->items->isEmpty()) {
+            return redirect()->route('cart.show')->with('status', 'A kosarad üres.');
+        }
+
+        if ($request->user()) {
+            return redirect()->route('checkout.create');
+        }
+
+        return view('storefront.checkout.gate');
+    }
+
     public function create(Request $request): View|RedirectResponse
     {
         $cart = $this->cartService->currentCart($request);
