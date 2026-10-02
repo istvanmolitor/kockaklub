@@ -208,7 +208,7 @@ class CheckoutController extends Controller
 
     public function confirmation(Order $order): View
     {
-        $order->load('items', 'orderStatus', 'shippingMethod', 'paymentMethod');
+        $order->load('items.product.defaultImage', 'orderStatus', 'shippingMethod', 'paymentMethod');
 
         return view('storefront.checkout.confirmation', ['order' => $order]);
     }
