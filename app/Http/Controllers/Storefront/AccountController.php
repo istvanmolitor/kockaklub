@@ -48,6 +48,7 @@ class AccountController extends Controller
             'billing_city' => ['nullable', 'string', 'max:255'],
             'billing_zip' => ['nullable', 'string', 'max:20'],
             'billing_address' => ['nullable', 'string', 'max:2000'],
+            'billing_tax_number' => ['nullable', 'string', 'max:20'],
         ]);
 
         $user = $request->user();

@@ -21,14 +21,20 @@
 
                     <div>
                         <label for="name" class="field-label">Név</label>
-                        <input id="name" name="name" type="text" value="{{ old('name') }}" required
-                               class="input-field">
+                        <input id="name" name="name" type="text" value="{{ old('name') }}"
+                               class="input-field @error('name') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('name')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
                         <label for="email" class="field-label">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required
-                               class="input-field">
+                        <input id="email" name="email" type="email" value="{{ old('email') }}"
+                               class="input-field @error('email') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('email')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
             @endguest
@@ -39,30 +45,42 @@
                 <div>
                     <label for="shipping_name" class="field-label">Átvevő neve</label>
                     <input id="shipping_name" name="shipping_name" type="text"
-                           value="{{ old('shipping_name', $customer->name ?? '') }}" required
-                           class="input-field">
+                           value="{{ old('shipping_name', $customer->name ?? '') }}"
+                           class="input-field @error('shipping_name') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                    @error('shipping_name')
+                        <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div>
                     <label for="shipping_phone" class="field-label">Telefonszám</label>
                     <input id="shipping_phone" name="shipping_phone" type="text"
-                           value="{{ old('shipping_phone', $customer->phone ?? '') }}" required
-                           class="input-field">
+                           value="{{ old('shipping_phone', $customer->phone ?? '') }}"
+                           class="input-field @error('shipping_phone') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                    @error('shipping_phone')
+                        <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label for="shipping_country" class="field-label">Ország</label>
                         <input id="shipping_country" name="shipping_country" type="text"
-                               value="{{ old('shipping_country', $customer->shipping_country ?? 'Magyarország') }}" required
-                               class="input-field">
+                               value="{{ old('shipping_country', $customer->shipping_country ?? 'Magyarország') }}"
+                               class="input-field @error('shipping_country') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('shipping_country')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
                         <label for="shipping_city" class="field-label">Város</label>
                         <input id="shipping_city" name="shipping_city" type="text"
-                               value="{{ old('shipping_city', $customer->shipping_city ?? '') }}" required
-                               class="input-field">
+                               value="{{ old('shipping_city', $customer->shipping_city ?? '') }}"
+                               class="input-field @error('shipping_city') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('shipping_city')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -70,15 +88,21 @@
                     <div>
                         <label for="shipping_zip" class="field-label">Irányítószám</label>
                         <input id="shipping_zip" name="shipping_zip" type="text"
-                               value="{{ old('shipping_zip', $customer->shipping_zip ?? '') }}" required
-                               class="input-field">
+                               value="{{ old('shipping_zip', $customer->shipping_zip ?? '') }}"
+                               class="input-field @error('shipping_zip') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('shipping_zip')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
                         <label for="shipping_address" class="field-label">Cím</label>
                         <input id="shipping_address" name="shipping_address" type="text"
-                               value="{{ old('shipping_address', $customer->shipping_address ?? '') }}" required
-                               class="input-field">
+                               value="{{ old('shipping_address', $customer->shipping_address ?? '') }}"
+                               class="input-field @error('shipping_address') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('shipping_address')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -97,7 +121,10 @@
                     <label for="billing_tax_number" class="field-label">Adószám (cégeknek, opcionális)</label>
                     <input id="billing_tax_number" name="billing_tax_number" type="text"
                            value="{{ old('billing_tax_number', $customer->billing_tax_number ?? '') }}"
-                           class="input-field">
+                           class="input-field @error('billing_tax_number') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                    @error('billing_tax_number')
+                        <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div id="billing-fields" class="space-y-4 {{ old('billing_same_as_shipping', '1') ? 'hidden' : '' }}">
@@ -105,7 +132,10 @@
                         <label for="billing_name" class="field-label">Név</label>
                         <input id="billing_name" name="billing_name" type="text"
                                value="{{ old('billing_name', $customer->billing_name ?? '') }}"
-                               class="input-field">
+                               class="input-field @error('billing_name') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('billing_name')
+                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="grid gap-4 sm:grid-cols-2">
@@ -113,14 +143,20 @@
                             <label for="billing_country" class="field-label">Ország</label>
                             <input id="billing_country" name="billing_country" type="text"
                                    value="{{ old('billing_country', $customer->billing_country ?? 'Magyarország') }}"
-                                   class="input-field">
+                                   class="input-field @error('billing_country') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('billing_country')
+                                <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
                             <label for="billing_city" class="field-label">Város</label>
                             <input id="billing_city" name="billing_city" type="text"
                                    value="{{ old('billing_city', $customer->billing_city ?? '') }}"
-                                   class="input-field">
+                                   class="input-field @error('billing_city') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('billing_city')
+                                <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
@@ -129,14 +165,20 @@
                             <label for="billing_zip" class="field-label">Irányítószám</label>
                             <input id="billing_zip" name="billing_zip" type="text"
                                    value="{{ old('billing_zip', $customer->billing_zip ?? '') }}"
-                                   class="input-field">
+                                   class="input-field @error('billing_zip') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('billing_zip')
+                                <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>
                             <label for="billing_address" class="field-label">Cím</label>
                             <input id="billing_address" name="billing_address" type="text"
                                    value="{{ old('billing_address', $customer->billing_address ?? '') }}"
-                                   class="input-field">
+                                   class="input-field @error('billing_address') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('billing_address')
+                                <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
@@ -162,6 +204,10 @@
                         </span>
                     </label>
                 @endforeach
+
+                @error('shipping_method_id')
+                    <p class="text-sm font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="card space-y-3">
@@ -191,6 +237,10 @@
                         @endforeach
                     </div>
                 @endforeach
+
+                @error('payment_method_id')
+                    <p class="text-sm font-semibold text-rose-600">{{ $message }}</p>
+                @enderror
             </div>
 
             <button type="submit" class="btn-primary w-full">

@@ -123,6 +123,13 @@
                            class="input-field">
                 </div>
             </div>
+
+            <div>
+                <label for="billing_tax_number" class="field-label">Adószám (cégeknek, opcionális)</label>
+                <input id="billing_tax_number" name="billing_tax_number" type="text"
+                       value="{{ old('billing_tax_number', $customer->billing_tax_number ?? '') }}"
+                       class="input-field">
+            </div>
         </div>
 
         <button type="submit" class="btn-primary">

@@ -77,7 +77,7 @@ class CheckoutController extends Controller
         }
 
         if ($request->user()) {
-            $customer = $request->user()->customer;
+            $customer = $this->customers->firstOrCreateForUser($request->user());
         } else {
             $customer = $this->customers->firstOrCreateByEmail($validated['email'], $validated['name']);
         }
