@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductAttribute;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,16 @@ class ImportUnasData extends Command
     protected $signature = 'import:unas-data {--path= : Az old_data mappa elérési útja (alapértelmezett: base_path(\'old_data\'))}';
 
     protected $description = 'Kategóriák, termékek és termékképek importálása az UNAS webshopból exportált old_data mappából';
+
+    /**
+     * Az UNAS CSV-ben "Paraméter: <Név>||enum" formátumban szereplő oszlopok,
+     * amelyeket termék tulajdonságként (ProductAttribute) importálunk.
+     */
+    private const ATTRIBUTE_COLUMNS = [
+        'Paraméter: Márka||enum' => 'Márka',
+        'Paraméter: Szín||enum' => 'Szín',
+        'Paraméter: Matrica||enum' => 'Matrica',
+    ];
 
     public function handle(): int
     {
@@ -97,6 +108,7 @@ class ImportUnasData extends Command
     {
         $rows = $this->readCsv($csvPath);
         $categoryIds = $this->categoryIdsByPath();
+        $attributesByColumn = $this->productAttributesByColumn();
 
         $productCount = 0;
         $imageCount = 0;
@@ -130,6 +142,8 @@ class ImportUnasData extends Command
             );
 
             $productCount++;
+
+            $this->syncProductAttributeValues($product, $row, $attributesByColumn);
 
             if ($this->importProductImage($product, $row['Kép link'], $imagesPath)) {
                 $imageCount++;
@@ -183,6 +197,59 @@ class ImportUnasData extends Command
         ]);
 
         return true;
+    }
+
+    /**
+     * Létrehozza (vagy visszaadja) a Márka/Szín/Matrica termék tulajdonságokat,
+     * CSV oszlopnév szerint indexelve.
+     *
+     * @return array<string, ProductAttribute>
+     */
+    private function productAttributesByColumn(): array
+    {
+        $byColumn = [];
+
+        foreach (self::ATTRIBUTE_COLUMNS as $column => $name) {
+            $byColumn[$column] = ProductAttribute::query()->updateOrCreate(
+                ['slug' => Str::slug($name)],
+                ['name' => $name, 'allow_multiple' => false],
+            );
+        }
+
+        return $byColumn;
+    }
+
+    /**
+     * A sorban szereplő Márka/Szín/Matrica paraméter értékeket termék tulajdonság
+     * értékként (ProductAttributeValue) hozza létre, és a termékhez szinkronizálja.
+     *
+     * @param  array<string, string>  $row
+     * @param  array<string, ProductAttribute>  $attributesByColumn
+     */
+    private function syncProductAttributeValues(Product $product, array $row, array $attributesByColumn): void
+    {
+        $attributeIds = [];
+        $targetValueIds = [];
+
+        foreach ($attributesByColumn as $column => $attribute) {
+            $attributeIds[] = $attribute->id;
+
+            $value = trim($row[$column] ?? '');
+
+            if ($value === '') {
+                continue;
+            }
+
+            $targetValueIds[] = $attribute->values()->firstOrCreate(['value' => $value])->id;
+        }
+
+        $currentValueIds = $product->attributeValues()
+            ->whereIn('product_attribute_id', $attributeIds)
+            ->pluck('product_attribute_values.id')
+            ->all();
+
+        $product->attributeValues()->detach(array_diff($currentValueIds, $targetValueIds));
+        $product->attributeValues()->syncWithoutDetaching($targetValueIds);
     }
 
     /**

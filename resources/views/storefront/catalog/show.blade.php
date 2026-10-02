@@ -106,6 +106,17 @@
                 {!! $product->description !!}
             </div>
 
+            @if ($product->attributeValues->isNotEmpty())
+                <dl class="mt-6 space-y-1.5 text-sm font-medium text-gray-600">
+                    @foreach ($product->attributeValues as $attributeValue)
+                        <div class="flex justify-between">
+                            <dt>{{ $attributeValue->attribute->name }}</dt>
+                            <dd>{{ $attributeValue->value }}</dd>
+                        </div>
+                    @endforeach
+                </dl>
+            @endif
+
             <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-8 flex items-end gap-4">
                 @csrf
                 <div>

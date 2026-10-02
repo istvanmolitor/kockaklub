@@ -36,7 +36,7 @@ class ProductRepository
 
     public function loadStorefrontShowRelations(Product $product): Product
     {
-        $product->load('images', 'category');
+        $product->load('images', 'category', 'attributeValues.attribute');
         $product->load(['relatedProducts' => fn ($query) => $query
             ->where('is_active', true)
             ->withPublicStock()
