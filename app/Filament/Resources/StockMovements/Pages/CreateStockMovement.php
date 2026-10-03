@@ -6,6 +6,7 @@ use App\Filament\Resources\StockMovements\StockMovementResource;
 use App\Models\StockMovement;
 use App\Services\StockService;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Auth;
 
 class CreateStockMovement extends CreateRecord
 {
@@ -15,12 +16,9 @@ class CreateStockMovement extends CreateRecord
     {
         $this->assertStockAvailable($data);
 
-        return $data;
-    }
+        $data['created_by'] = Auth::id();
 
-    protected function afterCreate(): void
-    {
-        app(StockService::class)->rebuildRegionProductStocks();
+        return $data;
     }
 
     /**

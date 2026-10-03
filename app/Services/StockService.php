@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\StockMovement;
 use App\Repositories\StockRepository;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class StockService
@@ -76,5 +79,36 @@ class StockService
                 ),
             ]);
         }
+    }
+
+    /**
+     * Closes $movement: validates there is enough stock for OUT/TRANSFER
+     * movements, stamps closed_at/closed_by, and recomputes the
+     * region_product_stocks snapshot so the movement finally affects stock.
+     */
+    public function closeMovement(StockMovement $movement): void
+    {
+        if ($movement->isClosed()) {
+            return;
+        }
+
+        if (in_array($movement->type, [StockMovement::TYPE_OUT, StockMovement::TYPE_TRANSFER], true)) {
+            $quantitiesByProduct = $movement->items
+                ->groupBy('product_id')
+                ->map(fn ($items) => $items->sum('quantity'));
+
+            foreach ($quantitiesByProduct as $productId => $quantity) {
+                $this->assertCanRemove((int) $productId, $movement->source_region_id, (int) $quantity);
+            }
+        }
+
+        DB::transaction(function () use ($movement) {
+            $movement->update([
+                'closed_at' => now(),
+                'closed_by' => Auth::id(),
+            ]);
+
+            $this->rebuildRegionProductStocks();
+        });
     }
 }

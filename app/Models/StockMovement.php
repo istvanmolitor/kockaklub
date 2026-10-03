@@ -25,12 +25,16 @@ class StockMovement extends Model
         'destination_region_id',
         'movement_date',
         'note',
+        'created_by',
+        'closed_by',
+        'closed_at',
     ];
 
     protected function casts(): array
     {
         return [
             'movement_date' => 'date',
+            'closed_at' => 'datetime',
         ];
     }
 
@@ -44,9 +48,24 @@ class StockMovement extends Model
         return $this->belongsTo(Region::class, 'destination_region_id');
     }
 
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function closedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'closed_by');
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(StockMovementItem::class);
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->closed_at !== null;
     }
 
     /**

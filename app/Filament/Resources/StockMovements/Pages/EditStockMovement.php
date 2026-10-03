@@ -5,8 +5,11 @@ namespace App\Filament\Resources\StockMovements\Pages;
 use App\Filament\Resources\StockMovements\StockMovementResource;
 use App\Models\StockMovement;
 use App\Services\StockService;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Validation\ValidationException;
 
 class EditStockMovement extends EditRecord
 {
@@ -15,9 +18,43 @@ class EditStockMovement extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('close')
+                ->label('Lezárás')
+                ->icon('heroicon-o-lock-closed')
+                ->color('success')
+                ->visible(fn (StockMovement $record) => ! $record->isClosed())
+                ->requiresConfirmation()
+                ->modalDescription('Lezárás után a mozgatás módosítja a készletet, és a tételek már nem szerkeszthetők.')
+                ->action(function (StockMovement $record) {
+                    try {
+                        app(StockService::class)->closeMovement($record);
+
+                        Notification::make()
+                            ->title('A készlet mozgatás lezárva')
+                            ->success()
+                            ->send();
+                    } catch (ValidationException $exception) {
+                        Notification::make()
+                            ->title('A lezárás sikertelen')
+                            ->body(implode(' ', $exception->validator->errors()->all()))
+                            ->danger()
+                            ->send();
+                    }
+                }),
             DeleteAction::make()
                 ->after(fn () => app(StockService::class)->rebuildRegionProductStocks()),
         ];
+    }
+
+    protected function getFormActions(): array
+    {
+        if ($this->record->isClosed()) {
+            return [
+                $this->getCancelFormAction(),
+            ];
+        }
+
+        return parent::getFormActions();
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
@@ -25,11 +62,6 @@ class EditStockMovement extends EditRecord
         $this->assertStockAvailable($data);
 
         return $data;
-    }
-
-    protected function afterSave(): void
-    {
-        app(StockService::class)->rebuildRegionProductStocks();
     }
 
     /**

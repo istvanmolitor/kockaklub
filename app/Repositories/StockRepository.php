@@ -18,6 +18,7 @@ class StockRepository
             ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
             ->where('stock_movement_items.product_id', $productId)
             ->where('stock_movements.destination_region_id', $regionId)
+            ->whereNotNull('stock_movements.closed_at')
             ->when($excludingMovementId, fn (Builder $query) => $query->where('stock_movements.id', '!=', $excludingMovementId))
             ->sum('stock_movement_items.quantity');
     }
@@ -32,6 +33,7 @@ class StockRepository
             ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
             ->where('stock_movement_items.product_id', $productId)
             ->where('stock_movements.source_region_id', $regionId)
+            ->whereNotNull('stock_movements.closed_at')
             ->when($excludingMovementId, fn (Builder $query) => $query->where('stock_movements.id', '!=', $excludingMovementId))
             ->sum('stock_movement_items.quantity');
     }
@@ -86,6 +88,7 @@ class StockRepository
         return DB::table('stock_movement_items')
             ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
             ->whereNotNull('stock_movements.destination_region_id')
+            ->whereNotNull('stock_movements.closed_at')
             ->groupBy('stock_movements.destination_region_id', 'stock_movement_items.product_id')
             ->get([
                 'stock_movements.destination_region_id as region_id',
@@ -105,6 +108,7 @@ class StockRepository
         return DB::table('stock_movement_items')
             ->join('stock_movements', 'stock_movements.id', '=', 'stock_movement_items.stock_movement_id')
             ->whereNotNull('stock_movements.source_region_id')
+            ->whereNotNull('stock_movements.closed_at')
             ->groupBy('stock_movements.source_region_id', 'stock_movement_items.product_id')
             ->get([
                 'stock_movements.source_region_id as region_id',

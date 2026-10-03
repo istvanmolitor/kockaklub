@@ -22,9 +22,9 @@ class StockMovementResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Készlet';
 
-    protected static ?string $modelLabel = 'Leltár';
+    protected static ?string $modelLabel = 'Készlet mozgatás';
 
-    protected static ?string $pluralModelLabel = 'Leltárak';
+    protected static ?string $pluralModelLabel = 'Készlet mozgatások';
 
     public static function form(Schema $schema): Schema
     {

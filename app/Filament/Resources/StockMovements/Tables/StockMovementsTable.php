@@ -4,12 +4,16 @@ namespace App\Filament\Resources\StockMovements\Tables;
 
 use App\Models\StockMovement;
 use App\Services\StockService;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Validation\ValidationException;
 
 class StockMovementsTable
 {
@@ -40,6 +44,19 @@ class StockMovementsTable
                 TextColumn::make('items_count')
                     ->counts('items')
                     ->label('Tételek'),
+                TextColumn::make('closed_at')
+                    ->label('Állapot')
+                    ->badge()
+                    ->state(fn (StockMovement $record) => $record->isClosed() ? 'Lezárva' : 'Nyitott')
+                    ->color(fn (StockMovement $record) => $record->isClosed() ? 'success' : 'gray'),
+                TextColumn::make('createdBy.name')
+                    ->label('Létrehozta')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('closedBy.name')
+                    ->label('Lezárta')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Létrehozva')
                     ->dateTime()
@@ -50,8 +67,40 @@ class StockMovementsTable
                 SelectFilter::make('type')
                     ->label('Típus')
                     ->options(StockMovement::types()),
+                TernaryFilter::make('closed_at')
+                    ->label('Állapot')
+                    ->placeholder('Mind')
+                    ->trueLabel('Lezárva')
+                    ->falseLabel('Nyitott')
+                    ->queries(
+                        true: fn ($query) => $query->whereNotNull('closed_at'),
+                        false: fn ($query) => $query->whereNull('closed_at'),
+                    ),
             ])
             ->recordActions([
+                Action::make('close')
+                    ->label('Lezárás')
+                    ->icon('heroicon-o-lock-closed')
+                    ->color('success')
+                    ->visible(fn (StockMovement $record) => ! $record->isClosed())
+                    ->requiresConfirmation()
+                    ->modalDescription('Lezárás után a mozgatás módosítja a készletet, és a tételek már nem szerkeszthetők.')
+                    ->action(function (StockMovement $record) {
+                        try {
+                            app(StockService::class)->closeMovement($record);
+
+                            Notification::make()
+                                ->title('A készlet mozgatás lezárva')
+                                ->success()
+                                ->send();
+                        } catch (ValidationException $exception) {
+                            Notification::make()
+                                ->title('A lezárás sikertelen')
+                                ->body(implode(' ', $exception->validator->errors()->all()))
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([
