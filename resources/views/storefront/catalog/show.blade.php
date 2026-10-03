@@ -106,12 +106,25 @@
                 {!! $product->description !!}
             </div>
 
-            @if ($product->attributeValues->isNotEmpty())
-                <dl class="mt-6 space-y-1.5 text-sm font-medium text-gray-600">
-                    @foreach ($product->attributeValues as $attributeValue)
-                        <div class="flex justify-between">
-                            <dt>{{ $attributeValue->attribute->name }}</dt>
-                            <dd>{{ $attributeValue->value }}</dd>
+            @php
+                $specs = $product->attributeValues
+                    ->map(fn ($attributeValue) => ['label' => $attributeValue->attribute->name, 'value' => $attributeValue->value])
+                    ->values();
+
+                if ($product->weight) {
+                    $specs->push([
+                        'label' => 'Súly',
+                        'value' => rtrim(rtrim(number_format($product->weight, 3, ',', ' '), '0'), ',').' kg',
+                    ]);
+                }
+            @endphp
+
+            @if ($specs->isNotEmpty())
+                <dl class="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    @foreach ($specs as $spec)
+                        <div class="rounded-xl bg-gray-50 px-3 py-2">
+                            <dt class="text-[11px] font-bold uppercase tracking-wide text-gray-400">{{ $spec['label'] }}</dt>
+                            <dd class="text-sm font-bold text-gray-900">{{ $spec['value'] }}</dd>
                         </div>
                     @endforeach
                 </dl>

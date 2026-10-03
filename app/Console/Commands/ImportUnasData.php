@@ -137,6 +137,7 @@ class ImportUnasData extends Command
                     'slug' => $slug,
                     'description' => $row['Rövid Leírás'] !== '' ? $row['Rövid Leírás'] : null,
                     'price' => (int) round((float) $row['Bruttó Ár']),
+                    'weight' => $this->parseWeight($row['Tömeg']),
                     'is_active' => $row['Státusz'] === '1',
                 ],
             );
@@ -171,6 +172,17 @@ class ImportUnasData extends Command
             ->exists();
 
         return $exists ? $slug.'-'.Str::slug($row['Cikkszám']) : $slug;
+    }
+
+    /**
+     * A CSV "Tömeg" oszlopa kg-ban adja meg a súlyt; 0 vagy üres érték azt jelenti,
+     * hogy a súly nincs megadva az UNAS-ban, ezért ilyenkor null-t adunk vissza.
+     */
+    private function parseWeight(string $value): ?float
+    {
+        $weight = (float) $value;
+
+        return $weight > 0 ? $weight : null;
     }
 
     private function importProductImage(Product $product, string $imageUrl, string $imagesPath): bool
