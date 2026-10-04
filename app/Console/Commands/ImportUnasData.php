@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductAttribute;
+use App\Models\Site;
+use App\Models\StockMovement;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -47,6 +49,14 @@ class ImportUnasData extends Command
         $this->components->info('Termékek importálása...');
         [$productCount, $imageCount] = $this->importProducts($productsCsv, $imagesPath);
         $this->components->info("{$productCount} termék és {$imageCount} termékkép importálva.");
+
+        $stockCsv = $basePath.'/keszlet.csv';
+
+        if (is_file($stockCsv)) {
+            $this->components->info('Készlet importálása...');
+            [$stockItemCount, $stockSkippedCount] = $this->importStock($stockCsv);
+            $this->components->info("{$stockItemCount} készlet tétel importálva, {$stockSkippedCount} kihagyva.");
+        }
 
         return self::SUCCESS;
     }
@@ -288,9 +298,75 @@ class ImportUnasData extends Command
     }
 
     /**
+     * A keszlet.csv-ből egy nyitott (lezáratlan) IN típusú készletmozgatást hoz
+     * létre a fő telephely első régiójába. Soronkénti cikkszám: az egyedi
+     * vonalkód, ha az nincs megadva, akkor az eredeti vonalkód.
+     *
+     * @return array{0: int, 1: int} [importált tételek száma, kihagyott sorok száma]
+     */
+    private function importStock(string $csvPath): array
+    {
+        $rows = $this->readCsv($csvPath, ',');
+
+        $region = Site::main()?->regions()->orderBy('id')->first();
+
+        if (! $region) {
+            $this->components->warn('Nincs fő telephely vagy régió, a készlet importálása kimarad.');
+
+            return [0, 0];
+        }
+
+        $movement = StockMovement::create([
+            'type' => StockMovement::TYPE_IN,
+            'destination_region_id' => $region->id,
+            'movement_date' => now(),
+            'note' => 'UNAS készlet import',
+        ]);
+
+        $itemCount = 0;
+        $skippedCount = 0;
+
+        foreach ($rows as $row) {
+            $quantity = (int) ($row['db'] ?? '');
+
+            if ($quantity <= 0) {
+                continue;
+            }
+
+            $sku = $row['Egyedi vonalkód'] !== '' ? $row['Egyedi vonalkód'] : $row['Eredeti vonalkód'];
+
+            if ($sku === '') {
+                continue;
+            }
+
+            $product = Product::query()->where('sku', $sku)->first();
+
+            if (! $product) {
+                $this->components->warn("Ismeretlen cikkszám ({$sku}) a(z) \"{$row['Név']}\" készlet sorhoz, kihagyva.");
+                $skippedCount++;
+
+                continue;
+            }
+
+            $movement->items()->create([
+                'product_id' => $product->id,
+                'quantity' => $quantity,
+            ]);
+
+            $itemCount++;
+        }
+
+        if ($itemCount === 0) {
+            $movement->delete();
+        }
+
+        return [$itemCount, $skippedCount];
+    }
+
+    /**
      * @return list<array<string, string>>
      */
-    private function readCsv(string $path): array
+    private function readCsv(string $path, string $separator = ';'): array
     {
         $handle = fopen($path, 'r');
 
@@ -299,11 +375,11 @@ class ImportUnasData extends Command
             rewind($handle);
         }
 
-        $header = fgetcsv($handle, separator: ';', enclosure: '"');
+        $header = fgetcsv($handle, separator: $separator, enclosure: '"');
 
         $rows = [];
 
-        while (($values = fgetcsv($handle, separator: ';', enclosure: '"')) !== false) {
+        while (($values = fgetcsv($handle, separator: $separator, enclosure: '"')) !== false) {
             if ($values === [null]) {
                 continue;
             }
