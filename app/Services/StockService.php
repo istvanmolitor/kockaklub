@@ -2,8 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\StockMovement;
 use App\Repositories\StockRepository;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -32,6 +35,18 @@ class StockService
     public function publicStockForProduct(int $productId): int
     {
         return $this->stock->publicStockForProduct($productId);
+    }
+
+    /**
+     * How much of $productId can still be promised to a new order: the public
+     * stock minus what's already sitting on orders that exist but have not
+     * been reserved (picked off the shelf) yet.
+     */
+    public function freeStockForProduct(int $productId): int
+    {
+        $available = $this->publicStockForProduct($productId) - $this->stock->pendingReservationQuantityForProduct($productId);
+
+        return max(0, $available);
     }
 
     /**
@@ -109,6 +124,110 @@ class StockService
             ]);
 
             $this->rebuildRegionProductStocks();
+        });
+    }
+
+    /**
+     * For each item of $order, works out which public region(s) of the
+     * order's site the quantity would be taken from if it were reserved now
+     * — smallest-stocked region first — and how much (if any) can't be
+     * covered by public stock at all.
+     *
+     * @return Collection<int, array{item: OrderItem, allocations: array<int, array{region_id: int, region_name: string, quantity: int}>, shortfall: int}>
+     */
+    public function planReservation(Order $order): Collection
+    {
+        return $order->items->map(function (OrderItem $item) use ($order) {
+            $remaining = $item->quantity;
+            $allocations = [];
+
+            foreach ($this->stock->publicRegionStocksForProduct($item->product_id, $order->site_id) as $regionStock) {
+                if ($remaining <= 0) {
+                    break;
+                }
+
+                $quantity = min($remaining, (int) $regionStock->quantity);
+
+                $allocations[] = [
+                    'region_id' => (int) $regionStock->region_id,
+                    'region_name' => $regionStock->region_name,
+                    'quantity' => $quantity,
+                ];
+
+                $remaining -= $quantity;
+            }
+
+            return [
+                'item' => $item,
+                'allocations' => $allocations,
+                'shortfall' => $remaining,
+            ];
+        });
+    }
+
+    /**
+     * Picks $order's items off the shelf: deducts the quantities from the
+     * public regions of the order's site (smallest region first, per
+     * planReservation()) via closed StockMovements, and stamps reserved_at.
+     * Does nothing if the order was already reserved. Throws if the order's
+     * site doesn't have enough public stock for one or more items — in that
+     * case nothing is deducted.
+     */
+    public function reserveOrder(Order $order): void
+    {
+        if ($order->isReserved()) {
+            return;
+        }
+
+        $plan = $this->planReservation($order);
+
+        $shortages = $plan->filter(fn (array $row) => $row['shortfall'] > 0);
+
+        if ($shortages->isNotEmpty()) {
+            throw ValidationException::withMessages([
+                'items' => $shortages
+                    ->map(fn (array $row) => sprintf(
+                        '%s: nincs elég publikus készlet (hiányzik %d db).',
+                        $row['item']->product_name,
+                        $row['shortfall']
+                    ))
+                    ->all(),
+            ]);
+        }
+
+        DB::transaction(function () use ($order, $plan) {
+            $quantitiesByRegion = [];
+
+            foreach ($plan as $row) {
+                foreach ($row['allocations'] as $allocation) {
+                    $productId = $row['item']->product_id;
+                    $quantitiesByRegion[$allocation['region_id']][$productId] =
+                        ($quantitiesByRegion[$allocation['region_id']][$productId] ?? 0) + $allocation['quantity'];
+                }
+            }
+
+            foreach ($quantitiesByRegion as $regionId => $quantitiesByProduct) {
+                $movement = StockMovement::create([
+                    'type' => StockMovement::TYPE_OUT,
+                    'source_region_id' => $regionId,
+                    'movement_date' => now(),
+                    'note' => "Rendelés: {$order->order_number}",
+                    'created_by' => Auth::id(),
+                    'closed_by' => Auth::id(),
+                    'closed_at' => now(),
+                ]);
+
+                foreach ($quantitiesByProduct as $productId => $quantity) {
+                    $movement->items()->create([
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                    ]);
+                }
+            }
+
+            $this->rebuildRegionProductStocks();
+
+            $order->update(['reserved_at' => now()]);
         });
     }
 }

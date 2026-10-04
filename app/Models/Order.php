@@ -43,6 +43,7 @@ class Order extends Model
         'invoice_number',
         'invoiced_at',
         'invoice_pdf_path',
+        'reserved_at',
     ];
 
     protected function casts(): array
@@ -53,6 +54,7 @@ class Order extends Model
             'payment_cost' => 'integer',
             'total' => 'integer',
             'invoiced_at' => 'datetime',
+            'reserved_at' => 'datetime',
         ];
     }
 
@@ -99,5 +101,10 @@ class Order extends Model
     public function isInvoiced(): bool
     {
         return filled($this->invoice_number);
+    }
+
+    public function isReserved(): bool
+    {
+        return filled($this->reserved_at);
     }
 }

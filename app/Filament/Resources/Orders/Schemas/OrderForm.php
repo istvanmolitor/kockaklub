@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
@@ -41,7 +42,29 @@ class OrderForm
                     ->relationship('customer', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, Set $set) {
+                        $customer = Customer::find($state);
+
+                        if (! $customer) {
+                            return;
+                        }
+
+                        $set('shipping_name', $customer->shipping_name);
+                        $set('shipping_phone', $customer->phone);
+                        $set('shipping_country', $customer->shipping_country);
+                        $set('shipping_city', $customer->shipping_city);
+                        $set('shipping_zip', $customer->shipping_zip);
+                        $set('shipping_address', $customer->shipping_address);
+
+                        $set('billing_name', $customer->billing_name);
+                        $set('billing_country', $customer->billing_country);
+                        $set('billing_city', $customer->billing_city);
+                        $set('billing_zip', $customer->billing_zip);
+                        $set('billing_address', $customer->billing_address);
+                        $set('billing_tax_number', $customer->billing_tax_number);
+                    }),
                 Select::make('order_status_id')
                     ->label('Státusz')
                     ->relationship('orderStatus', 'name')

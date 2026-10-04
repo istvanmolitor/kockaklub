@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\ProductObserver;
 use App\Repositories\StockRepository;
+use App\Services\StockService;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -135,6 +136,16 @@ class Product extends Model
     public function isOrderable(int $publicStock): bool
     {
         return ! $this->is_discontinued || $publicStock > 0;
+    }
+
+    /**
+     * How much of this product can still be promised to a new order: the
+     * public stock minus what's already sitting on orders that exist but
+     * haven't been reserved (picked off the shelf) yet.
+     */
+    public function freeStock(): int
+    {
+        return app(StockService::class)->freeStockForProduct($this->id);
     }
 
     /**

@@ -49,7 +49,7 @@ class CatalogController extends Controller
 
         return view('storefront.catalog.show', [
             'product' => $product,
-            'publicStock' => $this->stockService->publicStockForProduct($product->id),
+            'freeStock' => $this->stockService->freeStockForProduct($product->id),
         ]);
     }
 }

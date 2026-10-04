@@ -98,8 +98,8 @@
             @endif
             <p class="mt-2 text-3xl font-black text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Ft</p>
 
-            <p class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold {{ $publicStock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
-                {{ $publicStock > 0 ? "Raktáron ({$publicStock} db)" : 'Elfogyott' }}
+            <p class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold {{ $freeStock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                {{ $freeStock > 0 ? "Raktáron ({$freeStock} db)" : 'Elfogyott' }}
             </p>
 
             <div class="mt-6 prose prose-sm max-w-none text-gray-700">
@@ -134,13 +134,13 @@
                 @csrf
                 <div>
                     <label for="quantity" class="field-label">Mennyiség</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" @if ($publicStock > 0) max="{{ $publicStock }}" @endif
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" @if ($freeStock > 0) max="{{ $freeStock }}" @endif
                            class="input-field w-24">
                 </div>
                 <button type="submit"
-                        @disabled(! $product->isOrderable($publicStock))
+                        @disabled(! $product->isOrderable($freeStock))
                         class="btn-primary">
-                    {{ $product->isOrderable($publicStock) ? ($publicStock < 1 ? 'Előrendelem' : 'Kosárba teszem') : 'Elfogyott' }}
+                    {{ $product->isOrderable($freeStock) ? ($freeStock < 1 ? 'Előrendelem' : 'Kosárba teszem') : 'Elfogyott' }}
                 </button>
             </form>
         </div>

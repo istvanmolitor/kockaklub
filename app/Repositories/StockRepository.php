@@ -64,6 +64,43 @@ class StockRepository
     }
 
     /**
+     * Public regions of $siteId that currently hold stock of $productId, ordered
+     * by quantity ascending (smallest box first) — the depletion order used when
+     * fulfilling an order.
+     *
+     * @return Collection<int, object>
+     */
+    public function publicRegionStocksForProduct(int $productId, int $siteId): Collection
+    {
+        return DB::table('region_product_stocks')
+            ->join('regions', 'regions.id', '=', 'region_product_stocks.region_id')
+            ->where('region_product_stocks.product_id', $productId)
+            ->where('regions.site_id', $siteId)
+            ->where('regions.is_public', true)
+            ->where('region_product_stocks.quantity', '>', 0)
+            ->orderBy('region_product_stocks.quantity')
+            ->get([
+                'regions.id as region_id',
+                'regions.name as region_name',
+                'region_product_stocks.quantity',
+            ]);
+    }
+
+    /**
+     * Total quantity of $productId sitting on orders that have not been
+     * reserved yet (orders.reserved_at is null) — stock already promised
+     * but not yet taken off the shelf.
+     */
+    public function pendingReservationQuantityForProduct(int $productId): int
+    {
+        return (int) DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.product_id', $productId)
+            ->whereNull('orders.reserved_at')
+            ->sum('order_items.quantity');
+    }
+
+    /**
      * Correlated subquery expression for "sum of public-region stock" per product,
      * for use with Product::query()->addSelect(['public_stock' => StockRepository::publicStockSubquery()]).
      * Correlates to the outer `products.id` column via whereColumn.
