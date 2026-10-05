@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedInteger('price');
             $table->unsignedTinyInteger('vat_rate')->default(27);
             $table->string('sku')->nullable()->unique();
+            $table->decimal('weight', 8, 3)->nullable();
             $table->boolean('is_active')->default(true);
             $table->boolean('is_discontinued')->default(false);
             $table->boolean('is_featured')->default(false);

@@ -13,9 +13,9 @@ Rendelésszám: **{{ $order->order_number }}**
 
 **Végösszeg: {{ number_format($order->total, 0, ',', ' ') }} Ft**
 
-Szállítási cím: {{ $order->shipping_name }}, {{ $order->shipping_country }}, {{ $order->shipping_zip }} {{ $order->shipping_city }}, {{ $order->shipping_address }}
+Szállítási cím: {{ $order->shipping_name }}, {{ $order->shippingCountry?->name }}, {{ $order->shipping_zip }} {{ $order->shipping_city }}, {{ $order->shipping_address }}
 
-Számlázási cím: {{ $order->billing_name }}, {{ $order->billing_country }}, {{ $order->billing_zip }} {{ $order->billing_city }}, {{ $order->billing_address }}
+Számlázási cím: {{ $order->billing_name }}, {{ $order->billingCountry?->name }}, {{ $order->billing_zip }} {{ $order->billing_city }}, {{ $order->billing_address }}
 
 Szállítási mód: {{ $order->shippingMethod->name }}
 

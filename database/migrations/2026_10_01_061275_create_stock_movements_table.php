@@ -15,6 +15,9 @@ return new class extends Migration
             $table->foreignId('destination_region_id')->nullable()->constrained('regions')->restrictOnDelete();
             $table->date('movement_date');
             $table->text('note')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('closed_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('closed_at')->nullable();
             $table->timestamps();
         });
     }

@@ -24,12 +24,12 @@ class Order extends Model
         'order_number',
         'shipping_name',
         'shipping_phone',
-        'shipping_country',
+        'shipping_country_id',
         'shipping_city',
         'shipping_zip',
         'shipping_address',
         'billing_name',
-        'billing_country',
+        'billing_country_id',
         'billing_city',
         'billing_zip',
         'billing_address',
@@ -66,6 +66,16 @@ class Order extends Model
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function shippingCountry(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'shipping_country_id');
+    }
+
+    public function billingCountry(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'billing_country_id');
     }
 
     public function orderStatus(): BelongsTo

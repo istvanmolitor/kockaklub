@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Country;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,12 +24,12 @@ class CustomerFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->optional()->phoneNumber(),
             'shipping_name' => fake()->name(),
-            'shipping_country' => 'Magyarország',
+            'shipping_country_id' => Country::where('code', 'HU')->value('id'),
             'shipping_city' => fake()->city(),
             'shipping_zip' => fake()->postcode(),
             'shipping_address' => fake()->streetAddress(),
             'billing_name' => fake()->name(),
-            'billing_country' => 'Magyarország',
+            'billing_country_id' => Country::where('code', 'HU')->value('id'),
             'billing_city' => fake()->city(),
             'billing_zip' => fake()->postcode(),
             'billing_address' => fake()->streetAddress(),

@@ -37,7 +37,7 @@ class SzamlazzService
             throw new SzamlaAgentException('Nincs beállítva a Számlázz.hu Agent kulcs (Beállítások > Számlázz.hu Agent kulcs).');
         }
 
-        $order->loadMissing(['items', 'customer', 'paymentMethod', 'shippingMethod']);
+        $order->loadMissing(['items', 'customer', 'paymentMethod', 'shippingMethod', 'billingCountry']);
 
         $invoice = new Invoice(Invoice::INVOICE_TYPE_E_INVOICE);
         $invoice->setHeader($this->buildHeader($order));
@@ -108,7 +108,7 @@ class SzamlazzService
     {
         $buyer = (new Buyer)
             ->setName($order->billing_name)
-            ->setCountry($order->billing_country)
+            ->setCountry($order->billingCountry?->name)
             ->setZipCode($order->billing_zip)
             ->setCity($order->billing_city)
             ->setAddress($order->billing_address)

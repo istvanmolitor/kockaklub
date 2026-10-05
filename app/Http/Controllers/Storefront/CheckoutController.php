@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Mail\OrderConfirmationMail;
+use App\Models\Country;
 use App\Models\Order;
 use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
@@ -72,6 +73,7 @@ class CheckoutController extends Controller
             'cart' => $cart,
             'customer' => $customer,
             'shippingMethods' => $shippingMethods,
+            'countries' => Country::orderBy('sort_order')->get(),
         ]);
     }
 
@@ -106,14 +108,14 @@ class CheckoutController extends Controller
         $billing = $billingSameAsShipping
             ? [
                 'billing_name' => $validated['shipping_name'],
-                'billing_country' => $validated['shipping_country'],
+                'billing_country_id' => $validated['shipping_country_id'],
                 'billing_city' => $validated['shipping_city'],
                 'billing_zip' => $validated['shipping_zip'],
                 'billing_address' => $validated['shipping_address'],
             ]
             : [
                 'billing_name' => $validated['billing_name'],
-                'billing_country' => $validated['billing_country'],
+                'billing_country_id' => $validated['billing_country_id'],
                 'billing_city' => $validated['billing_city'],
                 'billing_zip' => $validated['billing_zip'],
                 'billing_address' => $validated['billing_address'],
@@ -152,7 +154,7 @@ class CheckoutController extends Controller
                     'order_number' => Order::generateOrderNumber(),
                     'shipping_name' => $validated['shipping_name'],
                     'shipping_phone' => $validated['shipping_phone'],
-                    'shipping_country' => $validated['shipping_country'],
+                    'shipping_country_id' => $validated['shipping_country_id'],
                     'shipping_city' => $validated['shipping_city'],
                     'shipping_zip' => $validated['shipping_zip'],
                     'shipping_address' => $validated['shipping_address'],
@@ -198,7 +200,7 @@ class CheckoutController extends Controller
         if (! $customer->hasShippingDetails()) {
             $customer->fill([
                 'shipping_name' => $validated['shipping_name'],
-                'shipping_country' => $validated['shipping_country'],
+                'shipping_country_id' => $validated['shipping_country_id'],
                 'shipping_city' => $validated['shipping_city'],
                 'shipping_zip' => $validated['shipping_zip'],
                 'shipping_address' => $validated['shipping_address'],
@@ -224,7 +226,7 @@ class CheckoutController extends Controller
 
     public function confirmation(Order $order): View
     {
-        $order->load('items.product.defaultImage', 'orderStatus', 'shippingMethod', 'paymentMethod');
+        $order->load('items.product.defaultImage', 'orderStatus', 'shippingMethod', 'paymentMethod', 'shippingCountry', 'billingCountry');
 
         return view('storefront.checkout.confirmation', ['order' => $order]);
     }

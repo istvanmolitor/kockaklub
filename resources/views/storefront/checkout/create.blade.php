@@ -7,39 +7,47 @@
         $selectedShippingMethodId = (int) old('shipping_method_id', $shippingMethods->first()->id);
         $oldPaymentMethodId = old('payment_method_id');
         $cartTotal = $cart->items->sum(fn ($item) => $item->lineTotal());
+        $defaultCountryId = $countries->firstWhere('code', 'HU')?->id;
     @endphp
 
     <h1 class="mb-6 text-2xl font-black text-gray-900">Pénztár</h1>
 
-    <div class="grid gap-10 md:grid-cols-3">
-        <form method="POST" action="{{ route('checkout.store') }}" class="md:col-span-2 space-y-6">
+    <div class="grid gap-10 md:grid-cols-3 md:items-start">
+        <form id="checkout-form" method="POST" action="{{ route('checkout.store') }}" class="md:col-span-2 space-y-6">
             @csrf
 
             @guest
-                <div class="card space-y-4">
-                    <h2 class="text-lg font-black text-gray-900">Kapcsolattartó adatok</h2>
+                <div class="card animate-pop relative overflow-hidden p-8">
+                    <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-accent-200 to-accent3-200 opacity-50"></div>
 
-                    <div>
-                        <label for="name" class="field-label">Név</label>
-                        <input id="name" name="name" type="text" value="{{ old('name') }}"
-                               class="input-field @error('name') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                        @error('name')
-                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="relative space-y-4">
+                        <h2 class="text-lg font-black text-gray-900">Kapcsolattartó adatok</h2>
 
-                    <div>
-                        <label for="email" class="field-label">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}"
-                               class="input-field @error('email') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                        @error('email')
-                            <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
+                        <div>
+                            <label for="name" class="field-label">Név</label>
+                            <input id="name" name="name" type="text" value="{{ old('name') }}"
+                                   class="input-field @error('name') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('name')
+                                <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="email" class="field-label">Email</label>
+                            <input id="email" name="email" type="email" value="{{ old('email') }}"
+                                   class="input-field @error('email') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('email')
+                                <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
             @endguest
 
-            <div class="card space-y-4">
+            <div class="card animate-pop relative overflow-hidden p-8" style="animation-delay: 90ms">
+                <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-accent-200 to-accent3-200 opacity-50"></div>
+
+                <div class="relative space-y-4">
                 <h2 class="text-lg font-black text-gray-900">Szállítási adatok</h2>
 
                 <div>
@@ -64,21 +72,24 @@
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="shipping_country" class="field-label">Ország</label>
-                        <input id="shipping_country" name="shipping_country" type="text"
-                               value="{{ old('shipping_country', $customer->shipping_country ?? 'Magyarország') }}"
-                               class="input-field @error('shipping_country') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                        @error('shipping_country')
+                        <label for="shipping_country_id" class="field-label">Ország</label>
+                        <select id="shipping_country_id" name="shipping_country_id"
+                                class="select-field mt-1.5 block w-full @error('shipping_country_id') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @foreach ($countries as $country)
+                                <option value="{{ $country->id }}" @selected((int) old('shipping_country_id', $customer->shipping_country_id ?? $defaultCountryId) === $country->id)>{{ $country->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('shipping_country_id')
                             <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="shipping_city" class="field-label">Város</label>
-                        <input id="shipping_city" name="shipping_city" type="text"
-                               value="{{ old('shipping_city', $customer->shipping_city ?? '') }}"
-                               class="input-field @error('shipping_city') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                        @error('shipping_city')
+                        <label for="shipping_zip" class="field-label">Irányítószám</label>
+                        <input id="shipping_zip" name="shipping_zip" type="text" data-zip-input data-country-input="shipping_country_id" data-city-target="shipping_city"
+                               value="{{ old('shipping_zip', $customer->shipping_zip ?? '') }}"
+                               class="input-field @error('shipping_zip') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('shipping_zip')
                             <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -86,11 +97,11 @@
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="shipping_zip" class="field-label">Irányítószám</label>
-                        <input id="shipping_zip" name="shipping_zip" type="text"
-                               value="{{ old('shipping_zip', $customer->shipping_zip ?? '') }}"
-                               class="input-field @error('shipping_zip') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                        @error('shipping_zip')
+                        <label for="shipping_city" class="field-label">Város</label>
+                        <input id="shipping_city" name="shipping_city" type="text"
+                               value="{{ old('shipping_city', $customer->shipping_city ?? '') }}"
+                               class="input-field @error('shipping_city') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                        @error('shipping_city')
                             <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -105,9 +116,10 @@
                         @enderror
                     </div>
                 </div>
+                </div>
             </div>
 
-            <div class="card space-y-4">
+            <div class="card animate-pop p-8 space-y-4" style="animation-delay: 180ms">
                 <h2 class="text-lg font-black text-gray-900">Számlázási adatok</h2>
 
                 <label class="flex items-center gap-2 text-sm font-medium text-gray-600">
@@ -140,21 +152,24 @@
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
-                            <label for="billing_country" class="field-label">Ország</label>
-                            <input id="billing_country" name="billing_country" type="text"
-                                   value="{{ old('billing_country', $customer->billing_country ?? 'Magyarország') }}"
-                                   class="input-field @error('billing_country') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                            @error('billing_country')
+                            <label for="billing_country_id" class="field-label">Ország</label>
+                            <select id="billing_country_id" name="billing_country_id"
+                                    class="select-field mt-1.5 block w-full @error('billing_country_id') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                                @foreach ($countries as $country)
+                                    <option value="{{ $country->id }}" @selected((int) old('billing_country_id', $customer->billing_country_id ?? $defaultCountryId) === $country->id)>{{ $country->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('billing_country_id')
                                 <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="billing_city" class="field-label">Város</label>
-                            <input id="billing_city" name="billing_city" type="text"
-                                   value="{{ old('billing_city', $customer->billing_city ?? '') }}"
-                                   class="input-field @error('billing_city') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                            @error('billing_city')
+                            <label for="billing_zip" class="field-label">Irányítószám</label>
+                            <input id="billing_zip" name="billing_zip" type="text" data-zip-input data-country-input="billing_country_id" data-city-target="billing_city"
+                                   value="{{ old('billing_zip', $customer->billing_zip ?? '') }}"
+                                   class="input-field @error('billing_zip') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('billing_zip')
                                 <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -162,11 +177,11 @@
 
                     <div class="grid gap-4 sm:grid-cols-2">
                         <div>
-                            <label for="billing_zip" class="field-label">Irányítószám</label>
-                            <input id="billing_zip" name="billing_zip" type="text"
-                                   value="{{ old('billing_zip', $customer->billing_zip ?? '') }}"
-                                   class="input-field @error('billing_zip') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
-                            @error('billing_zip')
+                            <label for="billing_city" class="field-label">Város</label>
+                            <input id="billing_city" name="billing_city" type="text"
+                                   value="{{ old('billing_city', $customer->billing_city ?? '') }}"
+                                   class="input-field @error('billing_city') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">
+                            @error('billing_city')
                                 <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
                             @enderror
                         </div>
@@ -184,7 +199,7 @@
                 </div>
             </div>
 
-            <div class="card space-y-3">
+            <div class="card animate-pop p-8 space-y-3" style="animation-delay: 270ms">
                 <h2 class="text-lg font-black text-gray-900">Szállítási mód</h2>
 
                 @foreach ($shippingMethods as $shippingMethod)
@@ -210,7 +225,7 @@
                 @enderror
             </div>
 
-            <div class="card space-y-3">
+            <div class="card animate-pop p-8 space-y-3" style="animation-delay: 360ms">
                 <h2 class="text-lg font-black text-gray-900">Fizetési mód</h2>
 
                 @foreach ($shippingMethods as $shippingMethod)
@@ -243,15 +258,14 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn-primary w-full">
-                Rendelés leadása
-            </button>
         </form>
 
-        <div class="card h-fit">
-            <h2 class="mb-4 text-lg font-black text-gray-900">Rendelés összegzés</h2>
+        <div class="animate-pop relative overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-8 shadow-sm md:sticky md:top-24" style="animation-delay: 90ms">
+            <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-accent-200 to-accent3-200 opacity-50"></div>
 
-            <ul class="divide-y divide-gray-100 text-sm">
+            <h2 class="relative mb-4 text-lg font-black text-gray-900">Rendelés összegzés</h2>
+
+            <ul class="relative divide-y divide-gray-100 text-sm">
                 @foreach ($cart->items as $item)
                     <li class="flex justify-between py-2 font-medium text-gray-700">
                         <span>{{ $item->product->name }} &times; {{ $item->quantity }}</span>
@@ -260,7 +274,7 @@
                 @endforeach
             </ul>
 
-            <div class="mt-4 space-y-1 border-t border-gray-100 pt-4 text-sm font-medium text-gray-600">
+            <div class="relative mt-4 space-y-1 border-t border-gray-100 pt-4 text-sm font-medium text-gray-600">
                 <div class="flex justify-between">
                     <span>Részösszeg</span>
                     <span data-summary-subtotal>{{ number_format($cartTotal, 0, ',', ' ') }} Ft</span>
@@ -275,10 +289,14 @@
                 </div>
             </div>
 
-            <div class="mt-4 flex justify-between border-t border-gray-100 pt-4 font-black text-gray-900">
+            <div class="relative mt-4 flex justify-between border-t border-gray-100 pt-4 font-black text-gray-900">
                 <span>Összesen</span>
                 <span data-summary-total>{{ number_format($cartTotal, 0, ',', ' ') }} Ft</span>
             </div>
+
+            <button type="submit" form="checkout-form" class="btn-primary relative mt-6 w-full">
+                Rendelés leadása
+            </button>
         </div>
     </div>
 
@@ -338,6 +356,53 @@
 
             billingCheckbox.addEventListener('change', function () {
                 billingFields.classList.toggle('hidden', billingCheckbox.checked);
+            });
+
+            var postalCodesUrlTemplate = @js(route('postal-codes.index', ['country' => '__COUNTRY__']));
+            var postalCodeMaps = {};
+
+            function loadPostalCodes(countryId) {
+                if (!countryId) {
+                    return Promise.resolve({});
+                }
+
+                if (!postalCodeMaps[countryId]) {
+                    postalCodeMaps[countryId] = fetch(postalCodesUrlTemplate.replace('__COUNTRY__', countryId))
+                        .then(function (response) { return response.json(); })
+                        .catch(function () { return {}; });
+                }
+
+                return postalCodeMaps[countryId];
+            }
+
+            document.querySelectorAll('[data-zip-input]').forEach(function (zipInput) {
+                var countrySelect = document.getElementById(zipInput.dataset.countryInput);
+                var cityInput = document.getElementById(zipInput.dataset.cityTarget);
+
+                if (!countrySelect || !cityInput) {
+                    return;
+                }
+
+                countrySelect.addEventListener('change', function () {
+                    loadPostalCodes(countrySelect.value);
+                });
+
+                zipInput.addEventListener('focus', function () {
+                    loadPostalCodes(countrySelect.value);
+                }, { once: true });
+
+                zipInput.addEventListener('input', function () {
+                    var zip = zipInput.value.trim();
+                    if (!zip) {
+                        return;
+                    }
+
+                    loadPostalCodes(countrySelect.value).then(function (map) {
+                        if (map[zip]) {
+                            cityInput.value = map[zip];
+                        }
+                    });
+                });
             });
         });
     </script>

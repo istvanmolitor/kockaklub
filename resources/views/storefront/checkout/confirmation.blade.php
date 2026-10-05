@@ -71,7 +71,7 @@
                     <p class="text-sm font-medium text-gray-600">
                         {{ $order->shipping_name }}<br>
                         {{ $order->shipping_zip }} {{ $order->shipping_city }}, {{ $order->shipping_address }}<br>
-                        {{ $order->shipping_country }}
+                        {{ $order->shippingCountry?->name }}
                     </p>
                 </div>
 
@@ -85,7 +85,7 @@
                     <p class="text-sm font-medium text-gray-600">
                         {{ $order->billing_name }}<br>
                         {{ $order->billing_zip }} {{ $order->billing_city }}, {{ $order->billing_address }}<br>
-                        {{ $order->billing_country }}
+                        {{ $order->billingCountry?->name }}
                     </p>
                 </div>
             </div>

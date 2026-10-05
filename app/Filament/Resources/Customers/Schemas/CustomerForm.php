@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Customers\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -27,8 +28,11 @@ class CustomerForm
                     ->schema([
                         TextInput::make('shipping_name')
                             ->label('Név'),
-                        TextInput::make('shipping_country')
-                            ->label('Ország'),
+                        Select::make('shipping_country_id')
+                            ->label('Ország')
+                            ->relationship('shippingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                            ->searchable()
+                            ->preload(),
                         TextInput::make('shipping_city')
                             ->label('Város'),
                         TextInput::make('shipping_zip')
@@ -42,8 +46,11 @@ class CustomerForm
                     ->schema([
                         TextInput::make('billing_name')
                             ->label('Név'),
-                        TextInput::make('billing_country')
-                            ->label('Ország'),
+                        Select::make('billing_country_id')
+                            ->label('Ország')
+                            ->relationship('billingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                            ->searchable()
+                            ->preload(),
                         TextInput::make('billing_city')
                             ->label('Város'),
                         TextInput::make('billing_zip')

@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('order_number')->unique();
             $table->string('shipping_name');
             $table->string('shipping_phone');
-            $table->string('shipping_country')->nullable();
+            $table->foreignId('shipping_country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->string('shipping_city')->nullable();
             $table->string('shipping_zip')->nullable();
             $table->text('shipping_address');
             $table->string('billing_name')->nullable();
-            $table->string('billing_country')->nullable();
+            $table->foreignId('billing_country_id')->nullable()->constrained('countries')->nullOnDelete();
             $table->string('billing_city')->nullable();
             $table->string('billing_zip')->nullable();
             $table->string('billing_address')->nullable();
@@ -35,6 +35,7 @@ return new class extends Migration
             $table->string('invoice_number')->nullable();
             $table->timestamp('invoiced_at')->nullable();
             $table->string('invoice_pdf_path')->nullable();
+            $table->timestamp('reserved_at')->nullable();
             $table->timestamps();
         });
     }

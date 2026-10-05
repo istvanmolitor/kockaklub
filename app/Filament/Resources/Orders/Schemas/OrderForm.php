@@ -53,13 +53,13 @@ class OrderForm
 
                         $set('shipping_name', $customer->shipping_name);
                         $set('shipping_phone', $customer->phone);
-                        $set('shipping_country', $customer->shipping_country);
+                        $set('shipping_country_id', $customer->shipping_country_id);
                         $set('shipping_city', $customer->shipping_city);
                         $set('shipping_zip', $customer->shipping_zip);
                         $set('shipping_address', $customer->shipping_address);
 
                         $set('billing_name', $customer->billing_name);
-                        $set('billing_country', $customer->billing_country);
+                        $set('billing_country_id', $customer->billing_country_id);
                         $set('billing_city', $customer->billing_city);
                         $set('billing_zip', $customer->billing_zip);
                         $set('billing_address', $customer->billing_address);
@@ -91,8 +91,11 @@ class OrderForm
                         TextInput::make('shipping_phone')
                             ->label('Telefon')
                             ->required(),
-                        TextInput::make('shipping_country')
+                        Select::make('shipping_country_id')
                             ->label('Ország')
+                            ->relationship('shippingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                            ->searchable()
+                            ->preload()
                             ->required(),
                         TextInput::make('shipping_city')
                             ->label('Város')
@@ -110,8 +113,11 @@ class OrderForm
                         TextInput::make('billing_name')
                             ->label('Név')
                             ->required(),
-                        TextInput::make('billing_country')
+                        Select::make('billing_country_id')
                             ->label('Ország')
+                            ->relationship('billingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                            ->searchable()
+                            ->preload()
                             ->required(),
                         TextInput::make('billing_city')
                             ->label('Város')

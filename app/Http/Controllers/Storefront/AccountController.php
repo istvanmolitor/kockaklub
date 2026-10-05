@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Models\Country;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AccountController extends Controller
@@ -17,6 +19,7 @@ class AccountController extends Controller
         return view('storefront.account.show', [
             'user' => $request->user(),
             'customer' => $customer,
+            'countries' => Country::orderBy('sort_order')->get(),
         ]);
     }
 
@@ -39,12 +42,12 @@ class AccountController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:255'],
             'shipping_name' => ['nullable', 'string', 'max:255'],
-            'shipping_country' => ['nullable', 'string', 'max:255'],
+            'shipping_country_id' => ['nullable', 'integer', Rule::exists('countries', 'id')],
             'shipping_city' => ['nullable', 'string', 'max:255'],
             'shipping_zip' => ['nullable', 'string', 'max:20'],
             'shipping_address' => ['nullable', 'string', 'max:2000'],
             'billing_name' => ['nullable', 'string', 'max:255'],
-            'billing_country' => ['nullable', 'string', 'max:255'],
+            'billing_country_id' => ['nullable', 'integer', Rule::exists('countries', 'id')],
             'billing_city' => ['nullable', 'string', 'max:255'],
             'billing_zip' => ['nullable', 'string', 'max:20'],
             'billing_address' => ['nullable', 'string', 'max:2000'],
