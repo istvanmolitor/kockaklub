@@ -9,6 +9,7 @@ use App\Services\ProductInterestService;
 use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CartController extends Controller
@@ -24,12 +25,12 @@ class CartController extends Controller
         $cart = $this->cartService->currentCart($request);
         $cart->load('items.product.defaultImage');
 
-        $publicStockByProductId = $cart->items
-            ->mapWithKeys(fn ($item) => [$item->product_id => $this->stockService->publicStockForProduct($item->product_id)]);
+        $freeStockByProductId = $cart->items
+            ->mapWithKeys(fn ($item) => [$item->product_id => $this->stockService->freeStockForProduct($item->product_id)]);
 
         return view('storefront.cart.show', [
             'cart' => $cart,
-            'publicStockByProductId' => $publicStockByProductId,
+            'freeStockByProductId' => $freeStockByProductId,
         ]);
     }
 
@@ -41,7 +42,24 @@ class CartController extends Controller
 
         abort_unless($product->is_active, 404);
 
-        $this->cartService->add($request, $product, $validated['quantity'] ?? 1);
+        $quantity = $validated['quantity'] ?? 1;
+
+        if ($product->is_discontinued) {
+            $freeStock = $this->stockService->freeStockForProduct($product->id);
+            $alreadyInCart = $this->cartService->currentCart($request)->items()
+                ->where('product_id', $product->id)->value('quantity') ?? 0;
+
+            if ($alreadyInCart + $quantity > $freeStock) {
+                throw ValidationException::withMessages([
+                    'quantity' => sprintf(
+                        'Ez a termék kifutó, legfeljebb %d db tehető belőle a kosárba.',
+                        max(0, $freeStock - $alreadyInCart)
+                    ),
+                ]);
+            }
+        }
+
+        $this->cartService->add($request, $product, $quantity);
 
         if ($request->user()) {
             $this->productInterestService->recordCartAdd($request->user(), $product);
@@ -55,6 +73,19 @@ class CartController extends Controller
         $validated = $request->validate([
             'quantity' => ['required', 'integer', 'min:0'],
         ]);
+
+        if ($product->is_discontinued) {
+            $freeStock = $this->stockService->freeStockForProduct($product->id);
+
+            if ($validated['quantity'] > $freeStock) {
+                throw ValidationException::withMessages([
+                    'quantity' => sprintf(
+                        'Ez a termék kifutó, legfeljebb %d db tehető belőle a kosárba.',
+                        $freeStock
+                    ),
+                ]);
+            }
+        }
 
         $this->cartService->updateQuantity($request, $product, $validated['quantity']);
 

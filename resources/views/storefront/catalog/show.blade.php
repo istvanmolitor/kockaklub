@@ -92,15 +92,34 @@
         </div>
 
         <div class="animate-rise">
-            <h1 class="text-2xl font-black text-gray-900">{{ $product->name }}</h1>
+            <h1 class="flex items-center gap-2 text-2xl font-black text-gray-900">
+                {{ $product->name }}
+
+                @if (auth()->user()?->is_admin)
+                    <a href="{{ route('filament.admin.resources.products.edit', ['record' => $product->id]) }}"
+                       title="Termék szerkesztése" class="text-gray-400 hover:text-accent-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                        </svg>
+                    </a>
+                @endif
+            </h1>
             @if ($product->sku)
                 <p class="mt-1 text-sm font-medium text-gray-500">Cikkszám: {{ $product->sku }}</p>
             @endif
             <p class="mt-2 text-3xl font-black text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Ft</p>
 
-            <p class="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold {{ $freeStock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
-                {{ $freeStock > 0 ? "Raktáron ({$freeStock} db)" : 'Elfogyott' }}
-            </p>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+                <p class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-bold {{ $freeStock > 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                    {{ $freeStock > 0 ? "Raktáron ({$freeStock} db)" : 'Elfogyott' }}
+                </p>
+
+                @if ($product->is_discontinued)
+                    <p class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">
+                        Kifutó termék
+                    </p>
+                @endif
+            </div>
 
             <div class="mt-6 prose prose-sm max-w-none text-gray-700">
                 {!! $product->description !!}
@@ -134,7 +153,7 @@
                 @csrf
                 <div>
                     <label for="quantity" class="field-label">Mennyiség</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" @if ($freeStock > 0) max="{{ $freeStock }}" @endif
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" @if ($product->is_discontinued && $freeStock > 0) max="{{ $freeStock }}" @endif
                            class="input-field w-24">
                 </div>
                 <button type="submit"

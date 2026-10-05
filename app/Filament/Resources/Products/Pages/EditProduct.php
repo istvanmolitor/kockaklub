@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products\Pages;
 use App\Filament\Resources\Products\ProductResource;
 use App\Filament\Resources\Products\RelationManagers\PriceLogsRelationManager;
 use App\Filament\Resources\Products\Schemas\ProductForm;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
@@ -22,6 +23,11 @@ class EditProduct extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('viewPublic')
+                ->label('Publikus nézet')
+                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->url(fn (): string => route('catalog.show', $this->record))
+                ->openUrlInNewTab(),
             ViewAction::make()
                 ->label('Statisztika')
                 ->icon('heroicon-o-chart-bar'),
