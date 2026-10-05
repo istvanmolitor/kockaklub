@@ -34,6 +34,7 @@ class CatalogController extends Controller
             'products' => $products,
             'categories' => $categories,
             'activeCategory' => $request->string('category')->toString(),
+            'category' => $category,
         ]);
     }
 

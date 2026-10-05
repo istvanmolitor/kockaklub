@@ -1,6 +1,7 @@
 @extends('layouts.account')
 
 @section('title', 'Rendelés visszaigazolás')
+@section('robots', 'noindex,nofollow')
 
 @section('account-content')
     <div class="card animate-pop overflow-hidden p-0">

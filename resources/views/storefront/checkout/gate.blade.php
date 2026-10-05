@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Tovább a pénztárhoz')
+@section('robots', 'noindex,nofollow')
 
 @section('content')
     <div class="animate-rise mx-auto max-w-5xl">

@@ -1,6 +1,62 @@
 @extends('layouts.app')
 
-@section('title', $product->name)
+@php
+    $breadcrumbItems = collect([['name' => 'Főoldal', 'url' => route('home')]])
+        ->concat($product->category->ancestors()->map(fn ($ancestor) => [
+            'name' => $ancestor->name,
+            'url' => route('catalog.index', ['category' => $ancestor->slug]),
+        ]))
+        ->push(['name' => $product->category->name, 'url' => route('catalog.index', ['category' => $product->category->slug])])
+        ->push(['name' => $product->name, 'url' => route('catalog.show', $product)]);
+
+    $availability = match (true) {
+        $freeStock > 0 => 'https://schema.org/InStock',
+        $product->isOrderable($freeStock) => 'https://schema.org/PreOrder',
+        default => 'https://schema.org/OutOfStock',
+    };
+
+    $productImages = $product->images->isNotEmpty()
+        ? $product->images->map(fn ($image) => $image->url())->values()->all()
+        : [$product->default_image_url];
+@endphp
+
+@section('title', "{$product->name} | Kockaklub")
+@section('meta_description', $product->seo_description)
+@section('og_type', 'product')
+@section('og_image', $product->default_image_url)
+
+@push('structured_data')
+<script type="application/ld+json">
+{!! json_encode([
+    '@@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => $breadcrumbItems->values()->map(fn ($item, $index) => [
+        '@type' => 'ListItem',
+        'position' => $index + 1,
+        'name' => $item['name'],
+        'item' => $item['url'],
+    ])->all(),
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+<script type="application/ld+json">
+{!! json_encode(array_filter([
+    '@@context' => 'https://schema.org',
+    '@type' => 'Product',
+    'name' => $product->name,
+    'image' => $productImages,
+    'description' => $product->seo_description,
+    'sku' => $product->sku,
+    'url' => route('catalog.show', $product),
+    'offers' => [
+        '@type' => 'Offer',
+        'price' => (string) $product->price,
+        'priceCurrency' => 'HUF',
+        'availability' => $availability,
+        'url' => route('catalog.show', $product),
+    ],
+]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endpush
 
 @section('content')
     <nav class="mb-6 text-sm font-medium text-gray-500">

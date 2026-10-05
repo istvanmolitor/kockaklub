@@ -1,6 +1,39 @@
 @extends('layouts.app')
 
-@section('title', 'Termékek')
+@php
+    $categoryArticle = $category && preg_match('/^[aáeéiíoóöőuúüű]/iu', $category->name) ? 'az' : 'a';
+    $metaDescription = $category
+        ? (($category->description ? \Illuminate\Support\Str::of($category->description)->stripTags()->squish()->limit(160)->toString() : null)
+            ?: "Fedezd fel {$categoryArticle} {$category->name} kategória termékeit a Kockaklubban.")
+        : 'Nézd át a Kockaklub teljes termékkínálatát: társasjátékok, kártyajátékok és kiegészítők egy helyen.';
+
+    $breadcrumbItems = collect([['name' => 'Főoldal', 'url' => route('home')]])
+        ->when($category, fn ($items) => $items
+            ->concat($category->ancestors()->map(fn ($ancestor) => [
+                'name' => $ancestor->name,
+                'url' => route('catalog.index', ['category' => $ancestor->slug]),
+            ]))
+            ->push(['name' => $category->name, 'url' => route('catalog.index', ['category' => $category->slug])]))
+        ->when(! $category, fn ($items) => $items->push(['name' => 'Termékek', 'url' => route('catalog.index')]));
+@endphp
+
+@section('title', $category ? "{$category->name} | Kockaklub" : 'Termékek | Kockaklub')
+@section('meta_description', $metaDescription)
+
+@push('structured_data')
+<script type="application/ld+json">
+{!! json_encode([
+    '@@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => $breadcrumbItems->values()->map(fn ($item, $index) => [
+        '@type' => 'ListItem',
+        'position' => $index + 1,
+        'name' => $item['name'],
+        'item' => $item['url'],
+    ])->all(),
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endpush
 
 @section('content')
     <div class="flex flex-col gap-8 sm:flex-row">

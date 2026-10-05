@@ -20,6 +20,7 @@ class SettingSeeder extends Seeder
             'facebook_url' => ['label' => 'Facebook link', 'value' => 'https://www.facebook.com/KockaKlubHu'],
             'instagram_url' => ['label' => 'Instagram link', 'value' => 'https://www.instagram.com/kockaklub'],
             'youtube_url' => ['label' => 'Youtube link', 'value' => 'https://www.youtube.com/@KockafejAndr%C3%A1s'],
+            'seo_home_description' => ['label' => 'Főoldal meta leírás (SEO)', 'value' => 'Fedezd fel a Kockaklub széles társasjáték- és kiegészítő-kínálatát. Gyors kiszállítás, folyamatosan frissülő készlet.'],
             'szamlazz_api_key' => ['label' => 'Számlázz.hu Agent kulcs', 'value' => null],
             'szamlazz_bank_name' => ['label' => 'Számlázz.hu – bankszámla neve (opcionális)', 'value' => null],
             'szamlazz_bank_account_number' => ['label' => 'Számlázz.hu – bankszámlaszám (opcionális)', 'value' => null],

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Pénztár')
+@section('robots', 'noindex,nofollow')
 
 @section('content')
     @php

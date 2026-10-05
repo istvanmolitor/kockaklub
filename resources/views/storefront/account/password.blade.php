@@ -1,6 +1,7 @@
 @extends('layouts.account')
 
 @section('title', 'Jelszó módosítása')
+@section('robots', 'noindex,nofollow')
 
 @section('account-content')
     <h1 class="mb-6 text-2xl font-black text-gray-900">Jelszó módosítása</h1>

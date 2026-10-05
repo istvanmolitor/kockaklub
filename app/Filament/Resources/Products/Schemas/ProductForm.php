@@ -53,6 +53,11 @@ class ProductForm
                                 RichEditor::make('description')
                                     ->label('Leírás')
                                     ->columnSpanFull(),
+                                TextInput::make('meta_description')
+                                    ->label('Meta leírás (SEO)')
+                                    ->helperText('Megjelenik a Google keresésben és AI-asszisztensekben. Üresen hagyva a leírásból generálódik.')
+                                    ->maxLength(160)
+                                    ->columnSpanFull(),
                                 TextInput::make('price')
                                     ->label('Ár')
                                     ->required()

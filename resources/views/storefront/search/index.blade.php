@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', $query !== '' ? "Keresés – {$query}" : 'Keresés')
+@section('title', $query !== '' ? "Keresés – {$query} | Kockaklub" : 'Keresés | Kockaklub')
+@section('robots', 'noindex,follow')
 
 @section('content')
     <form method="GET" action="{{ route('search.index') }}" class="mb-8 flex max-w-md gap-2">

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Str;
 
 #[ObservedBy(ProductObserver::class)]
 class Product extends Model
@@ -35,6 +36,7 @@ class Product extends Model
         'name',
         'slug',
         'description',
+        'meta_description',
         'price',
         'vat_rate',
         'sku',
@@ -126,6 +128,18 @@ class Product extends Model
     protected function defaultImageUrl(): Attribute
     {
         return Attribute::get(fn () => $this->defaultImage?->url() ?? asset('images/product-placeholder.svg'));
+    }
+
+    /**
+     * The text used for the meta description and AI/structured-data summaries:
+     * the dedicated meta_description field, falling back to the plain-text
+     * description truncated to a search-snippet-friendly length.
+     */
+    protected function seoDescription(): Attribute
+    {
+        return Attribute::get(
+            fn () => $this->meta_description ?: Str::of((string) $this->description)->stripTags()->squish()->limit(160)->toString()
+        );
     }
 
     /**

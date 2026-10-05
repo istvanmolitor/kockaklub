@@ -1,6 +1,7 @@
 @extends('layouts.account')
 
 @section('title', 'Fiókom')
+@section('robots', 'noindex,nofollow')
 
 @section('account-content')
     @php

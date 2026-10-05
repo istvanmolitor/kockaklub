@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Email megerősítése')
+@section('robots', 'noindex,nofollow')
 
 @section('content')
     <div class="animate-pop relative mx-auto max-w-md overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-8 text-center shadow-sm">

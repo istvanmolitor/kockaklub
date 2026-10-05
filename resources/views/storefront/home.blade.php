@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Kockaklub')
+@section('title', 'Kockaklub – társasjátékok és kiegészítők webshopja')
+@section('meta_description', setting('seo_home_description', ''))
 
 @section('content')
     <div class="relative mb-14 overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-accent-600 via-accent2-600 to-accent3-500 px-6 py-14 text-center text-white sm:py-20">
