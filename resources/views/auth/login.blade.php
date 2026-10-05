@@ -25,10 +25,16 @@
                        class="input-field">
             </div>
 
-            <label class="flex items-center gap-2 text-sm font-medium text-gray-600">
-                <input type="checkbox" name="remember" class="checkbox-field">
-                Maradjak bejelentkezve
-            </label>
+            <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 text-sm font-medium text-gray-600">
+                    <input type="checkbox" name="remember" class="checkbox-field">
+                    Maradjak bejelentkezve
+                </label>
+
+                <a href="{{ route('password.request') }}" class="text-sm font-bold text-accent-600 hover:underline">
+                    Elfelejtett jelszó?
+                </a>
+            </div>
 
             <button type="submit" class="btn-primary w-full">
                 Bejelentkezés

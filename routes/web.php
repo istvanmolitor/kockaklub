@@ -3,9 +3,12 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\NewPasswordController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Storefront\AccountController;
+use App\Http\Controllers\Storefront\AccountPasswordController;
 use App\Http\Controllers\Storefront\CartController;
 use App\Http\Controllers\Storefront\CatalogController;
 use App\Http\Controllers\Storefront\CheckoutController;
@@ -46,6 +49,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/bejelentkezes', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/bejelentkezes', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('/elfelejtett-jelszo', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/elfelejtett-jelszo', [PasswordResetLinkController::class, 'store'])->name('password.email');
+
+    Route::get('/jelszo-visszaallitas/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/jelszo-visszaallitas', [NewPasswordController::class, 'store'])->name('password.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -62,4 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/fiokom', [AccountController::class, 'show'])->middleware('verified')->name('account.show');
     Route::patch('/fiokom', [AccountController::class, 'update'])->middleware('verified')->name('account.update');
     Route::get('/fiokom/rendeleseim', [AccountController::class, 'orders'])->middleware('verified')->name('account.orders');
+
+    Route::get('/fiokom/jelszo', [AccountPasswordController::class, 'edit'])->middleware('verified')->name('account.password.edit');
+    Route::patch('/fiokom/jelszo', [AccountPasswordController::class, 'update'])->middleware('verified')->name('account.password.update');
 });

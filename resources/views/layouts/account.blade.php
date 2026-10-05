@@ -13,6 +13,10 @@
                        class="block rounded-2xl px-4 py-2.5 text-sm font-bold transition {{ request()->routeIs('account.orders') ? 'bg-gradient-to-r from-accent-600 to-accent3-500 text-white shadow-sm' : 'text-gray-600 hover:bg-accent-50 hover:text-accent-700' }}">
                         Megrendelés
                     </a>
+                    <a href="{{ route('account.password.edit') }}"
+                       class="block rounded-2xl px-4 py-2.5 text-sm font-bold transition {{ request()->routeIs('account.password.*') ? 'bg-gradient-to-r from-accent-600 to-accent3-500 text-white shadow-sm' : 'text-gray-600 hover:bg-accent-50 hover:text-accent-700' }}">
+                        Jelszó módosítása
+                    </a>
                 </nav>
             </aside>
         @endauth
