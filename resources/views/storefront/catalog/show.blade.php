@@ -149,12 +149,30 @@
                 </dl>
             @endif
 
-            <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-8 flex items-end gap-4">
+            @php $hasMax = $product->is_discontinued && $freeStock > 0; @endphp
+            <form method="POST" action="{{ route('cart.store', $product) }}"
+                  x-data="{ qty: 1 }" class="mt-8 flex items-end gap-4">
                 @csrf
                 <div>
                     <label for="quantity" class="field-label">Mennyiség</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" @if ($product->is_discontinued && $freeStock > 0) max="{{ $freeStock }}" @endif
-                           class="input-field w-24">
+                    <div class="mt-1.5 flex items-center overflow-hidden rounded-2xl border-2 border-gray-200 bg-white">
+                        <button type="button" @click="qty = Math.max(1, qty - 1)" :disabled="qty <= 1"
+                                class="flex h-12 w-10 items-center justify-center text-gray-500 transition hover:bg-gray-100 hover:text-accent-600 disabled:cursor-not-allowed disabled:opacity-30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+                            </svg>
+                        </button>
+
+                        <input type="number" id="quantity" name="quantity" x-model.number="qty" min="1" @if ($hasMax) max="{{ $freeStock }}" @endif
+                               class="h-12 w-14 border-0 bg-transparent text-center text-sm font-bold text-gray-900 [appearance:textfield] focus:outline-none focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
+
+                        <button type="button" @click="qty = qty + 1" @if ($hasMax) :disabled="qty >= {{ $freeStock }}" @endif
+                                class="flex h-12 w-10 items-center justify-center text-gray-500 transition hover:bg-gray-100 hover:text-accent-600 disabled:cursor-not-allowed disabled:opacity-30">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.25">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit"
                         @disabled(! $product->isOrderable($freeStock))
