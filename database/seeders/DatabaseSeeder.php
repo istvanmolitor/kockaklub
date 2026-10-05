@@ -19,9 +19,6 @@ class DatabaseSeeder extends Seeder
             SiteSeeder::class,
             OrderStatusSeeder::class,
             ShippingMethodSeeder::class,
-            CategorySeeder::class,
-            ProductAttributeSeeder::class,
-            ProductSeeder::class,
         ]);
     }
 }

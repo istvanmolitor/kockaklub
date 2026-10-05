@@ -11,13 +11,21 @@
         </a>
         <p class="mt-1 text-lg font-black text-gray-900">{{ number_format($product->price, 0, ',', ' ') }} Ft</p>
 
-        <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-auto pt-4">
-            @csrf
-            <button type="submit"
-                    @disabled(! $product->isOrderable($product->public_stock))
-                    class="w-full rounded-full bg-gradient-to-r from-accent-600 to-accent3-500 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-95 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-none disabled:bg-gray-300 disabled:shadow-none">
-                {{ $product->isOrderable($product->public_stock) ? ($product->public_stock < 1 ? 'Elfogyott, előrendelhető' : 'Kosárba') : 'Elfogyott' }}
-            </button>
-        </form>
+        @if ($product->isOrderable($product->public_stock))
+            <form method="POST" action="{{ route('cart.store', $product) }}" class="mt-auto pt-4">
+                @csrf
+                <button type="submit"
+                        class="w-full rounded-full bg-gradient-to-r from-accent-600 to-accent3-500 px-3 py-2.5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-95">
+                    Kosárba
+                </button>
+            </form>
+        @else
+            <div class="mt-auto pt-4">
+                <a href="{{ route('catalog.show', $product) }}"
+                   class="block w-full rounded-full bg-gray-200 px-3 py-2.5 text-center text-sm font-bold text-gray-600 transition-colors duration-200 hover:bg-gray-300">
+                    Termék megtekintése
+                </a>
+            </div>
+        @endif
     </div>
 </div>
