@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Models\ShippingMethod;
+use App\Services\Shipping\ShippingFulfillmentHandler;
+use App\Services\Shipping\ShippingFulfillmentHandlerFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,10 +21,6 @@ class StoreOrderRequest extends FormRequest
         $rules = [
             'shipping_name' => ['required', 'string', 'max:255'],
             'shipping_phone' => ['required', 'string', 'max:255'],
-            'shipping_country_id' => ['required', 'integer', Rule::exists('countries', 'id')],
-            'shipping_city' => ['required', 'string', 'max:255'],
-            'shipping_zip' => ['required', 'string', 'max:20'],
-            'shipping_address' => ['required', 'string', 'max:2000'],
             'billing_same_as_shipping' => ['sometimes', 'boolean'],
             'billing_name' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:255'],
             'billing_country_id' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'integer', Rule::exists('countries', 'id')],
@@ -47,7 +45,22 @@ class StoreOrderRequest extends FormRequest
             $rules['email'] = ['required', 'email', 'max:255'];
         }
 
+        if ($handler = $this->resolveFulfillmentHandler()) {
+            $rules = array_merge($rules, $handler->rules());
+        }
+
         return $rules;
+    }
+
+    public function resolveFulfillmentHandler(): ?ShippingFulfillmentHandler
+    {
+        $shippingMethod = ShippingMethod::find($this->input('shipping_method_id'));
+
+        if (! $shippingMethod) {
+            return null;
+        }
+
+        return ShippingFulfillmentHandlerFactory::make($shippingMethod);
     }
 
     public function withValidator(Validator $validator): void

@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'foxpost' => [
+        // Iframe embed URL for the Foxpost parcel locker map widget, no API key needed
+        // for pickup-point selection. See shipping-plan.md §5 for the integration notes.
+        'map_widget_url' => env('FOXPOST_MAP_WIDGET_URL', 'https://cdn.foxpost.hu/apt-finder/v1/app/'),
+    ],
+
 ];

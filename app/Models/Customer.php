@@ -14,6 +14,11 @@ class Customer extends Model
     /** @use HasFactory<CustomerFactory> */
     use HasFactory;
 
+    protected $attributes = [
+        'is_buyer' => false,
+        'is_seller' => false,
+    ];
+
     protected $fillable = [
         'user_id',
         'name',
@@ -30,7 +35,17 @@ class Customer extends Model
         'billing_zip',
         'billing_address',
         'billing_tax_number',
+        'is_buyer',
+        'is_seller',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_buyer' => 'boolean',
+            'is_seller' => 'boolean',
+        ];
+    }
 
     public function hasShippingDetails(): bool
     {

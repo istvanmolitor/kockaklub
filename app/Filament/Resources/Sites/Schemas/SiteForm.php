@@ -37,6 +37,11 @@ class SiteForm
                     ->helperText('Az új megrendelések mindig a fő telephelyre érkeznek be. Egyszerre csak egy telephely lehet fő telephely.')
                     ->default(false)
                     ->required(),
+                Toggle::make('is_pickup_point')
+                    ->label('Átvételi pont')
+                    ->helperText('Megjelenjen-e választható átvételi helyként a pénztár "Személyes átvétel" szállítási módjánál.')
+                    ->default(true)
+                    ->required(),
             ]);
     }
 }

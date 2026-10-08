@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Site;
+use App\Models\DeliveryPoint;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Site>
+ * @extends Factory<DeliveryPoint>
  */
-class SiteFactory extends Factory
+class DeliveryPointFactory extends Factory
 {
     /**
      * @return array<string, mixed>
@@ -16,14 +16,15 @@ class SiteFactory extends Factory
     public function definition(): array
     {
         return [
+            'type' => 'foxpost',
+            'reference_id' => fake()->unique()->numerify('####'),
             'name' => fake()->company(),
-            'country' => 'Magyarország',
-            'city' => fake()->city(),
             'zip' => fake()->postcode(),
+            'city' => fake()->city(),
             'address' => fake()->streetAddress(),
-            'is_active' => true,
-            'is_main' => false,
-            'is_pickup_point' => true,
+            'lat' => fake()->latitude(),
+            'lng' => fake()->longitude(),
+            'raw_payload' => [],
         ];
     }
 }

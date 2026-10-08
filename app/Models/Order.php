@@ -28,6 +28,7 @@ class Order extends Model
         'shipping_city',
         'shipping_zip',
         'shipping_address',
+        'delivery_point_id',
         'billing_name',
         'billing_country_id',
         'billing_city',
@@ -86,6 +87,11 @@ class Order extends Model
     public function shippingMethod(): BelongsTo
     {
         return $this->belongsTo(ShippingMethod::class);
+    }
+
+    public function deliveryPoint(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryPoint::class);
     }
 
     public function paymentMethod(): BelongsTo

@@ -23,6 +23,7 @@ class Site extends Model
         'address',
         'is_active',
         'is_main',
+        'is_pickup_point',
     ];
 
     protected function casts(): array
@@ -30,6 +31,7 @@ class Site extends Model
         return [
             'is_active' => 'boolean',
             'is_main' => 'boolean',
+            'is_pickup_point' => 'boolean',
         ];
     }
 

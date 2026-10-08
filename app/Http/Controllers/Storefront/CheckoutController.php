@@ -16,6 +16,7 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\ShippingMethodRepository;
 use App\Services\CartService;
 use App\Services\ProductInterestService;
+use App\Services\Shipping\ShippingFulfillmentHandlerFactory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -74,6 +75,7 @@ class CheckoutController extends Controller
             'customer' => $customer,
             'shippingMethods' => $shippingMethods,
             'countries' => Country::orderBy('sort_order')->get(),
+            'pickupSites' => Site::query()->where('is_active', true)->where('is_pickup_point', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -105,24 +107,28 @@ class CheckoutController extends Controller
 
         $billingSameAsShipping = (bool) ($validated['billing_same_as_shipping'] ?? false);
 
-        $billing = $billingSameAsShipping
-            ? [
-                'billing_name' => $validated['shipping_name'],
-                'billing_country_id' => $validated['shipping_country_id'],
-                'billing_city' => $validated['shipping_city'],
-                'billing_zip' => $validated['shipping_zip'],
-                'billing_address' => $validated['shipping_address'],
-            ]
-            : [
-                'billing_name' => $validated['billing_name'],
-                'billing_country_id' => $validated['billing_country_id'],
-                'billing_city' => $validated['billing_city'],
-                'billing_zip' => $validated['billing_zip'],
-                'billing_address' => $validated['billing_address'],
-            ];
-
         try {
-            $order = DB::transaction(function () use ($cart, $customer, $validated, $billing, $shippingMethod, $paymentMethod, $mainSite) {
+            $order = DB::transaction(function () use ($cart, $customer, $validated, $billingSameAsShipping, $shippingMethod, $paymentMethod, $mainSite) {
+                $fulfillment = ShippingFulfillmentHandlerFactory::make($shippingMethod)->resolve($validated);
+                $shipping = $fulfillment['shipping'];
+                $deliveryPoint = $fulfillment['delivery_point'];
+
+                $billing = $billingSameAsShipping
+                    ? [
+                        'billing_name' => $validated['shipping_name'],
+                        'billing_country_id' => $shipping['shipping_country_id'],
+                        'billing_city' => $shipping['shipping_city'],
+                        'billing_zip' => $shipping['shipping_zip'],
+                        'billing_address' => $shipping['shipping_address'],
+                    ]
+                    : [
+                        'billing_name' => $validated['billing_name'],
+                        'billing_country_id' => $validated['billing_country_id'],
+                        'billing_city' => $validated['billing_city'],
+                        'billing_zip' => $validated['billing_zip'],
+                        'billing_address' => $validated['billing_address'],
+                    ];
+
                 $subtotal = 0;
                 $lineData = [];
 
@@ -154,10 +160,11 @@ class CheckoutController extends Controller
                     'order_number' => Order::generateOrderNumber(),
                     'shipping_name' => $validated['shipping_name'],
                     'shipping_phone' => $validated['shipping_phone'],
-                    'shipping_country_id' => $validated['shipping_country_id'],
-                    'shipping_city' => $validated['shipping_city'],
-                    'shipping_zip' => $validated['shipping_zip'],
-                    'shipping_address' => $validated['shipping_address'],
+                    'shipping_country_id' => $shipping['shipping_country_id'],
+                    'shipping_city' => $shipping['shipping_city'],
+                    'shipping_zip' => $shipping['shipping_zip'],
+                    'shipping_address' => $shipping['shipping_address'],
+                    'delivery_point_id' => $deliveryPoint?->id,
                     ...$billing,
                     'billing_tax_number' => $validated['billing_tax_number'] ?? null,
                     'shipping_method_id' => $shippingMethod->id,
@@ -199,20 +206,26 @@ class CheckoutController extends Controller
 
         if (! $customer->hasShippingDetails()) {
             $customer->fill([
-                'shipping_name' => $validated['shipping_name'],
-                'shipping_country_id' => $validated['shipping_country_id'],
-                'shipping_city' => $validated['shipping_city'],
-                'shipping_zip' => $validated['shipping_zip'],
-                'shipping_address' => $validated['shipping_address'],
+                'shipping_name' => $order->shipping_name,
+                'shipping_country_id' => $order->shipping_country_id,
+                'shipping_city' => $order->shipping_city,
+                'shipping_zip' => $order->shipping_zip,
+                'shipping_address' => $order->shipping_address,
             ]);
         }
 
         if (! $customer->hasBillingDetails()) {
-            $customer->fill($billing);
+            $customer->fill([
+                'billing_name' => $order->billing_name,
+                'billing_country_id' => $order->billing_country_id,
+                'billing_city' => $order->billing_city,
+                'billing_zip' => $order->billing_zip,
+                'billing_address' => $order->billing_address,
+            ]);
         }
 
-        if (blank($customer->billing_tax_number) && filled($validated['billing_tax_number'] ?? null)) {
-            $customer->billing_tax_number = $validated['billing_tax_number'];
+        if (blank($customer->billing_tax_number) && filled($order->billing_tax_number)) {
+            $customer->billing_tax_number = $order->billing_tax_number;
         }
 
         if ($customer->isDirty()) {

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\ShippingFulfillmentType;
 use App\Models\ShippingMethod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,6 +23,8 @@ class ShippingMethodFactory extends Factory
             'description' => fake()->sentence(),
             'cost' => fake()->numberBetween(0, 3000),
             'is_active' => true,
+            'fulfillment_type' => ShippingFulfillmentType::Courier,
+            'locker_provider' => null,
         ];
     }
 }

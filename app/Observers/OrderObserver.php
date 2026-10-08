@@ -14,6 +14,10 @@ class OrderObserver
             'previous_order_status_id' => null,
             'user_id' => Auth::id(),
         ]);
+
+        if (! $order->customer->is_buyer) {
+            $order->customer->update(['is_buyer' => true]);
+        }
     }
 
     public function updated(Order $order): void

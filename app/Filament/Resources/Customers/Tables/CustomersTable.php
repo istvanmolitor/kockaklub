@@ -27,6 +27,12 @@ class CustomersTable
                     ->label('Regisztrált')
                     ->boolean()
                     ->state(fn ($record) => $record->user_id !== null),
+                IconColumn::make('is_buyer')
+                    ->label('Vásárló')
+                    ->boolean(),
+                IconColumn::make('is_seller')
+                    ->label('Eladó')
+                    ->boolean(),
                 TextColumn::make('orders_count')
                     ->counts('orders')
                     ->label('Rendelések'),
@@ -40,6 +46,10 @@ class CustomersTable
                 TernaryFilter::make('user_id')
                     ->label('Regisztrált')
                     ->nullable(),
+                TernaryFilter::make('is_buyer')
+                    ->label('Vásárló'),
+                TernaryFilter::make('is_seller')
+                    ->label('Eladó'),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ShippingFulfillmentType;
 use Database\Factories\ShippingMethodFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,8 @@ class ShippingMethod extends Model
         'description',
         'cost',
         'is_active',
+        'fulfillment_type',
+        'locker_provider',
     ];
 
     protected function casts(): array
@@ -24,6 +27,7 @@ class ShippingMethod extends Model
         return [
             'cost' => 'integer',
             'is_active' => 'boolean',
+            'fulfillment_type' => ShippingFulfillmentType::class,
         ];
     }
 

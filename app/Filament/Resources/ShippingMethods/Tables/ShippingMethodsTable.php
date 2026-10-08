@@ -30,6 +30,10 @@ class ShippingMethodsTable
                 TextColumn::make('paymentMethods.name')
                     ->label('Fizetési módok')
                     ->badge(),
+                TextColumn::make('fulfillment_type')
+                    ->label('Teljesítés módja')
+                    ->formatStateUsing(fn ($state) => $state?->label())
+                    ->badge(),
                 IconColumn::make('is_active')
                     ->label('Aktív')
                     ->boolean(),

@@ -34,6 +34,9 @@ class SitesTable
                 IconColumn::make('is_main')
                     ->label('Fő')
                     ->boolean(),
+                IconColumn::make('is_pickup_point')
+                    ->label('Átvételi pont')
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Létrehozva')
                     ->dateTime()

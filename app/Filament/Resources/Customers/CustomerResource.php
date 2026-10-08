@@ -23,9 +23,9 @@ class CustomerResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Ügyfelek';
 
-    protected static ?string $modelLabel = 'Vásárló';
+    protected static ?string $modelLabel = 'Ügyfél';
 
-    protected static ?string $pluralModelLabel = 'Vásárlók';
+    protected static ?string $pluralModelLabel = 'Ügyfelek';
 
     public static function form(Schema $schema): Schema
     {

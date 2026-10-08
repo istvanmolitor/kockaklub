@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Customers\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -23,6 +24,10 @@ class CustomerForm
                 TextInput::make('phone')
                     ->label('Telefon')
                     ->tel(),
+                Toggle::make('is_buyer')
+                    ->label('Vásárló'),
+                Toggle::make('is_seller')
+                    ->label('Eladó'),
                 Section::make('Szállítási adatok')
                     ->columns(2)
                     ->schema([
