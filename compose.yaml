@@ -6,11 +6,10 @@ services:
             args:
                 WWWGROUP: '${WWWGROUP}'
         image: 'sail-8.5/app'
+        container_name: kockaklub
+        restart: unless-stopped
         extra_hosts:
             - 'host.docker.internal:host-gateway'
-        ports:
-            - '${APP_PORT:-80}:80'
-            - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
         environment:
             WWWUSER: '${WWWUSER}'
             LARAVEL_SAIL: 1
@@ -21,13 +20,24 @@ services:
             - '.:/var/www/html'
         networks:
             - sail
+            - webproxy
         depends_on:
             - mysql
             - mailpit
+        labels:
+            - "traefik.enable=true"
+            - "traefik.docker.network=webproxy"
+            - "traefik.http.routers.kockaklub.entrypoints=websecure"
+            - "traefik.http.routers.kockaklub.rule=Host(`kockaklub.hu`) || Host(`www.kockaklub.hu`)"
+            - "traefik.http.routers.kockaklub.tls.certresolver=myresolver"
+            - "traefik.http.services.kockaklub.loadbalancer.server.port=80"
+            - "traefik.http.routers.kockaklub-http.entrypoints=web"
+            - "traefik.http.routers.kockaklub-http.rule=Host(`kockaklub.hu`) || Host(`www.kockaklub.hu`)"
+            - "traefik.http.routers.kockaklub-http.middlewares=redirect-to-https"
     mysql:
         image: 'mysql:8.4'
-        ports:
-            - '${FORWARD_DB_PORT:-3306}:3306'
+        container_name: kockaklub-mysql
+        restart: unless-stopped
         environment:
             MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
             MYSQL_ROOT_HOST: '%'
@@ -51,14 +61,15 @@ services:
             timeout: 5s
     mailpit:
         image: 'axllent/mailpit:latest'
-        ports:
-            - '${FORWARD_MAILPIT_PORT:-1025}:1025'
-            - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+        container_name: kockaklub-mailpit
+        restart: unless-stopped
         networks:
             - sail
 networks:
     sail:
         driver: bridge
+    webproxy:
+        external: true
 volumes:
     sail-mysql:
         driver: local
