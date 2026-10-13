@@ -35,7 +35,7 @@ services:
             - "traefik.http.routers.kockaklub-http.rule=Host(`kockaklub.hu`) || Host(`www.kockaklub.hu`)"
             - "traefik.http.routers.kockaklub-http.middlewares=redirect-to-https"
     mysql:
-        image: 'mysql:8.4'
+        image: 'mariadb:11.4'
         container_name: kockaklub-mysql
         restart: unless-stopped
         environment:
