@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Customers\RelationManagers;
 
+use App\Filament\Resources\Orders\OrderResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
@@ -35,7 +36,8 @@ class OrdersRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->url(fn ($record): string => OrderResource::getUrl('edit', ['record' => $record])),
             ]);
     }
 }
