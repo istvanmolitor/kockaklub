@@ -115,6 +115,21 @@ class StockRepository
     }
 
     /**
+     * Correlated subquery expression for "quantity sitting on unreserved orders"
+     * per product, for use with
+     * Product::query()->addSelect(['pending_reservation' => StockRepository::pendingReservationSubquery()]).
+     * Correlates to the outer `products.id` column via whereColumn.
+     */
+    public static function pendingReservationSubquery(): Builder
+    {
+        return DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->whereColumn('order_items.product_id', 'products.id')
+            ->whereNull('orders.reserved_at')
+            ->selectRaw('COALESCE(SUM(order_items.quantity), 0)');
+    }
+
+    /**
      * Per region+product incoming quantity totals, from the stock movement
      * history (rows: region_id, product_id, quantity).
      *

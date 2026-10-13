@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductAttribute;
 use App\Models\Site;
 use App\Models\StockMovement;
+use App\Services\StockService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -27,6 +28,14 @@ class ImportUnasData extends Command
         'Paraméter: Szín||enum' => 'Szín',
         'Paraméter: Matrica||enum' => 'Matrica',
     ];
+
+    /**
+     * A keszlet.csv mindig az "András" telephely készletét tartalmazza; a "hely"
+     * oszlop ennek a telephelynek a régiószámát adja meg (pl. "5" -> "Régió 5").
+     */
+    private const STOCK_SITE_NAME = 'András';
+
+    private const STOCK_IMPORT_NOTE = 'UNAS készlet import';
 
     public function handle(): int
     {
@@ -298,9 +307,12 @@ class ImportUnasData extends Command
     }
 
     /**
-     * A keszlet.csv-ből egy nyitott (lezáratlan) IN típusú készletmozgatást hoz
-     * létre a fő telephely első régiójába. Soronkénti cikkszám: az egyedi
-     * vonalkód, ha az nincs megadva, akkor az eredeti vonalkód.
+     * A keszlet.csv-ből az "András" telephely régióinkénti (a "hely" oszlop
+     * szerinti "Régió N") lezárt IN típusú készletmozgatásait hozza létre,
+     * majd újraépíti a region_product_stocks készlet-pillanatképet. Soronkénti
+     * cikkszám: az egyedi vonalkód, ha az nincs megadva, akkor az eredeti
+     * vonalkód. Az újrafuttatás nem duplázza a készletet: a korábbi UNAS
+     * készlet import mozgásokat előbb törli.
      *
      * @return array{0: int, 1: int} [importált tételek száma, kihagyott sorok száma]
      */
@@ -308,57 +320,78 @@ class ImportUnasData extends Command
     {
         $rows = $this->readCsv($csvPath, ',');
 
-        $region = Site::main()?->regions()->orderBy('id')->first();
+        $site = Site::query()->where('name', self::STOCK_SITE_NAME)->first();
 
-        if (! $region) {
-            $this->components->warn('Nincs fő telephely vagy régió, a készlet importálása kimarad.');
+        if (! $site) {
+            $this->components->warn('Nincs "'.self::STOCK_SITE_NAME.'" nevű telephely, a készlet importálása kimarad.');
 
             return [0, 0];
         }
 
-        $movement = StockMovement::create([
-            'type' => StockMovement::TYPE_IN,
-            'destination_region_id' => $region->id,
-            'movement_date' => now(),
-            'note' => 'UNAS készlet import',
-        ]);
+        $rowsByRegionName = [];
+
+        foreach ($rows as $row) {
+            $quantity = (int) ($row['db'] ?? '');
+            $hely = trim($row['hely'] ?? '');
+
+            if ($quantity <= 0 || $hely === '') {
+                continue;
+            }
+
+            $rowsByRegionName['Régió '.$hely][] = $row;
+        }
 
         $itemCount = 0;
         $skippedCount = 0;
 
-        foreach ($rows as $row) {
-            $quantity = (int) ($row['db'] ?? '');
+        DB::transaction(function () use ($site, $rowsByRegionName, &$itemCount, &$skippedCount) {
+            StockMovement::query()
+                ->where('note', self::STOCK_IMPORT_NOTE)
+                ->whereHas('destinationRegion', fn ($query) => $query->where('site_id', $site->id))
+                ->delete();
 
-            if ($quantity <= 0) {
-                continue;
+            foreach ($rowsByRegionName as $regionName => $regionRows) {
+                $region = $site->regions()->firstOrCreate(['name' => $regionName], ['is_public' => true]);
+
+                $movement = StockMovement::create([
+                    'type' => StockMovement::TYPE_IN,
+                    'destination_region_id' => $region->id,
+                    'movement_date' => now(),
+                    'note' => self::STOCK_IMPORT_NOTE,
+                    'closed_at' => now(),
+                ]);
+
+                foreach ($regionRows as $row) {
+                    $sku = $row['Egyedi vonalkód'] !== '' ? $row['Egyedi vonalkód'] : $row['Eredeti vonalkód'];
+
+                    if ($sku === '') {
+                        continue;
+                    }
+
+                    $product = Product::query()->where('sku', $sku)->first();
+
+                    if (! $product) {
+                        $this->components->warn("Ismeretlen cikkszám ({$sku}) a(z) \"{$row['Név']}\" készlet sorhoz, kihagyva.");
+                        $skippedCount++;
+
+                        continue;
+                    }
+
+                    $movement->items()->create([
+                        'product_id' => $product->id,
+                        'quantity' => (int) $row['db'],
+                    ]);
+
+                    $itemCount++;
+                }
+
+                if ($movement->items()->doesntExist()) {
+                    $movement->delete();
+                }
             }
+        });
 
-            $sku = $row['Egyedi vonalkód'] !== '' ? $row['Egyedi vonalkód'] : $row['Eredeti vonalkód'];
-
-            if ($sku === '') {
-                continue;
-            }
-
-            $product = Product::query()->where('sku', $sku)->first();
-
-            if (! $product) {
-                $this->components->warn("Ismeretlen cikkszám ({$sku}) a(z) \"{$row['Név']}\" készlet sorhoz, kihagyva.");
-                $skippedCount++;
-
-                continue;
-            }
-
-            $movement->items()->create([
-                'product_id' => $product->id,
-                'quantity' => $quantity,
-            ]);
-
-            $itemCount++;
-        }
-
-        if ($itemCount === 0) {
-            $movement->delete();
-        }
+        app(StockService::class)->rebuildRegionProductStocks();
 
         return [$itemCount, $skippedCount];
     }

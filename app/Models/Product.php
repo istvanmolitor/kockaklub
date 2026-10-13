@@ -172,6 +172,18 @@ class Product extends Model
     }
 
     /**
+     * Adds `public_stock` and `pending_reservation` columns to the query (see
+     * scopeWithPublicStock()). Subtracting the two (floored at zero) gives the
+     * free stock: how much can still be promised to a new order.
+     */
+    public function scopeWithFreeStock(Builder $query): Builder
+    {
+        return $query
+            ->withPublicStock()
+            ->addSelect(['pending_reservation' => StockRepository::pendingReservationSubquery()]);
+    }
+
+    /**
      * Orders the query by one of self::SORT_OPTIONS, defaulting to newest first.
      */
     public function scopeSortBy(Builder $query, ?string $sort): Builder

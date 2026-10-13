@@ -15,6 +15,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
@@ -71,6 +72,18 @@ class OrderForm
                     ->relationship('orderStatus', 'name')
                     ->default(fn () => OrderStatus::default()?->id)
                     ->required(),
+                Select::make('shipping_method_id')
+                    ->label('Szállítási mód')
+                    ->relationship('shippingMethod', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
+                        $set('shipping_cost', ShippingMethod::find($state)?->cost ?? 0);
+
+                        static::recalculateOrderTotals($get('items') ?? [], $get, $set);
+                    }),
                 Select::make('payment_method_id')
                     ->label('Fizetési mód')
                     ->relationship('paymentMethod', 'name')
@@ -83,54 +96,58 @@ class OrderForm
 
                         static::recalculateOrderTotals($get('items') ?? [], $get, $set);
                     }),
-                Section::make('Szállítási adatok')
-                    ->columns(2)
+                Grid::make(2)
+                    ->columnSpanFull()
                     ->schema([
-                        TextInput::make('shipping_name')
-                            ->label('Név')
-                            ->required(),
-                        TextInput::make('shipping_phone')
-                            ->label('Telefon')
-                            ->required(),
-                        Select::make('shipping_country_id')
-                            ->label('Ország')
-                            ->relationship('shippingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        TextInput::make('shipping_city')
-                            ->label('Város')
-                            ->required(),
-                        TextInput::make('shipping_zip')
-                            ->label('Irányítószám')
-                            ->required(),
-                        TextInput::make('shipping_address')
-                            ->label('Cím')
-                            ->required(),
-                    ]),
-                Section::make('Számlázási adatok')
-                    ->columns(2)
-                    ->schema([
-                        TextInput::make('billing_name')
-                            ->label('Név')
-                            ->required(),
-                        Select::make('billing_country_id')
-                            ->label('Ország')
-                            ->relationship('billingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        TextInput::make('billing_city')
-                            ->label('Város')
-                            ->required(),
-                        TextInput::make('billing_zip')
-                            ->label('Irányítószám')
-                            ->required(),
-                        TextInput::make('billing_address')
-                            ->label('Cím')
-                            ->required(),
-                        TextInput::make('billing_tax_number')
-                            ->label('Adószám'),
+                        Section::make('Szállítási adatok')
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('shipping_name')
+                                    ->label('Név')
+                                    ->required(),
+                                TextInput::make('shipping_phone')
+                                    ->label('Telefon')
+                                    ->required(),
+                                Select::make('shipping_country_id')
+                                    ->label('Ország')
+                                    ->relationship('shippingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                                TextInput::make('shipping_city')
+                                    ->label('Város')
+                                    ->required(),
+                                TextInput::make('shipping_zip')
+                                    ->label('Irányítószám')
+                                    ->required(),
+                                TextInput::make('shipping_address')
+                                    ->label('Cím')
+                                    ->required(),
+                            ]),
+                        Section::make('Számlázási adatok')
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('billing_name')
+                                    ->label('Név')
+                                    ->required(),
+                                Select::make('billing_country_id')
+                                    ->label('Ország')
+                                    ->relationship('billingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                                TextInput::make('billing_city')
+                                    ->label('Város')
+                                    ->required(),
+                                TextInput::make('billing_zip')
+                                    ->label('Irányítószám')
+                                    ->required(),
+                                TextInput::make('billing_address')
+                                    ->label('Cím')
+                                    ->required(),
+                                TextInput::make('billing_tax_number')
+                                    ->label('Adószám'),
+                            ]),
                     ]),
                 Section::make('Megjegyzések')
                     ->columns(2)
@@ -159,18 +176,6 @@ class OrderForm
                             ->disabled()
                             ->dehydrated(false),
                     ]),
-                Select::make('shipping_method_id')
-                    ->label('Szállítási mód')
-                    ->relationship('shippingMethod', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
-                        $set('shipping_cost', ShippingMethod::find($state)?->cost ?? 0);
-
-                        static::recalculateOrderTotals($get('items') ?? [], $get, $set);
-                    }),
                 Repeater::make('items')
                     ->label('Tételek')
                     ->relationship()
