@@ -9,6 +9,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductRepository
 {
+    public function findBySlug(string $slug): ?Product
+    {
+        return Product::query()->where('slug', $slug)->first();
+    }
+
     public function paginateActiveCatalog(?Category $category, ?string $sort, int $perPage = 12): LengthAwarePaginator
     {
         return Product::query()

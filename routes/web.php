@@ -29,7 +29,6 @@ Route::get('/robots.txt', fn () => response()->view('robots-txt')->header('Conte
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/termekek', [CatalogController::class, 'index'])->name('catalog.index');
-Route::get('/termekek/{product:slug}', [CatalogController::class, 'show'])->name('catalog.show');
 
 Route::get('/kereses', [SearchController::class, 'index'])->name('search.index');
 
@@ -82,3 +81,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/fiokom/jelszo', [AccountPasswordController::class, 'edit'])->middleware('verified')->name('account.password.edit');
     Route::patch('/fiokom/jelszo', [AccountPasswordController::class, 'update'])->middleware('verified')->name('account.password.update');
 });
+
+// Catch-all for flat product/category slugs, matching the UNAS shop's URL structure.
+// Must stay last so every literal route above takes priority.
+Route::get('/{slug}', [CatalogController::class, 'showBySlug'])->name('storefront.show');

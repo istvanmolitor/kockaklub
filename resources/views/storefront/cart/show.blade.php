@@ -41,7 +41,7 @@
 
                             <div class="min-w-[10rem] flex-1">
                                 <div class="flex items-center gap-1.5">
-                                    <a href="{{ route('catalog.show', $item->product) }}" class="font-bold text-gray-900 hover:text-accent-600">
+                                    <a href="{{ route('storefront.show', $item->product->slug) }}" class="font-bold text-gray-900 hover:text-accent-600">
                                         {{ $item->product->name }}
                                     </a>
 

@@ -19,7 +19,7 @@
 
     @foreach ($categories as $category)
         <url>
-            <loc>{{ route('catalog.index', ['category' => $category->slug]) }}</loc>
+            <loc>{{ route('storefront.show', $category->slug) }}</loc>
             <lastmod>{{ $category->updated_at->toAtomString() }}</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.7</priority>
@@ -28,7 +28,7 @@
 
     @foreach ($products as $product)
         <url>
-            <loc>{{ route('catalog.show', $product) }}</loc>
+            <loc>{{ route('storefront.show', $product->slug) }}</loc>
             <lastmod>{{ $product->updated_at->toAtomString() }}</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.8</priority>

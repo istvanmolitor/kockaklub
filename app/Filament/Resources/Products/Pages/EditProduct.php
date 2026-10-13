@@ -26,7 +26,7 @@ class EditProduct extends EditRecord
             Action::make('viewPublic')
                 ->label('Publikus nézet')
                 ->icon('heroicon-o-arrow-top-right-on-square')
-                ->url(fn (): string => route('catalog.show', $this->record))
+                ->url(fn (): string => route('storefront.show', $this->record->slug))
                 ->openUrlInNewTab(),
             ViewAction::make()
                 ->label('Statisztika')

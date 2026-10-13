@@ -4,10 +4,10 @@
     $breadcrumbItems = collect([['name' => 'Főoldal', 'url' => route('home')]])
         ->concat($product->category->ancestors()->map(fn ($ancestor) => [
             'name' => $ancestor->name,
-            'url' => route('catalog.index', ['category' => $ancestor->slug]),
+            'url' => route('storefront.show', $ancestor->slug),
         ]))
-        ->push(['name' => $product->category->name, 'url' => route('catalog.index', ['category' => $product->category->slug])])
-        ->push(['name' => $product->name, 'url' => route('catalog.show', $product)]);
+        ->push(['name' => $product->category->name, 'url' => route('storefront.show', $product->category->slug)])
+        ->push(['name' => $product->name, 'url' => route('storefront.show', $product->slug)]);
 
     $availability = match (true) {
         $freeStock > 0 => 'https://schema.org/InStock',
@@ -46,13 +46,13 @@
     'image' => $productImages,
     'description' => $product->seo_description,
     'sku' => $product->sku,
-    'url' => route('catalog.show', $product),
+    'url' => route('storefront.show', $product->slug),
     'offers' => [
         '@type' => 'Offer',
         'price' => (string) $product->price,
         'priceCurrency' => 'HUF',
         'availability' => $availability,
-        'url' => route('catalog.show', $product),
+        'url' => route('storefront.show', $product->slug),
     ],
 ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
 </script>
@@ -63,12 +63,12 @@
         <a href="{{ route('catalog.index') }}" class="hover:text-accent-600">Termékek</a>
         @foreach ($product->category->ancestors() as $ancestor)
             <span class="mx-2">/</span>
-            <a href="{{ route('catalog.index', ['category' => $ancestor->slug]) }}" class="hover:text-accent-600">
+            <a href="{{ route('storefront.show', $ancestor->slug) }}" class="hover:text-accent-600">
                 {{ $ancestor->name }}
             </a>
         @endforeach
         <span class="mx-2">/</span>
-        <a href="{{ route('catalog.index', ['category' => $product->category->slug]) }}" class="hover:text-accent-600">
+        <a href="{{ route('storefront.show', $product->category->slug) }}" class="hover:text-accent-600">
             {{ $product->category->name }}
         </a>
     </nav>

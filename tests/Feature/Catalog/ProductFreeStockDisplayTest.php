@@ -37,7 +37,7 @@ it('shows the free stock instead of the raw public stock on the product page', f
         'quantity' => 4,
     ]);
 
-    $response = $this->get(route('catalog.show', $product));
+    $response = $this->get(route('storefront.show', $product->slug));
 
     $response->assertOk();
     $response->assertSee('Raktáron (6 db)');

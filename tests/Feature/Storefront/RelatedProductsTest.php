@@ -12,7 +12,7 @@ it('shows related products on the product detail page in the configured order', 
         $first->id => ['sort_order' => 1],
     ]);
 
-    $response = $this->get(route('catalog.show', $product));
+    $response = $this->get(route('storefront.show', $product->slug));
 
     $response->assertOk();
     $response->assertSee('Kapcsolódó termékek');
@@ -25,7 +25,7 @@ it('does not show inactive related products', function () {
 
     $product->relatedProducts()->attach($inactive->id, ['sort_order' => 0]);
 
-    $response = $this->get(route('catalog.show', $product));
+    $response = $this->get(route('storefront.show', $product->slug));
 
     $response->assertOk();
     $response->assertDontSee('Inaktív kapcsolódó termék');

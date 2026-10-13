@@ -11,9 +11,9 @@
         ->when($category, fn ($items) => $items
             ->concat($category->ancestors()->map(fn ($ancestor) => [
                 'name' => $ancestor->name,
-                'url' => route('catalog.index', ['category' => $ancestor->slug]),
+                'url' => route('storefront.show', $ancestor->slug),
             ]))
-            ->push(['name' => $category->name, 'url' => route('catalog.index', ['category' => $category->slug])]))
+            ->push(['name' => $category->name, 'url' => route('storefront.show', $category->slug)]))
         ->when(! $category, fn ($items) => $items->push(['name' => 'Termékek', 'url' => route('catalog.index')]));
 @endphp
 

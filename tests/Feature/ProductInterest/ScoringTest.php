@@ -23,7 +23,7 @@ it('awards one point for viewing a product page while logged in', function () {
     $user = User::factory()->create();
     $product = Product::factory()->create();
 
-    $this->actingAs($user)->get("/termekek/{$product->slug}");
+    $this->actingAs($user)->get("/{$product->slug}");
 
     expect(ProductInterest::first()->score)->toBe(1);
 });
@@ -31,7 +31,7 @@ it('awards one point for viewing a product page while logged in', function () {
 it('does not record a score for guests viewing a product page', function () {
     $product = Product::factory()->create();
 
-    $this->get("/termekek/{$product->slug}");
+    $this->get("/{$product->slug}");
 
     expect(ProductInterest::count())->toBe(0);
 });

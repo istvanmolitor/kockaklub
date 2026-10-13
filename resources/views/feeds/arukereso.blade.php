@@ -23,7 +23,7 @@
             @if ($description !== '')
                 <DESCRIPTION>{{ $description }}</DESCRIPTION>
             @endif
-            <URL>{{ route('catalog.show', $product) }}</URL>
+            <URL>{{ route('storefront.show', $product->slug) }}</URL>
             <IMGURL>{{ $images->first() }}</IMGURL>
             @foreach ($images->slice(1) as $alternativeImage)
                 <IMGURL_ALTERNATIVE>{{ $alternativeImage }}</IMGURL_ALTERNATIVE>

@@ -2,7 +2,7 @@
 
 <div x-data="{ open: false }">
     <div class="flex items-center justify-between">
-        <a href="{{ route('catalog.index', ['category' => $category->slug]) }}"
+        <a href="{{ route('storefront.show', $category->slug) }}"
            class="flex-1 py-2.5 {{ $level === 0 ? 'text-base font-bold text-gray-900' : 'text-sm font-medium text-gray-600' }} transition hover:text-accent-600 active:text-accent-600">
             {{ $category->name }}
         </a>

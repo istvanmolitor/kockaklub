@@ -12,7 +12,7 @@ function orderButtonHtml(\Illuminate\Testing\TestResponse $response): string
 it('allows ordering a regular product even when it has no stock', function () {
     $product = Product::factory()->create(['is_active' => true, 'is_discontinued' => false]);
 
-    $response = $this->get(route('catalog.show', $product));
+    $response = $this->get(route('storefront.show', $product->slug));
 
     $response->assertOk();
     $response->assertSee('Előrendelem');
@@ -22,7 +22,7 @@ it('allows ordering a regular product even when it has no stock', function () {
 it('blocks ordering a discontinued product once it has no stock', function () {
     $product = Product::factory()->create(['is_active' => true, 'is_discontinued' => true]);
 
-    $response = $this->get(route('catalog.show', $product));
+    $response = $this->get(route('storefront.show', $product->slug));
 
     $response->assertOk();
     $response->assertSee('Elfogyott');

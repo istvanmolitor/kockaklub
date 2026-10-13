@@ -50,7 +50,7 @@
                                             <div class="grid grid-cols-2 gap-6 sm:grid-cols-3">
                                                 @foreach ($headerCategories->take(6) as $category)
                                                     <div>
-                                                        <a href="{{ route('catalog.index', ['category' => $category->slug]) }}"
+                                                        <a href="{{ route('storefront.show', $category->slug) }}"
                                                            class="block font-bold text-gray-900 transition hover:text-accent-600">
                                                             {{ $category->name }}
                                                         </a>
@@ -58,7 +58,7 @@
                                                             <ul class="mt-2 space-y-1.5">
                                                                 @foreach ($category->children->take(5) as $child)
                                                                     <li>
-                                                                        <a href="{{ route('catalog.index', ['category' => $child->slug]) }}"
+                                                                        <a href="{{ route('storefront.show', $child->slug) }}"
                                                                            class="text-sm font-medium text-gray-500 transition hover:text-accent-600">
                                                                             {{ $child->name }}
                                                                         </a>

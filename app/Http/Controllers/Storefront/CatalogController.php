@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\Product;
 use App\Repositories\CategoryRepository;
 use App\Repositories\ProductRepository;
@@ -22,8 +23,28 @@ class CatalogController extends Controller
 
     public function index(Request $request): View
     {
-        $category = $this->categories->findBySlug($request->string('category')->toString());
+        return $this->renderCatalog($request, null);
+    }
 
+    /**
+     * Resolves the flat, UNAS-style slug (shared by products and categories)
+     * registered as the site-wide catch-all route.
+     */
+    public function showBySlug(Request $request, string $slug): View
+    {
+        if ($product = $this->products->findBySlug($slug)) {
+            return $this->show($request, $product);
+        }
+
+        if ($category = $this->categories->findBySlug($slug)) {
+            return $this->renderCatalog($request, $category);
+        }
+
+        abort(404);
+    }
+
+    private function renderCatalog(Request $request, ?Category $category): View
+    {
         $products = $this->products
             ->paginateActiveCatalog($category, $request->string('sort')->toString())
             ->withQueryString();
@@ -33,7 +54,7 @@ class CatalogController extends Controller
         return view('storefront.catalog.index', [
             'products' => $products,
             'categories' => $categories,
-            'activeCategory' => $request->string('category')->toString(),
+            'activeCategory' => $category?->slug ?? '',
             'category' => $category,
         ]);
     }
