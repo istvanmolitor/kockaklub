@@ -13,6 +13,7 @@ use App\Repositories\ProductRepository;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -130,6 +131,20 @@ class OrderForm
                             ->required(),
                         TextInput::make('billing_tax_number')
                             ->label('Adószám'),
+                    ]),
+                Section::make('Megjegyzések')
+                    ->columns(2)
+                    ->schema([
+                        Textarea::make('note')
+                            ->label('Vásárlói megjegyzés')
+                            ->helperText('A vásárló adta meg a pénztár oldalon.')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Textarea::make('admin_note')
+                            ->label('Belső megjegyzés')
+                            ->helperText('Csak az adminisztrációs felületen látható, a vásárló nem látja.')
+                            ->rows(3)
+                            ->columnSpanFull(),
                     ]),
                 Section::make('Számla')
                     ->columns(2)

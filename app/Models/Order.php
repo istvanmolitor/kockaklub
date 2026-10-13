@@ -36,6 +36,8 @@ class Order extends Model
         'billing_zip',
         'billing_address',
         'billing_tax_number',
+        'note',
+        'admin_note',
         'shipping_method_id',
         'payment_method_id',
         'payment_status',

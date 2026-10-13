@@ -185,6 +185,7 @@ class CheckoutController extends Controller
                     'delivery_point_id' => $deliveryPoint?->id,
                     ...$billing,
                     'billing_tax_number' => $validated['billing_tax_number'] ?? null,
+                    'note' => $validated['note'] ?? null,
                     'shipping_method_id' => $shippingMethod->id,
                     'payment_method_id' => $paymentMethod->id,
                     'subtotal' => $subtotal,

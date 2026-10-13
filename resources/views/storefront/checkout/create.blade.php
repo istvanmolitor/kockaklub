@@ -258,6 +258,19 @@
                 </div>
             </div>
 
+            <div class="card animate-pop p-8 space-y-3" style="animation-delay: 270ms">
+                <h2 class="text-lg font-black text-gray-900">Megjegyzés</h2>
+
+                <div>
+                    <label for="note" class="field-label">Megjegyzés a rendeléshez (opcionális)</label>
+                    <textarea id="note" name="note" rows="3"
+                              class="input-field @error('note') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">{{ old('note') }}</textarea>
+                    @error('note')
+                        <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
             <div class="card animate-pop p-8 space-y-3" style="animation-delay: 360ms">
                 <h2 class="text-lg font-black text-gray-900">Fizetési mód</h2>
 
