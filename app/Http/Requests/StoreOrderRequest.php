@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\PaymentMethod;
 use App\Models\ShippingMethod;
+use App\Services\Payment\PaymentHandler;
+use App\Services\Payment\PaymentHandlerFactory;
 use App\Services\Shipping\ShippingFulfillmentHandler;
 use App\Services\Shipping\ShippingFulfillmentHandlerFactory;
 use Illuminate\Contracts\Validation\Validator;
@@ -49,6 +52,10 @@ class StoreOrderRequest extends FormRequest
             $rules = array_merge($rules, $handler->rules());
         }
 
+        if ($paymentHandler = $this->resolvePaymentHandler()) {
+            $rules = array_merge($rules, $paymentHandler->rules());
+        }
+
         return $rules;
     }
 
@@ -61,6 +68,17 @@ class StoreOrderRequest extends FormRequest
         }
 
         return ShippingFulfillmentHandlerFactory::make($shippingMethod);
+    }
+
+    public function resolvePaymentHandler(): ?PaymentHandler
+    {
+        $paymentMethod = PaymentMethod::find($this->input('payment_method_id'));
+
+        if (! $paymentMethod) {
+            return null;
+        }
+
+        return PaymentHandlerFactory::make($paymentMethod);
     }
 
     public function withValidator(Validator $validator): void

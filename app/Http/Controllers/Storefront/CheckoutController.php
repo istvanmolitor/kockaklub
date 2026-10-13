@@ -15,11 +15,13 @@ use App\Models\Site;
 use App\Repositories\CustomerRepository;
 use App\Repositories\ShippingMethodRepository;
 use App\Services\CartService;
+use App\Services\Payment\PaymentHandlerFactory;
 use App\Services\ProductInterestService;
 use App\Services\Shipping\ShippingFulfillmentHandlerFactory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -70,12 +72,28 @@ class CheckoutController extends Controller
             return redirect()->route('cart.show')->with('status', 'Jelenleg nem fogadható rendelés.');
         }
 
+        $defaultShippingMethodId = $shippingMethods->contains('id', $customer?->default_shipping_method_id)
+            ? $customer->default_shipping_method_id
+            : ($shippingMethods->contains('id', ShippingMethod::default()?->id)
+                ? ShippingMethod::default()->id
+                : $shippingMethods->first()->id);
+
+        $defaultShippingMethodPaymentMethods = $shippingMethods->firstWhere('id', $defaultShippingMethodId)->paymentMethods;
+
+        $defaultPaymentMethodId = $defaultShippingMethodPaymentMethods->contains('id', $customer?->default_payment_method_id)
+            ? $customer->default_payment_method_id
+            : ($defaultShippingMethodPaymentMethods->contains('id', PaymentMethod::default()?->id)
+                ? PaymentMethod::default()->id
+                : $defaultShippingMethodPaymentMethods->first()->id);
+
         return view('storefront.checkout.create', [
             'cart' => $cart,
             'customer' => $customer,
             'shippingMethods' => $shippingMethods,
             'countries' => Country::orderBy('sort_order')->get(),
             'pickupSites' => Site::query()->where('is_active', true)->where('is_pickup_point', true)->orderBy('name')->get(),
+            'defaultShippingMethodId' => $defaultShippingMethodId,
+            'defaultPaymentMethodId' => $defaultPaymentMethodId,
         ]);
     }
 
@@ -228,11 +246,33 @@ class CheckoutController extends Controller
             $customer->billing_tax_number = $order->billing_tax_number;
         }
 
+        $customer->default_shipping_method_id = $shippingMethod->id;
+        $customer->default_payment_method_id = $paymentMethod->id;
+
         if ($customer->isDirty()) {
             $customer->save();
         }
 
         Mail::to($customer->email)->queue(new OrderConfirmationMail($order));
+
+        $paymentHandler = PaymentHandlerFactory::make($paymentMethod);
+
+        try {
+            $redirectUrl = $paymentHandler->initiate($order);
+        } catch (\Throwable $exception) {
+            Log::error('Payment initiation failed.', [
+                'order_id' => $order->id,
+                'payment_method_id' => $paymentMethod->id,
+                'exception' => $exception->getMessage(),
+            ]);
+
+            return redirect()->route('checkout.confirmation', $order)
+                ->with('status', 'Az online fizetés indítása sikertelen volt. Rendelésed rögzítettük, kollégáink hamarosan felveszik veled a kapcsolatot.');
+        }
+
+        if ($redirectUrl) {
+            return redirect()->away($redirectUrl);
+        }
 
         return redirect()->route('checkout.confirmation', $order);
     }

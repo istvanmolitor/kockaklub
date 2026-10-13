@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PaymentMethods\Schemas;
 
+use App\Enums\PaymentMethodType;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -29,6 +30,17 @@ class PaymentMethodForm
                 Toggle::make('is_active')
                     ->label('Aktív')
                     ->default(true)
+                    ->required(),
+                Toggle::make('is_default')
+                    ->label('Alapértelmezett'),
+                Select::make('type')
+                    ->label('Típus')
+                    ->options(array_combine(
+                        array_map(fn (PaymentMethodType $case) => $case->value, PaymentMethodType::cases()),
+                        array_map(fn (PaymentMethodType $case) => $case->label(), PaymentMethodType::cases()),
+                    ))
+                    ->default(PaymentMethodType::Cod->value)
+                    ->live()
                     ->required(),
                 Select::make('shippingMethods')
                     ->label('Szállítási módok')

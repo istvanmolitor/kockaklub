@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArukeresoFeedController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\AccountPasswordController;
 use App\Http\Controllers\Storefront\CartController;
@@ -15,10 +17,9 @@ use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\ContactController;
 use App\Http\Controllers\Storefront\ContentController;
 use App\Http\Controllers\Storefront\HomeController;
+use App\Http\Controllers\Storefront\PayPalPaymentController;
 use App\Http\Controllers\Storefront\PostalCodeController;
 use App\Http\Controllers\Storefront\SearchController;
-use App\Http\Controllers\ArukeresoFeedController;
-use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -48,6 +49,9 @@ Route::get('/penztar/kezdes', [CheckoutController::class, 'gate'])->name('checko
 Route::get('/penztar', [CheckoutController::class, 'create'])->name('checkout.create');
 Route::post('/penztar', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/rendeles/{order:order_number}/visszaigazolas', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
+
+Route::get('/fizetes/paypal/{order:order_number}/success', [PayPalPaymentController::class, 'success'])->name('payment.paypal.success');
+Route::get('/fizetes/paypal/{order:order_number}/cancel', [PayPalPaymentController::class, 'cancel'])->name('payment.paypal.cancel');
 
 Route::middleware('guest')->group(function () {
     Route::get('/regisztracio', [RegisteredUserController::class, 'create'])->name('register');

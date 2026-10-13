@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->string('meta_description', 160)->nullable();
             $table->unsignedInteger('price');
             $table->unsignedTinyInteger('vat_rate')->default(27);
             $table->string('sku')->nullable()->unique();

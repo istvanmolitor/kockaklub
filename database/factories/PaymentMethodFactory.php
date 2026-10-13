@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PaymentMethodType;
 use App\Models\PaymentMethod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,6 +23,7 @@ class PaymentMethodFactory extends Factory
             'description' => fake()->sentence(),
             'cost' => fake()->numberBetween(0, 1500),
             'is_active' => true,
+            'type' => PaymentMethodType::Cod,
         ];
     }
 }

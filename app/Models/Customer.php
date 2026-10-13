@@ -35,6 +35,8 @@ class Customer extends Model
         'billing_zip',
         'billing_address',
         'billing_tax_number',
+        'default_shipping_method_id',
+        'default_payment_method_id',
         'is_buyer',
         'is_seller',
     ];
@@ -70,6 +72,16 @@ class Customer extends Model
     public function billingCountry(): BelongsTo
     {
         return $this->belongsTo(Country::class, 'billing_country_id');
+    }
+
+    public function defaultShippingMethod(): BelongsTo
+    {
+        return $this->belongsTo(ShippingMethod::class);
+    }
+
+    public function defaultPaymentMethod(): BelongsTo
+    {
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function orders(): HasMany

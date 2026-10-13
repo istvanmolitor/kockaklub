@@ -41,4 +41,10 @@ return [
         'map_widget_url' => env('FOXPOST_MAP_WIDGET_URL', 'https://cdn.foxpost.hu/apt-finder/v1/app/'),
     ],
 
+    'paypal' => [
+        'client_id' => env('PAYPAL_CLIENT_ID'),
+        'client_secret' => env('PAYPAL_CLIENT_SECRET'),
+        'mode' => env('PAYPAL_MODE', 'sandbox'),
+    ],
+
 ];

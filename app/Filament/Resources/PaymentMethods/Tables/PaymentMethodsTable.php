@@ -27,11 +27,18 @@ class PaymentMethodsTable
                     ->label('Költség')
                     ->money('HUF', decimalPlaces: 0)
                     ->sortable(),
+                TextColumn::make('type')
+                    ->label('Típus')
+                    ->formatStateUsing(fn ($state) => $state?->label())
+                    ->badge(),
                 TextColumn::make('shippingMethods.name')
                     ->label('Szállítási módok')
                     ->badge(),
                 IconColumn::make('is_active')
                     ->label('Aktív')
+                    ->boolean(),
+                IconColumn::make('is_default')
+                    ->label('Alapértelmezett')
                     ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Létrehozva')

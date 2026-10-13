@@ -37,6 +37,9 @@ class ShippingMethodsTable
                 IconColumn::make('is_active')
                     ->label('Aktív')
                     ->boolean(),
+                IconColumn::make('is_default')
+                    ->label('Alapértelmezett')
+                    ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Létrehozva')
                     ->dateTime()

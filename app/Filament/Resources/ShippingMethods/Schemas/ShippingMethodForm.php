@@ -32,6 +32,8 @@ class ShippingMethodForm
                     ->label('Aktív')
                     ->default(true)
                     ->required(),
+                Toggle::make('is_default')
+                    ->label('Alapértelmezett'),
                 Select::make('fulfillment_type')
                     ->label('Teljesítés módja')
                     ->options(array_combine(

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use App\Observers\OrderObserver;
 use Database\Factories\OrderFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -37,6 +38,9 @@ class Order extends Model
         'billing_tax_number',
         'shipping_method_id',
         'payment_method_id',
+        'payment_status',
+        'paid_at',
+        'payment_reference',
         'subtotal',
         'shipping_cost',
         'payment_cost',
@@ -56,6 +60,8 @@ class Order extends Model
             'total' => 'integer',
             'invoiced_at' => 'datetime',
             'reserved_at' => 'datetime',
+            'payment_status' => PaymentStatus::class,
+            'paid_at' => 'datetime',
         ];
     }
 
@@ -122,5 +128,10 @@ class Order extends Model
     public function isReserved(): bool
     {
         return filled($this->reserved_at);
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->payment_status === PaymentStatus::Paid;
     }
 }

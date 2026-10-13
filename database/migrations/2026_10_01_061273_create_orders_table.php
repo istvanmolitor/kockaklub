@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,11 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained()->restrictOnDelete();
             $table->foreignId('order_status_id')->constrained()->restrictOnDelete();
             $table->foreignId('shipping_method_id')->constrained()->restrictOnDelete();
+            $table->foreignId('delivery_point_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('payment_method_id')->constrained()->restrictOnDelete();
+            $table->string('payment_status')->default(PaymentStatus::Pending->value);
+            $table->timestamp('paid_at')->nullable();
+            $table->string('payment_reference')->nullable();
             $table->string('order_number')->unique();
             $table->string('shipping_name');
             $table->string('shipping_phone');

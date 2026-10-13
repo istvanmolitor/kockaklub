@@ -54,3 +54,16 @@ it('allows an admin to deactivate a shipping method', function () {
 
     expect($shippingMethod->fresh()->is_active)->toBeFalse();
 });
+
+it('unsets the previous default shipping method when a new one is marked default', function () {
+    $previousDefault = ShippingMethod::factory()->create(['is_default' => true]);
+    $shippingMethod = ShippingMethod::factory()->create(['is_default' => false]);
+
+    livewire(EditShippingMethod::class, ['record' => $shippingMethod->getRouteKey()])
+        ->fillForm(['is_default' => true])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($shippingMethod->fresh()->is_default)->toBeTrue()
+        ->and($previousDefault->fresh()->is_default)->toBeFalse();
+});

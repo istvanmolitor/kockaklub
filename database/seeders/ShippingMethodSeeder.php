@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PaymentMethodType;
 use App\Enums\ShippingFulfillmentType;
 use App\Models\PaymentMethod;
 use App\Models\ShippingMethod;
@@ -16,12 +17,17 @@ class ShippingMethodSeeder extends Seeder
     {
         $cod = PaymentMethod::updateOrCreate(
             ['name' => 'Utánvét'],
-            ['description' => 'Fizetés a csomag átvételekor.', 'cost' => 390, 'is_active' => true]
+            ['description' => 'Fizetés a csomag átvételekor.', 'cost' => 390, 'is_active' => true, 'type' => PaymentMethodType::Cod]
         );
 
         $bankTransfer = PaymentMethod::updateOrCreate(
             ['name' => 'Banki átutalás'],
-            ['description' => 'Előre utalással.', 'cost' => 0, 'is_active' => true]
+            ['description' => 'Előre utalással.', 'cost' => 0, 'is_active' => true, 'is_default' => true, 'type' => PaymentMethodType::BankTransfer]
+        );
+
+        $paypal = PaymentMethod::updateOrCreate(
+            ['name' => 'PayPal'],
+            ['description' => 'Fizetés PayPal fiókkal vagy bankkártyával.', 'cost' => 0, 'is_active' => true, 'type' => PaymentMethodType::PayPal]
         );
 
         $courier = ShippingMethod::updateOrCreate(
@@ -30,10 +36,11 @@ class ShippingMethodSeeder extends Seeder
                 'description' => 'Kiszállítás futárszolgálattal.',
                 'cost' => 1490,
                 'is_active' => true,
+                'is_default' => true,
                 'fulfillment_type' => ShippingFulfillmentType::Courier,
             ]
         );
-        $courier->paymentMethods()->sync([$cod->id, $bankTransfer->id]);
+        $courier->paymentMethods()->sync([$cod->id, $bankTransfer->id, $paypal->id]);
 
         $pickup = ShippingMethod::updateOrCreate(
             ['name' => 'Személyes átvétel'],
@@ -44,7 +51,7 @@ class ShippingMethodSeeder extends Seeder
                 'fulfillment_type' => ShippingFulfillmentType::SitePickup,
             ]
         );
-        $pickup->paymentMethods()->sync([$bankTransfer->id]);
+        $pickup->paymentMethods()->sync([$bankTransfer->id, $paypal->id]);
 
         $foxpost = ShippingMethod::updateOrCreate(
             ['name' => 'Foxpost csomagautomata'],
@@ -56,6 +63,6 @@ class ShippingMethodSeeder extends Seeder
                 'locker_provider' => 'foxpost',
             ]
         );
-        $foxpost->paymentMethods()->sync([$cod->id, $bankTransfer->id]);
+        $foxpost->paymentMethods()->sync([$cod->id, $bankTransfer->id, $paypal->id]);
     }
 }

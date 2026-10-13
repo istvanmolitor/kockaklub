@@ -5,7 +5,7 @@
 
 @section('content')
     @php
-        $selectedShippingMethodId = (int) old('shipping_method_id', $shippingMethods->first()->id);
+        $selectedShippingMethodId = (int) old('shipping_method_id', $defaultShippingMethodId);
         $oldPaymentMethodId = old('payment_method_id');
         $cartTotal = $cart->items->sum(fn ($item) => $item->lineTotal());
         $defaultCountryId = $countries->firstWhere('code', 'HU')?->id;
@@ -263,6 +263,7 @@
 
                 @foreach ($shippingMethods as $shippingMethod)
                     <div data-payment-methods-for="{{ $shippingMethod->id }}"
+                         data-default-payment-method-id="{{ $shippingMethod->paymentMethods->contains('id', $defaultPaymentMethodId) ? $defaultPaymentMethodId : '' }}"
                          class="space-y-3 {{ $selectedShippingMethodId === $shippingMethod->id ? '' : 'hidden' }}">
                         @foreach ($shippingMethod->paymentMethods as $paymentMethod)
                             <label class="flex items-start gap-3 rounded-2xl border-2 border-gray-100 p-3 text-sm font-medium transition hover:border-accent-200 hover:bg-accent-50/50">
@@ -271,7 +272,7 @@
                                        data-cost="{{ $paymentMethod->cost }}"
                                        {{ $oldPaymentMethodId
                                             ? ($oldPaymentMethodId == $paymentMethod->id ? 'checked' : '')
-                                            : ($selectedShippingMethodId === $shippingMethod->id && $loop->first ? 'checked' : '') }}
+                                            : ($selectedShippingMethodId === $shippingMethod->id && $defaultPaymentMethodId === $paymentMethod->id ? 'checked' : '') }}
                                        class="mt-1 h-4 w-4 border-2 border-gray-300 text-accent-600 focus:ring-4 focus:ring-accent-500/15">
                                 <span>
                                     <span class="font-bold text-gray-900">{{ $paymentMethod->name }}</span>
@@ -382,9 +383,11 @@
                     group.classList.toggle('hidden', !isVisible);
 
                     if (isVisible && !group.querySelector('input[type="radio"]:checked')) {
-                        var firstRadio = group.querySelector('input[type="radio"]');
-                        if (firstRadio) {
-                            firstRadio.checked = true;
+                        var defaultId = group.dataset.defaultPaymentMethodId;
+                        var preferred = defaultId ? group.querySelector('input[value="' + defaultId + '"]') : null;
+                        var radio = preferred || group.querySelector('input[type="radio"]');
+                        if (radio) {
+                            radio.checked = true;
                         }
                     }
                 });

@@ -22,10 +22,16 @@
                     </div>
                 </div>
 
-                <span class="inline-flex w-fit items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-bold text-white shadow-sm backdrop-blur-sm">
-                    <span class="h-2 w-2 rounded-full bg-white"></span>
-                    {{ $order->orderStatus->name }}
-                </span>
+                <div class="flex flex-col items-start gap-2 sm:items-end">
+                    <span class="inline-flex w-fit items-center gap-2 rounded-full bg-white/20 px-4 py-2 text-sm font-bold text-white shadow-sm backdrop-blur-sm">
+                        <span class="h-2 w-2 rounded-full bg-white"></span>
+                        {{ $order->orderStatus->name }}
+                    </span>
+                    <span class="inline-flex w-fit items-center gap-2 rounded-full px-4 py-2 text-sm font-bold shadow-sm backdrop-blur-sm {{ $order->isPaid() ? 'bg-green-500/90 text-white' : 'bg-amber-400/90 text-amber-950' }}">
+                        <span class="h-2 w-2 rounded-full {{ $order->isPaid() ? 'bg-white' : 'bg-amber-950' }}"></span>
+                        {{ $order->payment_status->label() }}
+                    </span>
+                </div>
             </div>
         </div>
 
