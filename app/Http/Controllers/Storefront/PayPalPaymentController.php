@@ -6,12 +6,41 @@ use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\Payment\PayPalClient;
+use App\Services\Payment\PayPalPaymentHandler;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 
 class PayPalPaymentController extends Controller
 {
-    public function __construct(private readonly PayPalClient $client) {}
+    public function __construct(
+        private readonly PayPalClient $client,
+        private readonly PayPalPaymentHandler $handler,
+    ) {}
+
+    public function pay(Order $order): RedirectResponse
+    {
+        if ($order->isPaid()) {
+            return redirect()->route('checkout.confirmation', $order);
+        }
+
+        try {
+            $redirectUrl = $this->handler->initiate($order);
+        } catch (\Throwable $exception) {
+            Log::error('PayPal payment initiation failed.', [
+                'order_id' => $order->id,
+                'exception' => $exception->getMessage(),
+            ]);
+
+            $redirectUrl = null;
+        }
+
+        if (blank($redirectUrl)) {
+            return redirect()->route('checkout.confirmation', $order)
+                ->with('status', 'A PayPal fizetés indítása sikertelen volt. Próbáld meg újra, vagy válassz másik fizetési módot.');
+        }
+
+        return redirect()->away($redirectUrl);
+    }
 
     public function success(Order $order): RedirectResponse
     {

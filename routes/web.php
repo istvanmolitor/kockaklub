@@ -50,6 +50,7 @@ Route::get('/penztar', [CheckoutController::class, 'create'])->name('checkout.cr
 Route::post('/penztar', [CheckoutController::class, 'store'])->name('checkout.store');
 Route::get('/rendeles/{order:order_number}/visszaigazolas', [CheckoutController::class, 'confirmation'])->name('checkout.confirmation');
 
+Route::get('/fizetes/paypal/{order:order_number}/fizetes', [PayPalPaymentController::class, 'pay'])->name('payment.paypal.pay');
 Route::get('/fizetes/paypal/{order:order_number}/success', [PayPalPaymentController::class, 'success'])->name('payment.paypal.success');
 Route::get('/fizetes/paypal/{order:order_number}/cancel', [PayPalPaymentController::class, 'cancel'])->name('payment.paypal.cancel');
 

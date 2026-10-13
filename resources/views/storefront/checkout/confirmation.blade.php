@@ -97,6 +97,49 @@
                 </div>
             </div>
 
+            <div class="mt-4 rounded-2xl border-2 border-gray-100 p-5">
+                <div class="mb-2 flex items-center gap-2 text-gray-900">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-accent-600">
+                        <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
+                    </svg>
+                    <h3 class="font-bold">Fizetési információk</h3>
+                </div>
+
+                <dl class="space-y-1 text-sm font-medium text-gray-600">
+                    <div class="flex justify-between gap-4"><dt>Fizetési mód</dt><dd class="text-right">{{ $order->paymentMethod->name }}</dd></div>
+                    <div class="flex justify-between gap-4"><dt>Fizetési státusz</dt><dd class="text-right">{{ $order->payment_status->label() }}</dd></div>
+                </dl>
+
+                @if ($order->paymentMethod->description)
+                    <p class="mt-2 text-sm font-medium text-gray-500">{{ $order->paymentMethod->description }}</p>
+                @endif
+
+                @unless ($order->isPaid())
+                    @if ($order->paymentMethod->type === \App\Enums\PaymentMethodType::PayPal)
+                        <a href="{{ route('payment.paypal.pay', $order) }}" class="btn-primary btn-sm mt-4">
+                            Fizetés PayPal-lal
+                        </a>
+                    @elseif ($order->paymentMethod->type === \App\Enums\PaymentMethodType::BankTransfer)
+                        <div class="mt-4 rounded-2xl border-2 border-amber-200 bg-amber-50 p-4 text-sm font-semibold text-amber-800">
+                            <p class="mb-2 font-bold">Kérjük, utald el az összeget az alábbi bankszámlára:</p>
+                            <dl class="space-y-1">
+                                @if (setting('company_name'))
+                                    <div class="flex justify-between gap-4"><dt>Kedvezményezett</dt><dd class="text-right">{{ setting('company_name') }}</dd></div>
+                                @endif
+                                @if (setting('szamlazz_bank_name'))
+                                    <div class="flex justify-between gap-4"><dt>Bank</dt><dd class="text-right">{{ setting('szamlazz_bank_name') }}</dd></div>
+                                @endif
+                                @if (setting('szamlazz_bank_account_number'))
+                                    <div class="flex justify-between gap-4"><dt>Számlaszám</dt><dd class="text-right">{{ setting('szamlazz_bank_account_number') }}</dd></div>
+                                @endif
+                                <div class="flex justify-between gap-4"><dt>Közlemény</dt><dd class="text-right">{{ $order->order_number }}</dd></div>
+                                <div class="flex justify-between gap-4"><dt>Összeg</dt><dd class="text-right">{{ number_format($order->total, 0, ',', ' ') }} Ft</dd></div>
+                            </dl>
+                        </div>
+                    @endif
+                @endunless
+            </div>
+
             <a href="{{ route('catalog.index') }}" class="btn-secondary btn-sm mt-8">
                 Vissza a termékekhez
             </a>
