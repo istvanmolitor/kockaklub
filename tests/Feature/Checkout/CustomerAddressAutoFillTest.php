@@ -59,7 +59,8 @@ it('fills the customer address details from the first order when they were empty
     expect($customer->shipping_city)->toBe('Budapest')
         ->and($customer->shipping_address)->toBe('Első utca 1.')
         ->and($customer->billing_city)->toBe('Budapest')
-        ->and($customer->billing_address)->toBe('Első utca 1.');
+        ->and($customer->billing_address)->toBe('Első utca 1.')
+        ->and($customer->phone)->toBe('+36301230000');
 });
 
 it('does not overwrite already filled in customer address details on a later order', function () {
@@ -71,6 +72,7 @@ it('does not overwrite already filled in customer address details on a later ord
         'email' => $user->email,
         'shipping_city' => 'Eredeti Város',
         'billing_city' => 'Eredeti Város',
+        'phone' => '+36309999999',
     ]);
 
     $product = Product::factory()->create(['price' => 1000]);
@@ -90,5 +92,6 @@ it('does not overwrite already filled in customer address details on a later ord
         'payment_method_id' => $this->paymentMethod->id,
     ]);
 
-    expect($customer->fresh()->shipping_city)->toBe('Eredeti Város');
+    expect($customer->fresh()->shipping_city)->toBe('Eredeti Város')
+        ->and($customer->fresh()->phone)->toBe('+36309999999');
 });

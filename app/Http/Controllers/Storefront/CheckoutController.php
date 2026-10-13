@@ -246,6 +246,10 @@ class CheckoutController extends Controller
             $customer->billing_tax_number = $order->billing_tax_number;
         }
 
+        if (blank($customer->phone) && filled($order->shipping_phone)) {
+            $customer->phone = $order->shipping_phone;
+        }
+
         $customer->default_shipping_method_id = $shippingMethod->id;
         $customer->default_payment_method_id = $paymentMethod->id;
 
