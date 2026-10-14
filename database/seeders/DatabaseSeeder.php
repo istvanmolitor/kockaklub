@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             SiteSeeder::class,
             OrderStatusSeeder::class,
             ShippingMethodSeeder::class,
+            CurrencySeeder::class,
+            PurchaseStatusSeeder::class,
+            PurchaseCostTypeSeeder::class,
         ]);
     }
 }
