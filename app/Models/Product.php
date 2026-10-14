@@ -184,6 +184,16 @@ class Product extends Model
     }
 
     /**
+     * Adds a `pending_purchase` column to the query: the quantity of this
+     * product sitting on purchases that have been ordered but not yet
+     * received or cancelled.
+     */
+    public function scopeWithPendingPurchase(Builder $query): Builder
+    {
+        return $query->addSelect(['pending_purchase' => StockRepository::pendingPurchaseSubquery()]);
+    }
+
+    /**
      * Orders the query by one of self::SORT_OPTIONS, defaulting to newest first.
      */
     public function scopeSortBy(Builder $query, ?string $sort): Builder

@@ -33,7 +33,7 @@ class StockOverview extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Product::query()->withFreeStock())
+            ->query(Product::query()->withFreeStock()->withPendingPurchase())
             ->columns([
                 ImageColumn::make('default_image_url')
                     ->label('Kép')
@@ -53,6 +53,10 @@ class StockOverview extends Page implements HasTable
                     ->label('Szabad készlet')
                     ->getStateUsing(fn ($record) => max(0, (int) $record->public_stock - (int) $record->pending_reservation))
                     ->numeric(),
+                TextColumn::make('pending_purchase')
+                    ->label('Beszerzés alatt')
+                    ->numeric()
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('category_id')

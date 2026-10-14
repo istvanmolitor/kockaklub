@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\PurchaseStatus;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -171,6 +172,22 @@ class StockRepository
             ->whereColumn('order_items.product_id', 'products.id')
             ->whereNull('orders.reserved_at')
             ->selectRaw('COALESCE(SUM(order_items.quantity), 0)');
+    }
+
+    /**
+     * Correlated subquery expression for "quantity sitting on open purchases"
+     * (ordered but not yet received or cancelled) per product, for use with
+     * Product::query()->addSelect(['pending_purchase' => StockRepository::pendingPurchaseSubquery()]).
+     * Correlates to the outer `products.id` column via whereColumn.
+     */
+    public static function pendingPurchaseSubquery(): Builder
+    {
+        return DB::table('purchase_items')
+            ->join('purchases', 'purchases.id', '=', 'purchase_items.purchase_id')
+            ->join('purchase_statuses', 'purchase_statuses.id', '=', 'purchases.purchase_status_id')
+            ->whereColumn('purchase_items.product_id', 'products.id')
+            ->where('purchase_statuses.name', PurchaseStatus::ORDERED)
+            ->selectRaw('COALESCE(SUM(purchase_items.quantity), 0)');
     }
 
     /**
