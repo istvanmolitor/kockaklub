@@ -2,9 +2,13 @@
 
 namespace App\Filament\Resources\Sites\Tables;
 
+use App\Filament\Resources\Sites\Pages\OrganizeRegions;
+use App\Models\Site;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -55,6 +59,10 @@ class SitesTable
                     ->label('Fő telephely'),
             ])
             ->recordActions([
+                Action::make('organize')
+                    ->label('Rendezés')
+                    ->icon(Heroicon::OutlinedArrowsRightLeft)
+                    ->url(fn (Site $record) => OrganizeRegions::getUrl(['record' => $record])),
                 EditAction::make(),
             ])
             ->toolbarActions([

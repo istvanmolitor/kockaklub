@@ -51,6 +51,50 @@ class StockRepository
     }
 
     /**
+     * Adds $delta (negative to subtract) to the region_product_stocks
+     * snapshot for $regionId/$productId, creating the row if it doesn't
+     * exist yet. Locks the row for the duration of the transaction so
+     * concurrent adjustments don't race.
+     */
+    public function adjustStock(int $regionId, int $productId, int $delta): void
+    {
+        DB::transaction(function () use ($regionId, $productId, $delta) {
+            $row = DB::table('region_product_stocks')
+                ->where('region_id', $regionId)
+                ->where('product_id', $productId)
+                ->lockForUpdate()
+                ->first();
+
+            if ($row) {
+                DB::table('region_product_stocks')
+                    ->where('region_id', $regionId)
+                    ->where('product_id', $productId)
+                    ->update(['quantity' => $row->quantity + $delta]);
+            } else {
+                DB::table('region_product_stocks')->insert([
+                    'region_id' => $regionId,
+                    'product_id' => $productId,
+                    'quantity' => $delta,
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Raw region_product_stocks rows (quantity > 0) for any of $regionIds.
+     *
+     * @param  array<int, int>  $regionIds
+     * @return Collection<int, object>
+     */
+    public function quantitiesForRegions(array $regionIds): Collection
+    {
+        return DB::table('region_product_stocks')
+            ->whereIn('region_id', $regionIds)
+            ->where('quantity', '>', 0)
+            ->get(['region_id', 'product_id', 'quantity']);
+    }
+
+    /**
      * The aggregated quantity of $productId across every public region,
      * read from the region_product_stocks snapshot.
      */
