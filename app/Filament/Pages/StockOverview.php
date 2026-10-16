@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Product;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\ImageColumn;
@@ -62,6 +63,12 @@ class StockOverview extends Page implements HasTable
                 SelectFilter::make('category_id')
                     ->label('Kategória')
                     ->relationship('category', 'name'),
+            ])
+            ->recordActions([
+                Action::make('settings')
+                    ->label('Beállítás')
+                    ->icon(Heroicon::OutlinedCog6Tooth)
+                    ->url(fn (Product $record): string => ProductStockSettings::getUrl(['record' => $record])),
             ])
             ->defaultSort('public_stock');
     }

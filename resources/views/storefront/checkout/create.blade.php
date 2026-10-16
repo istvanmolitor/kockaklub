@@ -13,8 +13,8 @@
 
     <h1 class="mb-6 text-2xl font-black text-gray-900">Pénztár</h1>
 
-    <div class="grid gap-10 md:grid-cols-3 md:items-start">
-        <form id="checkout-form" method="POST" action="{{ route('checkout.store') }}" class="md:col-span-2 space-y-6">
+    <div class="grid gap-10 md:grid-cols-2 md:items-start">
+        <form id="checkout-form" method="POST" action="{{ route('checkout.store') }}" class="space-y-6">
             @csrf
 
             @guest
@@ -22,7 +22,7 @@
                     <div class="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br from-accent-200 to-accent3-200 opacity-50"></div>
 
                     <div class="relative space-y-4">
-                        <h2 class="text-lg font-black text-gray-900">Kapcsolattartó adatok</h2>
+                        <h2 class="text-lg font-black text-gray-900">Alap adatok</h2>
 
                         <div>
                             <label for="name" class="field-label">Név</label>
@@ -259,19 +259,6 @@
             </div>
 
             <div class="card animate-pop p-8 space-y-3" style="animation-delay: 270ms">
-                <h2 class="text-lg font-black text-gray-900">Megjegyzés</h2>
-
-                <div>
-                    <label for="note" class="field-label">Megjegyzés a rendeléshez (opcionális)</label>
-                    <textarea id="note" name="note" rows="3"
-                              class="input-field @error('note') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">{{ old('note') }}</textarea>
-                    @error('note')
-                        <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="card animate-pop p-8 space-y-3" style="animation-delay: 360ms">
                 <h2 class="text-lg font-black text-gray-900">Fizetési mód</h2>
 
                 @foreach ($shippingMethods as $shippingMethod)
@@ -305,6 +292,19 @@
                 @enderror
             </div>
 
+            <div class="card animate-pop p-8 space-y-3" style="animation-delay: 360ms">
+                <h2 class="text-lg font-black text-gray-900">Megjegyzés</h2>
+
+                <div>
+                    <label for="note" class="field-label">Megjegyzés a rendeléshez (opcionális)</label>
+                    <textarea id="note" name="note" rows="3"
+                              class="input-field @error('note') !border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/15 @enderror">{{ old('note') }}</textarea>
+                    @error('note')
+                        <p class="mt-1.5 text-sm font-semibold text-rose-600">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+
         </form>
 
         <div class="animate-pop relative overflow-hidden rounded-3xl border-2 border-gray-100 bg-white p-8 shadow-sm md:sticky md:top-24" style="animation-delay: 90ms">
@@ -312,14 +312,30 @@
 
             <h2 class="relative mb-4 text-lg font-black text-gray-900">Rendelés összegzés</h2>
 
-            <ul class="relative divide-y divide-gray-100 text-sm">
-                @foreach ($cart->items as $item)
-                    <li class="flex justify-between py-2 font-medium text-gray-700">
-                        <span>{{ $item->product->name }} &times; {{ $item->quantity }}</span>
-                        <span>{{ number_format($item->lineTotal(), 0, ',', ' ') }} Ft</span>
-                    </li>
-                @endforeach
-            </ul>
+            <div class="relative overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b-2 border-gray-100 text-xs font-bold tracking-wide text-gray-400 uppercase">
+                            <th class="pb-2 text-left" colspan="2">Termék</th>
+                            <th class="pb-2 text-center">Menny.</th>
+                            <th class="pb-2 text-right">Összeg</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        @foreach ($cart->items as $item)
+                            <tr class="font-medium text-gray-700">
+                                <td class="py-2 pr-3 w-12">
+                                    <img src="{{ $item->product->default_image_url }}" alt="{{ $item->product->name }}"
+                                         class="h-12 w-12 rounded-xl border-2 border-gray-100 object-cover">
+                                </td>
+                                <td class="py-2 pr-3">{{ $item->product->name }}</td>
+                                <td class="py-2 px-2 text-center">{{ $item->quantity }}</td>
+                                <td class="py-2 pl-2 text-right whitespace-nowrap">{{ number_format($item->lineTotal(), 0, ',', ' ') }} Ft</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <div class="relative mt-4 space-y-1 border-t border-gray-100 pt-4 text-sm font-medium text-gray-600">
                 <div class="flex justify-between">

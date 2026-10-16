@@ -54,7 +54,7 @@ class CheckoutController extends Controller
     public function create(Request $request): View|RedirectResponse
     {
         $cart = $this->cartService->currentCart($request);
-        $cart->load('items.product');
+        $cart->load('items.product.defaultImage');
 
         if ($cart->items->isEmpty()) {
             return redirect()->route('cart.show')->with('status', 'A kosarad üres.');
@@ -102,7 +102,7 @@ class CheckoutController extends Controller
         $validated = $request->validated();
 
         $cart = $this->cartService->currentCart($request);
-        $cart->load('items.product');
+        $cart->load('items.product.defaultImage');
 
         if ($cart->items->isEmpty()) {
             return redirect()->route('cart.show')->with('status', 'A kosarad üres.');
