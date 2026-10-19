@@ -34,6 +34,25 @@ services:
             - "traefik.http.routers.kockaklub-http.entrypoints=web"
             - "traefik.http.routers.kockaklub-http.rule=Host(`kockaklub.hu`) || Host(`www.kockaklub.hu`)"
             - "traefik.http.routers.kockaklub-http.middlewares=redirect-to-https"
+    queue:
+        build:
+            context: './vendor/laravel/sail/runtimes/8.5'
+            dockerfile: Dockerfile
+            args:
+                WWWGROUP: '${WWWGROUP}'
+        image: 'sail-8.5/app'
+        container_name: kockaklub-queue
+        restart: unless-stopped
+        environment:
+            WWWUSER: '${WWWUSER:-1000}'
+            LARAVEL_SAIL: 1
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - mysql
+        command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
     mysql:
         image: 'mariadb:11.4'
         container_name: kockaklub-mysql
