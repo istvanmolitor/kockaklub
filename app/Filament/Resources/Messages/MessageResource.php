@@ -2,14 +2,13 @@
 
 namespace App\Filament\Resources\Messages;
 
-use App\Filament\Resources\Messages\Pages\EditMessage;
+use App\Filament\Resources\Messages\Pages\CreateMessage;
 use App\Filament\Resources\Messages\Pages\ListMessages;
-use App\Filament\Resources\Messages\Schemas\MessageForm;
+use App\Filament\Resources\Messages\Pages\ViewMessage;
 use App\Filament\Resources\Messages\Tables\MessagesTable;
 use App\Models\Message;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -25,11 +24,6 @@ class MessageResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Üzenetek';
 
-    public static function form(Schema $schema): Schema
-    {
-        return MessageForm::configure($schema);
-    }
-
     public static function table(Table $table): Table
     {
         return MessagesTable::configure($table);
@@ -39,7 +33,8 @@ class MessageResource extends Resource
     {
         return [
             'index' => ListMessages::route('/'),
-            'edit' => EditMessage::route('/{record}/edit'),
+            'create' => CreateMessage::route('/create'),
+            'view' => ViewMessage::route('/{record}'),
         ];
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Messages\Tables;
 
-use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -26,6 +26,7 @@ class MessagesTable
                     ->searchable(),
                 TextColumn::make('message')
                     ->label('Üzenet')
+                    ->state(fn ($record) => $record->initiated_by_admin ? '📤 '.$record->reply : $record->message)
                     ->limit(60)
                     ->wrap(),
                 IconColumn::make('replied_at')
@@ -43,7 +44,7 @@ class MessagesTable
                     ->nullable(),
             ])
             ->recordActions([
-                EditAction::make(),
+                ViewAction::make(),
             ]);
     }
 }

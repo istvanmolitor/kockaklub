@@ -30,7 +30,7 @@ class NewContactMessageMail extends Mailable
             markdown: 'emails.messages.new-contact-message',
             with: [
                 'message' => $this->message,
-                'adminUrl' => MessageResource::getUrl('edit', ['record' => $this->message]),
+                'adminUrl' => MessageResource::getUrl('view', ['record' => $this->message]),
             ],
         );
     }

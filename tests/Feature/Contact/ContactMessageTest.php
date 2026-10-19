@@ -1,6 +1,6 @@
 <?php
 
-use App\Filament\Resources\Messages\Pages\EditMessage;
+use App\Filament\Resources\Messages\Pages\ViewMessage;
 use App\Mail\MessageReplyMail;
 use App\Models\Customer;
 use App\Models\Message;
@@ -67,9 +67,9 @@ it('allows an admin to reply to a message, which queues an email and stamps repl
 
     $this->actingAs($admin);
 
-    livewire(EditMessage::class, ['record' => $message->getRouteKey()])
+    livewire(ViewMessage::class, ['record' => $message->getRouteKey()])
         ->fillForm(['reply' => 'Köszönjük, hamarosan utánrendelünk!'])
-        ->call('save')
+        ->call('sendReply')
         ->assertHasNoFormErrors();
 
     $message->refresh();

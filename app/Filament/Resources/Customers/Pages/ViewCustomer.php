@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Customers\Pages;
 
 use App\Filament\Resources\Customers\CustomerResource;
 use App\Filament\Resources\Customers\RelationManagers\OrdersRelationManager;
+use App\Filament\Resources\Messages\MessageResource;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Resources\RelationManagers\RelationGroup;
@@ -17,6 +19,9 @@ class ViewCustomer extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('sendMessage')
+                ->label('Üzenet küldése')
+                ->url(fn () => MessageResource::getUrl('create', ['customer_id' => $this->getRecord()->id])),
             EditAction::make(),
         ];
     }

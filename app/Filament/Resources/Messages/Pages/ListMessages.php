@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Messages\Pages;
 
 use App\Filament\Resources\Messages\MessageResource;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListMessages extends ListRecords
@@ -11,6 +12,9 @@ class ListMessages extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            CreateAction::make()
+                ->label('Üzenet küldése'),
+        ];
     }
 }

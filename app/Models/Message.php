@@ -20,12 +20,14 @@ class Message extends Model
         'message',
         'reply',
         'replied_at',
+        'initiated_by_admin',
     ];
 
     protected function casts(): array
     {
         return [
             'replied_at' => 'datetime',
+            'initiated_by_admin' => 'boolean',
         ];
     }
 

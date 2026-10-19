@@ -19,7 +19,9 @@ class MessageReplyMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Válasz az üzenetedre',
+            subject: $this->message->initiated_by_admin
+                ? 'Üzenet a Kockaklubtól'
+                : 'Válasz az üzenetedre',
         );
     }
 
