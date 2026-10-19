@@ -30,13 +30,13 @@ class SitePickupFulfillmentHandler implements ShippingFulfillmentHandler
             'zip' => $site->zip,
             'city' => $site->city,
             'address' => $site->address,
-            'raw_payload' => $site->only(['id', 'name', 'country', 'city', 'zip', 'address']),
+            'raw_payload' => $site->only(['id', 'name', 'country_id', 'city', 'zip', 'address']),
         ]);
 
         return [
             'delivery_point' => $deliveryPoint,
             'shipping' => [
-                'shipping_country_id' => null,
+                'shipping_country_id' => $site->country_id,
                 'shipping_city' => $site->city,
                 'shipping_zip' => $site->zip,
                 'shipping_address' => trim($site->name.' — '.$site->address, ' —'),

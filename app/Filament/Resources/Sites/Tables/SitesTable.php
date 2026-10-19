@@ -23,7 +23,7 @@ class SitesTable
                 TextColumn::make('name')
                     ->label('Név')
                     ->searchable(),
-                TextColumn::make('country')
+                TextColumn::make('country.name')
                     ->label('Ország')
                     ->placeholder('—'),
                 TextColumn::make('city')

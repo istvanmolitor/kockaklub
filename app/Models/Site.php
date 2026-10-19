@@ -7,6 +7,7 @@ use Database\Factories\SiteFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[ObservedBy(SiteObserver::class)]
@@ -17,7 +18,7 @@ class Site extends Model
 
     protected $fillable = [
         'name',
-        'country',
+        'country_id',
         'city',
         'zip',
         'address',
@@ -33,6 +34,11 @@ class Site extends Model
             'is_main' => 'boolean',
             'is_pickup_point' => 'boolean',
         ];
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function regions(): HasMany

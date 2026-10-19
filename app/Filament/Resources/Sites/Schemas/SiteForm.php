@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Sites\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -19,8 +20,11 @@ class SiteForm
                 Section::make('Cím')
                     ->columns(2)
                     ->schema([
-                        TextInput::make('country')
-                            ->label('Ország'),
+                        Select::make('country_id')
+                            ->label('Ország')
+                            ->relationship('country', 'name', fn ($query) => $query->orderBy('sort_order'))
+                            ->searchable()
+                            ->preload(),
                         TextInput::make('city')
                             ->label('Város'),
                         TextInput::make('zip')

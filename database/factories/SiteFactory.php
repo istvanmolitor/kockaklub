@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Country;
 use App\Models\Site;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,7 +18,7 @@ class SiteFactory extends Factory
     {
         return [
             'name' => fake()->company(),
-            'country' => 'Magyarország',
+            'country_id' => Country::where('code', 'HU')->value('id'),
             'city' => fake()->city(),
             'zip' => fake()->postcode(),
             'address' => fake()->streetAddress(),
