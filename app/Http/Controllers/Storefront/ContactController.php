@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMessageRequest;
+use App\Mail\NewContactMessageMail;
 use App\Repositories\CustomerRepository;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class ContactController extends Controller
@@ -27,12 +29,14 @@ class ContactController extends Controller
             $customer = $this->customers->firstOrCreateByEmail($validated['email'], $validated['name']);
         }
 
-        $customer->messages()->create([
+        $message = $customer->messages()->create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
             'message' => $validated['message'],
         ]);
+
+        Mail::to(config('mail.from.address'))->send(new NewContactMessageMail($message));
 
         return redirect()->route('contact.create')->with('status', 'Köszönjük az üzeneted! Hamarosan válaszolunk.');
     }
