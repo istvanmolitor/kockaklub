@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Filament\Resources\Messages\MessageResource;
 use App\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -27,7 +28,10 @@ class NewContactMessageMail extends Mailable
     {
         return new Content(
             markdown: 'emails.messages.new-contact-message',
-            with: ['message' => $this->message],
+            with: [
+                'message' => $this->message,
+                'adminUrl' => MessageResource::getUrl('edit', ['record' => $this->message]),
+            ],
         );
     }
 }

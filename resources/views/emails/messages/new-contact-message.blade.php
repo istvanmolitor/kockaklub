@@ -11,6 +11,10 @@
 
 > {{ $message->message }}
 
+<x-mail::button :url="$adminUrl">
+Válasz az ügyfélnek
+</x-mail::button>
+
 Üdvözlettel,<br>
 Kockaklub
 </x-mail::message>
