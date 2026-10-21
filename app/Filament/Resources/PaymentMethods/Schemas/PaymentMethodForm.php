@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\PaymentMethods\Schemas;
 
 use App\Enums\PaymentMethodType;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
@@ -15,10 +15,16 @@ class PaymentMethodForm
     {
         return $schema
             ->components([
+                Toggle::make('is_active')
+                    ->label('Aktív')
+                    ->default(true)
+                    ->required(),
+                Toggle::make('is_default')
+                    ->label('Alapértelmezett'),
                 TextInput::make('name')
                     ->label('Név')
                     ->required(),
-                Textarea::make('description')
+                RichEditor::make('description')
                     ->label('Leírás')
                     ->columnSpanFull(),
                 TextInput::make('cost')
@@ -27,12 +33,6 @@ class PaymentMethodForm
                     ->numeric()
                     ->default(0)
                     ->suffix('Ft'),
-                Toggle::make('is_active')
-                    ->label('Aktív')
-                    ->default(true)
-                    ->required(),
-                Toggle::make('is_default')
-                    ->label('Alapértelmezett'),
                 Select::make('type')
                     ->label('Típus')
                     ->options(array_combine(

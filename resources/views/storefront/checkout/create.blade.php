@@ -61,7 +61,7 @@
                             &mdash;
                             {{ $shippingMethod->cost > 0 ? number_format($shippingMethod->cost, 0, ',', ' ').' Ft' : 'Díjtalan' }}
                             @if ($shippingMethod->description)
-                                <span class="block text-gray-500">{{ $shippingMethod->description }}</span>
+                                <div class="text-gray-500">{!! $shippingMethod->description !!}</div>
                             @endif
                         </span>
                     </label>
@@ -279,7 +279,7 @@
                                     &mdash;
                                     {{ $paymentMethod->cost > 0 ? number_format($paymentMethod->cost, 0, ',', ' ').' Ft' : 'Díjtalan' }}
                                     @if ($paymentMethod->description)
-                                        <span class="block text-gray-500">{{ $paymentMethod->description }}</span>
+                                        <div class="text-gray-500">{!! $paymentMethod->description !!}</div>
                                     @endif
                                 </span>
                             </label>

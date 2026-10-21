@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\ShippingMethods\Schemas;
 
 use App\Enums\ShippingFulfillmentType;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
@@ -16,10 +16,16 @@ class ShippingMethodForm
     {
         return $schema
             ->components([
+                Toggle::make('is_active')
+                    ->label('Aktív')
+                    ->default(true)
+                    ->required(),
+                Toggle::make('is_default')
+                    ->label('Alapértelmezett'),
                 TextInput::make('name')
                     ->label('Név')
                     ->required(),
-                Textarea::make('description')
+                RichEditor::make('description')
                     ->label('Leírás')
                     ->columnSpanFull(),
                 TextInput::make('cost')
@@ -28,12 +34,6 @@ class ShippingMethodForm
                     ->numeric()
                     ->default(0)
                     ->suffix('Ft'),
-                Toggle::make('is_active')
-                    ->label('Aktív')
-                    ->default(true)
-                    ->required(),
-                Toggle::make('is_default')
-                    ->label('Alapértelmezett'),
                 Select::make('fulfillment_type')
                     ->label('Teljesítés módja')
                     ->options(array_combine(

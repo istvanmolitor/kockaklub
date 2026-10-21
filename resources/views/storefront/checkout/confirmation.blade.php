@@ -111,7 +111,7 @@
                 </dl>
 
                 @if ($order->paymentMethod->description)
-                    <p class="mt-2 text-sm font-medium text-gray-500">{{ $order->paymentMethod->description }}</p>
+                    <div class="mt-2 text-sm font-medium text-gray-500">{!! $order->paymentMethod->description !!}</div>
                 @endif
 
                 @unless ($order->isPaid())
