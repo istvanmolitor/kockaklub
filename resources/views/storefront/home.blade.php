@@ -25,7 +25,7 @@
     @if ($recommendedProducts->isNotEmpty())
         <div class="animate-rise mb-14">
             <h2 class="mb-5 text-2xl font-black text-gray-900">Neked ajánljuk</h2>
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+            <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
                 @foreach ($recommendedProducts as $product)
                     <x-storefront.product-card :product="$product" />
                 @endforeach
@@ -90,7 +90,7 @@
     @if ($featuredProducts->isNotEmpty())
         <div class="animate-rise mb-14">
             <h2 class="mb-5 text-2xl font-black text-gray-900">Kiemelt termékek</h2>
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+            <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
                 @foreach ($featuredProducts as $product)
                     <x-storefront.product-card :product="$product" />
                 @endforeach
@@ -100,7 +100,7 @@
 
     <div class="animate-rise mb-14">
         <h2 class="mb-5 text-2xl font-black text-gray-900">Újdonságok</h2>
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+        <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
             @foreach ($newProducts as $product)
                 <x-storefront.product-card :product="$product" />
             @endforeach
