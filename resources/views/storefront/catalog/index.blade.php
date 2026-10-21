@@ -70,7 +70,7 @@
                 </div>
 
                 <div class="mt-8">
-                    {{ $products->links() }}
+                    {{ $products->onEachSide(1)->links() }}
                 </div>
             @endif
         </div>
