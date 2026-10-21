@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Orders\Schemas;
 
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\OrderStatus;
@@ -9,6 +10,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ShippingMethod;
 use App\Models\Site;
+use App\Repositories\PostalCodeRepository;
 use App\Repositories\ProductRepository;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
@@ -111,14 +113,23 @@ class OrderForm
                                 Select::make('shipping_country_id')
                                     ->label('Ország')
                                     ->relationship('shippingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                                    ->default(fn () => Country::where('code', 'HU')->first()?->id)
                                     ->searchable()
                                     ->preload()
                                     ->required(),
-                                TextInput::make('shipping_city')
-                                    ->label('Város')
-                                    ->required(),
                                 TextInput::make('shipping_zip')
                                     ->label('Irányítószám')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
+                                        $city = app(PostalCodeRepository::class)->findCity($get('shipping_country_id'), $state);
+
+                                        if ($city) {
+                                            $set('shipping_city', $city);
+                                        }
+                                    })
+                                    ->required(),
+                                TextInput::make('shipping_city')
+                                    ->label('Város')
                                     ->required(),
                                 TextInput::make('shipping_address')
                                     ->label('Cím')
@@ -133,14 +144,23 @@ class OrderForm
                                 Select::make('billing_country_id')
                                     ->label('Ország')
                                     ->relationship('billingCountry', 'name', fn ($query) => $query->orderBy('sort_order'))
+                                    ->default(fn () => Country::where('code', 'HU')->first()?->id)
                                     ->searchable()
                                     ->preload()
                                     ->required(),
-                                TextInput::make('billing_city')
-                                    ->label('Város')
-                                    ->required(),
                                 TextInput::make('billing_zip')
                                     ->label('Irányítószám')
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (?string $state, Set $set, Get $get) {
+                                        $city = app(PostalCodeRepository::class)->findCity($get('billing_country_id'), $state);
+
+                                        if ($city) {
+                                            $set('billing_city', $city);
+                                        }
+                                    })
+                                    ->required(),
+                                TextInput::make('billing_city')
+                                    ->label('Város')
                                     ->required(),
                                 TextInput::make('billing_address')
                                     ->label('Cím')
