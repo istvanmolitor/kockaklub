@@ -117,6 +117,11 @@ class Order extends Model
         return $this->hasMany(OrderStatusLog::class)->latest();
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(OrderPayment::class)->latest('received_at');
+    }
+
     public static function generateOrderNumber(): string
     {
         return 'ORD-'.now()->format('Ymd').'-'.strtoupper(Str::random(6));
@@ -135,5 +140,10 @@ class Order extends Model
     public function isPaid(): bool
     {
         return $this->payment_status === PaymentStatus::Paid;
+    }
+
+    public function outstandingBalance(): int
+    {
+        return max(0, $this->total - $this->payments->sum('amount'));
     }
 }

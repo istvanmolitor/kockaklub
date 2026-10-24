@@ -18,4 +18,14 @@ enum PaymentStatus: string
             self::Cancelled => 'Fizetés megszakítva',
         };
     }
+
+    public function color(): string
+    {
+        return match ($this) {
+            self::Pending => 'warning',
+            self::Paid => 'success',
+            self::Failed => 'danger',
+            self::Cancelled => 'gray',
+        };
+    }
 }

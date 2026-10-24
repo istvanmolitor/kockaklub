@@ -2,18 +2,25 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use App\Enums\PaymentStatus;
 use App\Models\Order;
 use App\Models\OrderStatus;
+use App\Services\PaymentStatusService;
 use App\Services\SzamlazzService;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class OrdersTable
@@ -40,6 +47,11 @@ class OrdersTable
                     ->label('Státusz')
                     ->badge()
                     ->color(fn ($record) => $record->orderStatus->color),
+                TextColumn::make('payment_status')
+                    ->label('Fizetés')
+                    ->badge()
+                    ->formatStateUsing(fn (PaymentStatus $state) => $state->label())
+                    ->color(fn (PaymentStatus $state) => $state->color()),
                 TextColumn::make('invoice_number')
                     ->label('Számla')
                     ->badge()
@@ -97,6 +109,58 @@ class OrdersTable
                                 ->danger()
                                 ->send();
                         }
+                    }),
+                Action::make('managePaymentStatus')
+                    ->label('Fizetés kezelése')
+                    ->icon('heroicon-o-banknotes')
+                    ->color('warning')
+                    ->schema([
+                        TextInput::make('amount')
+                            ->label('Beérkezett összeg')
+                            ->helperText('Csak akkor add meg, ha most rögzítesz egy beérkezett fizetést.')
+                            ->numeric()
+                            ->suffix('Ft'),
+                        DateTimePicker::make('received_at')
+                            ->label('Beérkezés időpontja'),
+                        Checkbox::make('mark_as_paid')
+                            ->label('A rendelés ezzel ki van fizetve'),
+                        Textarea::make('note')
+                            ->label('Megjegyzés')
+                            ->rows(2),
+                    ])
+                    ->fillForm(fn (Order $record) => [
+                        'amount' => $record->outstandingBalance(),
+                        'received_at' => now(),
+                        'mark_as_paid' => $record->isPaid(),
+                    ])
+                    ->action(function (Order $record, array $data, PaymentStatusService $paymentStatusService) {
+                        $amount = (int) ($data['amount'] ?? 0);
+                        $markAsPaid = (bool) ($data['mark_as_paid'] ?? false);
+                        $receivedAt = filled($data['received_at'] ?? null) ? Carbon::parse($data['received_at']) : null;
+
+                        if ($amount > 0 && $markAsPaid) {
+                            $paymentStatusService->recordPaymentAndSetStatus(
+                                $record,
+                                $amount,
+                                PaymentStatus::Paid,
+                                receivedAt: $receivedAt,
+                                note: $data['note'] ?? null,
+                            );
+                        } elseif ($amount > 0) {
+                            $paymentStatusService->recordPayment(
+                                $record,
+                                $amount,
+                                receivedAt: $receivedAt,
+                                note: $data['note'] ?? null,
+                            );
+                        } elseif ($markAsPaid) {
+                            $paymentStatusService->setStatus($record, PaymentStatus::Paid);
+                        }
+
+                        Notification::make()
+                            ->title('Fizetés frissítve')
+                            ->success()
+                            ->send();
                     }),
                 Action::make('downloadInvoice')
                     ->label('Számla letöltése')

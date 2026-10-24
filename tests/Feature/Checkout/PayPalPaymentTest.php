@@ -2,6 +2,7 @@
 
 use App\Enums\PaymentMethodType;
 use App\Enums\PaymentStatus;
+use App\Mail\PaymentUpdateMail;
 use App\Models\Cart;
 use App\Models\Country;
 use App\Models\Order;
@@ -11,6 +12,7 @@ use App\Models\Product;
 use App\Models\ShippingMethod;
 use App\Models\Site;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\TestResponse;
 
 beforeEach(function () {
@@ -77,6 +79,8 @@ it('redirects to the PayPal approve URL after placing an order with the PayPal p
 });
 
 it('marks the order as paid after returning from a completed PayPal payment', function () {
+    Mail::fake();
+
     Http::fake([
         '*/v1/oauth2/token' => Http::response(['access_token' => 'fake-token', 'expires_in' => 32400]),
         '*/v2/checkout/orders/*/capture' => Http::response(['id' => 'PAYPAL-ORDER-ID', 'status' => 'COMPLETED']),
@@ -102,6 +106,19 @@ it('marks the order as paid after returning from a completed PayPal payment', fu
 
     expect($order->isPaid())->toBeTrue()
         ->and($order->paid_at)->not->toBeNull();
+
+    expect($order->payments)->toHaveCount(1);
+    expect($order->payments->first())
+        ->amount->toBe($order->total)
+        ->reference->toBe('PAYPAL-ORDER-ID');
+
+    Mail::assertQueued(
+        PaymentUpdateMail::class,
+        fn ($mail) => $mail->order->is($order)
+            && $mail->payment?->amount === $order->total
+            && $mail->previousStatus === PaymentStatus::Pending,
+    );
+    Mail::assertQueuedCount(1);
 });
 
 it('does not call PayPal again for an already-paid order on success', function () {

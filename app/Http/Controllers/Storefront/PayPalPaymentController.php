@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\Payment\PayPalClient;
 use App\Services\Payment\PayPalPaymentHandler;
+use App\Services\PaymentStatusService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -15,6 +16,7 @@ class PayPalPaymentController extends Controller
     public function __construct(
         private readonly PayPalClient $client,
         private readonly PayPalPaymentHandler $handler,
+        private readonly PaymentStatusService $paymentStatusService,
     ) {}
 
     public function pay(Order $order): RedirectResponse
@@ -66,10 +68,12 @@ class PayPalPaymentController extends Controller
         }
 
         if (($response['status'] ?? null) === 'COMPLETED') {
-            $order->update([
-                'payment_status' => PaymentStatus::Paid,
-                'paid_at' => now(),
-            ]);
+            $this->paymentStatusService->recordPaymentAndSetStatus(
+                $order,
+                $order->total,
+                PaymentStatus::Paid,
+                reference: $order->payment_reference,
+            );
         }
 
         return redirect()->route('checkout.confirmation', $order);
