@@ -113,7 +113,8 @@ it('creates an order with a foxpost delivery point when a parcel locker payload 
         ->and($order->deliveryPoint->type)->toBe('foxpost')
         ->and($order->deliveryPoint->reference_id)->toBe('FP123')
         ->and($order->shipping_city)->toBe('Budapest')
-        ->and($order->shipping_zip)->toBe('1012');
+        ->and($order->shipping_zip)->toBe('1012')
+        ->and($order->shipping_country_id)->toBe($this->country->id);
 
     expect(DeliveryPoint::count())->toBe(1);
 });

@@ -2,6 +2,7 @@
 
 namespace App\Services\Shipping;
 
+use App\Models\Country;
 use App\Models\DeliveryPoint;
 use Illuminate\Validation\ValidationException;
 
@@ -39,7 +40,7 @@ class FoxpostFulfillmentHandler implements ShippingFulfillmentHandler
         return [
             'delivery_point' => $deliveryPoint,
             'shipping' => [
-                'shipping_country_id' => null,
+                'shipping_country_id' => Country::where('code', 'HU')->value('id'),
                 'shipping_city' => $deliveryPoint->city,
                 'shipping_zip' => $deliveryPoint->zip,
                 'shipping_address' => trim($deliveryPoint->name.' ('.$deliveryPoint->address.')'),
