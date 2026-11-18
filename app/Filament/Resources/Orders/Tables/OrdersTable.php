@@ -15,6 +15,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,6 +35,16 @@ class OrdersTable
                     ->label('Státusz')
                     ->badge()
                     ->color(fn ($record) => $record->orderStatus->color),
+                IconColumn::make('payment_status')
+                    ->label('Fizetés')
+                    ->boolean()
+                    ->getStateUsing(fn (Order $record) => $record->isPaid())
+                    ->tooltip(fn (Order $record) => $record->payment_status->label()),
+                IconColumn::make('invoice_number')
+                    ->label('Számla')
+                    ->boolean()
+                    ->getStateUsing(fn (Order $record) => $record->isInvoiced())
+                    ->tooltip(fn (Order $record) => $record->isInvoiced() ? $record->invoice_number : 'Nincs kiállítva'),
                 TextColumn::make('order_number')
                     ->label('Rendelésszám')
                     ->searchable(),
