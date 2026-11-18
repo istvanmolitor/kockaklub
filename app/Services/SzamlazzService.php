@@ -108,7 +108,7 @@ class SzamlazzService
     {
         $buyer = (new Buyer)
             ->setName($order->billing_name)
-            ->setCountry($order->billingCountry?->name)
+            ->setCountry($order->billingCountry?->name ?? 'Magyarország')
             ->setZipCode($order->billing_zip)
             ->setCity($order->billing_city)
             ->setAddress($order->billing_address)
