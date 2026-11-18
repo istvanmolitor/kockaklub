@@ -13,6 +13,7 @@ use App\Models\Site;
 use App\Repositories\PostalCodeRepository;
 use App\Repositories\ProductRepository;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -182,6 +183,16 @@ class OrderForm
                             ->helperText('Csak az adminisztrációs felületen látható, a vásárló nem látja.')
                             ->rows(3)
                             ->columnSpanFull(),
+                    ]),
+                Section::make('Fizetés')
+                    ->columns(2)
+                    ->schema([
+                        Placeholder::make('payment_status_display')
+                            ->label('Fizetési állapot')
+                            ->content(fn (?Order $record) => $record?->payment_status?->label() ?? '—'),
+                        Placeholder::make('outstanding_balance_display')
+                            ->label('Fennmaradó összeg')
+                            ->content(fn (?Order $record) => number_format($record?->outstandingBalance() ?? 0, 0, ',', ' ').' Ft'),
                     ]),
                 Section::make('Számla')
                     ->columns(2)

@@ -8,7 +8,7 @@ use App\Models\OrderStatus;
 use App\Services\PaymentStatusService;
 use App\Services\SzamlazzService;
 use Filament\Actions\Action;
-use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -30,36 +30,23 @@ class OrdersTable
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                TextColumn::make('orderStatus.name')
+                    ->label('Státusz')
+                    ->badge()
+                    ->color(fn ($record) => $record->orderStatus->color),
                 TextColumn::make('order_number')
                     ->label('Rendelésszám')
                     ->searchable(),
                 TextColumn::make('customer.name')
                     ->label('Vásárló')
                     ->searchable(),
-                TextColumn::make('site.name')
-                    ->label('Telephely')
-                    ->searchable(),
                 TextColumn::make('total')
                     ->label('Összeg')
                     ->money('HUF', decimalPlaces: 0)
                     ->sortable(),
-                TextColumn::make('orderStatus.name')
-                    ->label('Státusz')
-                    ->badge()
-                    ->color(fn ($record) => $record->orderStatus->color),
-                TextColumn::make('payment_status')
-                    ->label('Fizetés')
-                    ->badge()
-                    ->formatStateUsing(fn (PaymentStatus $state) => $state->label())
-                    ->color(fn (PaymentStatus $state) => $state->color()),
-                TextColumn::make('invoice_number')
-                    ->label('Számla')
-                    ->badge()
-                    ->state(fn (Order $record) => $record->isInvoiced() ? $record->invoice_number : 'Nincs számlázva')
-                    ->color(fn (Order $record) => $record->isInvoiced() ? 'success' : 'gray'),
                 TextColumn::make('created_at')
                     ->label('Dátum')
-                    ->dateTime()
+                    ->dateTime('Y.m.d. H:i')
                     ->sortable(),
             ])
             ->filters([
@@ -86,9 +73,12 @@ class OrdersTable
                     }),
             ])
             ->recordActions([
+                ViewAction::make()
+                    ->iconButton(),
                 Action::make('issueInvoice')
                     ->label('Számla kiállítása')
                     ->icon('heroicon-o-document-text')
+                    ->iconButton()
                     ->color('success')
                     ->visible(fn (Order $record) => ! $record->isInvoiced())
                     ->requiresConfirmation()
@@ -113,6 +103,7 @@ class OrdersTable
                 Action::make('managePaymentStatus')
                     ->label('Fizetés kezelése')
                     ->icon('heroicon-o-banknotes')
+                    ->iconButton()
                     ->color('warning')
                     ->schema([
                         TextInput::make('amount')
@@ -165,9 +156,9 @@ class OrdersTable
                 Action::make('downloadInvoice')
                     ->label('Számla letöltése')
                     ->icon('heroicon-o-arrow-down-tray')
+                    ->iconButton()
                     ->visible(fn (Order $record) => $record->isInvoiced() && filled($record->invoice_pdf_path))
                     ->action(fn (Order $record) => Storage::disk('local')->download($record->invoice_pdf_path, $record->invoice_number.'.pdf')),
-                EditAction::make(),
             ]);
     }
 }
