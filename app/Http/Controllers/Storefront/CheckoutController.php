@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Storefront;
 
+use App\Enums\ShippingFulfillmentType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Mail\OrderConfirmationMail;
@@ -123,7 +124,8 @@ class CheckoutController extends Controller
         $shippingMethod = ShippingMethod::findOrFail($validated['shipping_method_id']);
         $paymentMethod = PaymentMethod::findOrFail($validated['payment_method_id']);
 
-        $billingSameAsShipping = (bool) ($validated['billing_same_as_shipping'] ?? false);
+        $billingSameAsShipping = (bool) ($validated['billing_same_as_shipping'] ?? false)
+            && $shippingMethod->fulfillment_type === ShippingFulfillmentType::Courier;
 
         try {
             $order = DB::transaction(function () use ($cart, $customer, $validated, $billingSameAsShipping, $shippingMethod, $paymentMethod, $mainSite) {

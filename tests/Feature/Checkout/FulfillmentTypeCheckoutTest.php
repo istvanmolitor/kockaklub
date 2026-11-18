@@ -47,6 +47,11 @@ it('creates an order with a site delivery point when picking up at a pickup-enab
         'site_id' => $pickupSite->id,
         'shipping_method_id' => $shippingMethod->id,
         'payment_method_id' => $this->paymentMethod->id,
+        'billing_name' => 'Teszt Vásárló',
+        'billing_country_id' => $this->country->id,
+        'billing_city' => 'Szeged',
+        'billing_zip' => '6720',
+        'billing_address' => 'Számlázási utca 2.',
     ]);
 
     $order = Order::first();
@@ -59,7 +64,28 @@ it('creates an order with a site delivery point when picking up at a pickup-enab
         ->and($order->deliveryPoint->type)->toBe('site')
         ->and($order->deliveryPoint->reference_id)->toBe((string) $pickupSite->id)
         ->and($order->shipping_city)->toBe($pickupSite->city)
-        ->and($order->shipping_zip)->toBe($pickupSite->zip);
+        ->and($order->shipping_zip)->toBe($pickupSite->zip)
+        ->and($order->billing_city)->toBe('Szeged')
+        ->and($order->billing_address)->toBe('Számlázási utca 2.');
+});
+
+it('requires a billing address for site pickup orders even when billing_same_as_shipping is sent', function () {
+    $pickupSite = Site::factory()->create(['is_pickup_point' => true, 'is_main' => false]);
+
+    $shippingMethod = ShippingMethod::factory()->create([
+        'is_active' => true,
+        'fulfillment_type' => ShippingFulfillmentType::SitePickup,
+    ]);
+    $shippingMethod->paymentMethods()->attach($this->paymentMethod);
+
+    $response = placeOrder('site-pickup-no-billing-token', [
+        'site_id' => $pickupSite->id,
+        'shipping_method_id' => $shippingMethod->id,
+        'payment_method_id' => $this->paymentMethod->id,
+    ]);
+
+    $response->assertSessionHasErrors(['billing_name', 'billing_country_id', 'billing_city', 'billing_zip', 'billing_address']);
+    expect(Order::count())->toBe(0);
 });
 
 it('rejects a site pickup order when the chosen site is not pickup-enabled', function () {
@@ -101,6 +127,11 @@ it('creates an order with a foxpost delivery point when a parcel locker payload 
         'delivery_point_payload' => $payload,
         'shipping_method_id' => $shippingMethod->id,
         'payment_method_id' => $this->paymentMethod->id,
+        'billing_name' => 'Teszt Vásárló',
+        'billing_country_id' => $this->country->id,
+        'billing_city' => 'Szeged',
+        'billing_zip' => '6720',
+        'billing_address' => 'Számlázási utca 2.',
     ]);
 
     $order = Order::first();
@@ -114,9 +145,37 @@ it('creates an order with a foxpost delivery point when a parcel locker payload 
         ->and($order->deliveryPoint->reference_id)->toBe('FP123')
         ->and($order->shipping_city)->toBe('Budapest')
         ->and($order->shipping_zip)->toBe('1012')
-        ->and($order->shipping_country_id)->toBe($this->country->id);
+        ->and($order->shipping_country_id)->toBe($this->country->id)
+        ->and($order->billing_city)->toBe('Szeged')
+        ->and($order->billing_address)->toBe('Számlázási utca 2.');
 
     expect(DeliveryPoint::count())->toBe(1);
+});
+
+it('requires a billing address for parcel locker orders even when billing_same_as_shipping is sent', function () {
+    $shippingMethod = ShippingMethod::factory()->create([
+        'is_active' => true,
+        'fulfillment_type' => ShippingFulfillmentType::ParcelLocker,
+        'locker_provider' => 'foxpost',
+    ]);
+    $shippingMethod->paymentMethods()->attach($this->paymentMethod);
+
+    $payload = json_encode([
+        'place_id' => 'FP123',
+        'name' => 'Foxpost Teszt Automata',
+        'zip' => '1012',
+        'city' => 'Budapest',
+        'street' => 'Teszt körút 5.',
+    ]);
+
+    $response = placeOrder('foxpost-no-billing-token', [
+        'delivery_point_payload' => $payload,
+        'shipping_method_id' => $shippingMethod->id,
+        'payment_method_id' => $this->paymentMethod->id,
+    ]);
+
+    $response->assertSessionHasErrors(['billing_name', 'billing_country_id', 'billing_city', 'billing_zip', 'billing_address']);
+    expect(Order::count())->toBe(0);
 });
 
 it('rejects a parcel locker order when no locker was selected', function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ShippingFulfillmentType;
 use App\Models\PaymentMethod;
 use App\Models\ShippingMethod;
 use App\Services\Payment\PaymentHandler;
@@ -21,15 +22,17 @@ class StoreOrderRequest extends FormRequest
 
     public function rules(): array
     {
+        $billingRule = $this->billingCanMirrorShipping() ? 'required_unless:billing_same_as_shipping,1' : 'required';
+
         $rules = [
             'shipping_name' => ['required', 'string', 'max:255'],
             'shipping_phone' => ['required', 'string', 'max:255'],
             'billing_same_as_shipping' => ['sometimes', 'boolean'],
-            'billing_name' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:255'],
-            'billing_country_id' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'integer', Rule::exists('countries', 'id')],
-            'billing_city' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:255'],
-            'billing_zip' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:20'],
-            'billing_address' => ['required_unless:billing_same_as_shipping,1', 'nullable', 'string', 'max:2000'],
+            'billing_name' => [$billingRule, 'nullable', 'string', 'max:255'],
+            'billing_country_id' => [$billingRule, 'nullable', 'integer', Rule::exists('countries', 'id')],
+            'billing_city' => [$billingRule, 'nullable', 'string', 'max:255'],
+            'billing_zip' => [$billingRule, 'nullable', 'string', 'max:20'],
+            'billing_address' => [$billingRule, 'nullable', 'string', 'max:2000'],
             'billing_tax_number' => ['nullable', 'string', 'max:20'],
             'note' => ['nullable', 'string', 'max:2000'],
             'shipping_method_id' => [
@@ -58,6 +61,13 @@ class StoreOrderRequest extends FormRequest
         }
 
         return $rules;
+    }
+
+    public function billingCanMirrorShipping(): bool
+    {
+        $shippingMethod = ShippingMethod::find($this->input('shipping_method_id'));
+
+        return ! $shippingMethod || $shippingMethod->fulfillment_type === ShippingFulfillmentType::Courier;
     }
 
     public function resolveFulfillmentHandler(): ?ShippingFulfillmentHandler

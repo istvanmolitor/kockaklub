@@ -187,6 +187,9 @@
                            class="checkbox-field">
                     A számlázási cím megegyezik a szállítási címmel
                 </label>
+                <p data-billing-same-as-shipping-hint class="hidden text-sm text-gray-500">
+                    Csomagautomatás és telephelyi átvételnél a szállítási cím az átvételi pont címe, ezért a számlázási címet add meg külön.
+                </p>
 
                 <div>
                     <label for="billing_tax_number" class="field-label">Adószám (cégeknek, opcionális)</label>
@@ -425,6 +428,9 @@
             }
 
             var fulfillmentBlocks = document.querySelectorAll('[data-fulfillment-block]');
+            var billingSameAsShippingHint = document.querySelector('[data-billing-same-as-shipping-hint]');
+            var billingCheckbox = document.getElementById('billing_same_as_shipping');
+            var billingFields = document.getElementById('billing-fields');
 
             function updateFulfillmentBlocks() {
                 var selected = document.querySelector('[data-shipping-method-option]:checked');
@@ -438,6 +444,17 @@
                         field.disabled = !isVisible;
                     });
                 });
+
+                var billingCanMirrorShipping = fulfillmentType === 'courier';
+
+                billingCheckbox.disabled = !billingCanMirrorShipping;
+                billingSameAsShippingHint.classList.toggle('hidden', billingCanMirrorShipping);
+
+                if (!billingCanMirrorShipping) {
+                    billingCheckbox.checked = false;
+                }
+
+                billingFields.classList.toggle('hidden', billingCheckbox.checked);
             }
 
             shippingInputs.forEach(function (input) {
@@ -452,9 +469,6 @@
             });
 
             updateSummary();
-
-            var billingCheckbox = document.getElementById('billing_same_as_shipping');
-            var billingFields = document.getElementById('billing-fields');
 
             billingCheckbox.addEventListener('change', function () {
                 billingFields.classList.toggle('hidden', billingCheckbox.checked);
