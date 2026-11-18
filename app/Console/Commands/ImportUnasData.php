@@ -156,6 +156,7 @@ class ImportUnasData extends Command
                     'slug' => $slug,
                     'description' => $row['Rövid Leírás'] !== '' ? $row['Rövid Leírás'] : null,
                     'price' => (int) round((float) $row['Bruttó Ár']),
+                    'vat_rate' => 0,
                     'weight' => $this->parseWeight($row['Tömeg']),
                     'is_active' => $row['Státusz'] === '1',
                 ],
