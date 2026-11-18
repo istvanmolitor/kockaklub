@@ -136,7 +136,7 @@ class SzamlazzService
         $items = $order->items->map(fn (OrderItem $item) => $this->buildLineItem(
             name: $item->product_name,
             quantity: (float) $item->quantity,
-            netUnitPrice: (float) $item->unit_price,
+            grossUnitPrice: (float) $item->unit_price,
             vatRate: $item->vat_rate,
         ))->all();
 
@@ -144,7 +144,7 @@ class SzamlazzService
             $items[] = $this->buildLineItem(
                 name: sprintf('Szállítási díj (%s)', $order->shippingMethod?->name ?? 'szállítás'),
                 quantity: 1.0,
-                netUnitPrice: (float) $order->shipping_cost,
+                grossUnitPrice: (float) $order->shipping_cost,
                 vatRate: self::SURCHARGE_VAT_RATE,
             );
         }
@@ -153,7 +153,7 @@ class SzamlazzService
             $items[] = $this->buildLineItem(
                 name: sprintf('Fizetési mód díja (%s)', $order->paymentMethod?->name ?? 'fizetés'),
                 quantity: 1.0,
-                netUnitPrice: (float) $order->payment_cost,
+                grossUnitPrice: (float) $order->payment_cost,
                 vatRate: self::SURCHARGE_VAT_RATE,
             );
         }
@@ -161,11 +161,12 @@ class SzamlazzService
         return $items;
     }
 
-    private function buildLineItem(string $name, float $quantity, float $netUnitPrice, int $vatRate): InvoiceItem
+    private function buildLineItem(string $name, float $quantity, float $grossUnitPrice, int $vatRate): InvoiceItem
     {
-        $netPrice = $netUnitPrice * $quantity;
-        $vatAmount = round($netPrice * $vatRate / 100, 2);
-        $grossAmount = $netPrice + $vatAmount;
+        $grossPrice = $grossUnitPrice * $quantity;
+        $netPrice = $vatRate > 0 ? round($grossPrice / (1 + $vatRate / 100), 2) : $grossPrice;
+        $vatAmount = round($grossPrice - $netPrice, 2);
+        $netUnitPrice = $vatRate > 0 ? round($grossUnitPrice / (1 + $vatRate / 100), 2) : $grossUnitPrice;
 
         return (new InvoiceItem)
             ->setName($name)
@@ -175,7 +176,7 @@ class SzamlazzService
             ->setVat((string) $vatRate)
             ->setNetPrice($netPrice)
             ->setVatAmount($vatAmount)
-            ->setGrossAmount($grossAmount);
+            ->setGrossAmount($grossPrice);
     }
 
     private function buildSeller(): ?Seller
